@@ -41,6 +41,9 @@ dotfiles:
   d_teiler:
     dst: ~/.config/teiler
     src: config/teiler
+  d_walls:
+    dst: ~/.config/walls
+    src: walls
   f_compton.conf:
     dst: ~/.compton.conf
     src: compton.conf
