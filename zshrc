@@ -227,6 +227,8 @@ aliases[=]='noglob __calc_plugin'
 #------------------------------
 # Alias
 #------------------------------
+# Dotfiles management
+alias dt="dotdrop -c ~/.dotdrop.yml"
 # Short command aliases
 alias ssh="TERM=xterm ssh"
 alias mydf="df -hPT | column -t"

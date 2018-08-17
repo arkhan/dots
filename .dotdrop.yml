@@ -6,7 +6,7 @@ config:
   create: true
   dotpath: /media/data/dots
   keepdot: false
-  link_by_default: false
+  link_by_default: true
   longkey: false
 dotfiles:
   d_bin:
