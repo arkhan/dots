@@ -4,72 +4,96 @@ config:
   backup: true
   banner: true
   create: true
-  dotpath: /media/data/dots
+  dotpath: .dots
   keepdot: false
   link_by_default: true
   longkey: false
 dotfiles:
   d_bin:
     dst: ~/.bin
+    link: true
     src: bin
   d_bspwm:
     dst: ~/.config/bspwm
+    link: true
     src: config/bspwm
   d_dunst:
     dst: ~/.config/dunst
+    link: true
     src: config/dunst
   d_emacs.d:
     actions:
     - tangle
     dst: ~/.emacs.d
+    link: true
     src: emacs
   d_networkmanager-dmenu:
     dst: ~/.config/networkmanager-dmenu
+    link: true
     src: config/networkmanager-dmenu
   d_polybar:
     dst: ~/.config/polybar
+    link: true
     src: config/polybar
   d_ranger:
     dst: ~/.config/ranger
+    link: true
     src: config/ranger
   d_rofi-pass:
     dst: ~/.config/rofi-pass
+    link: true
     src: config/rofi-pass
   d_sxhkd:
     dst: ~/.config/sxhkd
+    link: true
     src: config/sxhkd
   d_teiler:
     dst: ~/.config/teiler
+    link: true
     src: config/teiler
   d_walls:
     dst: ~/.config/walls
+    link: true
     src: walls
   f_compton.conf:
     dst: ~/.compton.conf
+    link: true
     src: compton.conf
   f_editorconfig:
     dst: ~/.editorconfig
+    link: true
     src: editorconfig
   f_ncmpcpp:
     dst: ~/.ncmpcpp/config
+    link: true
     src: ncmpcpp/config
   f_rtorrent.rc:
     dst: ~/.rtorrent.rc
+    link: true
     src: rtorrent.rc
   f_safe-rm:
     dst: ~/.config/safe-rm
+    link: true
     src: config/safe-rm
   f_tmux.conf:
     dst: ~/.tmux.conf
+    link: true
     src: tmux.conf
   f_xprofile:
     dst: ~/.xprofile
+    link: true
     src: xprofile
   f_xresources:
     dst: ~/.Xresources
+    link: true
     src: Xresources
+  f_zaturarc:
+    dst: ~/.config/zathura/zathurarc
+    link: true
+    src: config/zathura/zathurarc
   f_zshrc:
     dst: ~/.zshrc
+    link: true
     src: zshrc
 profiles:
   Pantheon:

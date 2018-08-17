@@ -37,16 +37,16 @@ antibody bundle zimfw/zimfw folder:modules/history
 antibody bundle zimfw/zimfw folder:modules/history-substring-search
 antibody bundle zimfw/zimfw folder:modules/spectrum
 
-antibody bundle zsh-users/zsh-syntax-highlighting
+antibody bundle zdharma/fast-syntax-highlighting
 
 # Enable highlighters
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
+#ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
 
 # Override highlighter colors
-typeset -gA FAST_HIGHLIGHT_STYLES
+#typeset -gA FAST_HIGHLIGHT_STYLES
 
-ZSH_HIGHLIGHT_STYLES[default]=bold
-ZSH_HIGHLIGHT_STYLES[line]=bold
+#ZSH_HIGHLIGHT_STYLES[default]=bold
+#ZSH_HIGHLIGHT_STYLES[line]=bold
 
 autoload -U zutil
 autoload -U compinit
