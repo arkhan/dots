@@ -1,0 +1,201 @@
+[colors]
+bg_focus = "#b3020202"
+bg_normal = "#b3020202"
+bg_urgent = "#2A1F1EAA"
+bg_warning = "#2A1F1EAA"
+fg_focus = "#DDDCFF"
+fg_normal = "#747474"
+fg_underline = "#00FF65"
+fg_urgent = "#CC9393"
+fg_warning = #ffa900
+
+[bar/top]
+clickareas = 16
+height = 16
+monitor = ${env:MONITOR}
+width = 100%
+
+tray-background = ${colors.bg_normal}
+tray-position = right
+
+background = ${colors.bg_normal}
+foreground = ${colors.fg_normal}
+
+dpi = 96
+separator = ""
+
+overline-color = ${colors.fg_urgent}
+overline-size = 0
+underline-color = ${colors.bg_urgent}
+underline-size = 2
+
+locale = es_EC.UTF-8
+
+font-0 = Misc Termsyn:size=10;1
+font-1 = Wuncon Siji:size=12;1
+font-2 = FontAwesome:pixelsize=8;1
+
+modules-left = ws title
+modules-center =
+modules-right = wireless wired volume battery fs date
+
+wm-restack = bspwm
+
+[module/ws]
+type = internal/bspwm
+inline-mode = false
+fuzzy-match = true
+
+pin-workspaces = true
+ws-icon-0 = 0;
+ws-icon-1 = 1;
+ws-icon-2 = 2;
+ws-icon-3 = 3;
+ws-icon-4 = 4;
+ws-icon-5 = 5;
+ws-icon-6 = 6;
+ws-icon-7 = 7;
+ws-icon-8 = 8;
+ws-icon-9 = 9;
+ws-icon-10 = 10;
+ws-icon-11 = 11;
+ws-icon-12 = 12;
+ws-icon-default = 
+
+format = <label-state> <label-mode>
+
+label-dimmed-underline = ${colors.fg_normal}
+
+label-focused = %icon%
+label-focused-background = ${colors.bg_focus}
+label-focused-foreground = ${colors.fg_focus}
+label-focused-padding = 1
+label-focused-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_normal}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-empty =
+
+[module/battery]
+type = internal/battery
+full-at = 100
+time-format = %H:%M
+
+format-charging = <animation-charging> <label-charging>
+format-discharging = <ramp-capacity> <label-discharging>
+format-full = <ramp-capacity> <label-full>
+
+label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+label-discharging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+
+ramp-capacity-0 = 
+ramp-capacity-0-foreground = ${colors.fg_urgent}
+ramp-capacity-1 = 
+ramp-capacity-1-foreground = ${colors.fg_warning}
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+ramp-capacity-5 = 
+ramp-capacity-6 = 
+ramp-capacity-7 = 
+ramp-capacity-8 = 
+
+animation-charging-0 = 
+animation-charging-1 = 
+animation-charging-2 = 
+animation-charging-3 = 
+animation-charging-4 = 
+animation-charging-5 = 
+animation-charging-6 = 
+animation-charging-7 = 
+animation-charging-8 = 
+animation-charging-framerate = 750
+
+[module/date]
+type = internal/date
+date =  %%{F#fff}W%W, %Y/%m/%d%{F-}
+format = <label>
+label = %{A1:urxvtcd --geometry 100x30 -e calcurse:}%date%%{A} %time%
+time = %{F#fff}%R%{F-}
+
+[module/wireless]
+type = internal/network
+interface = wlan0
+interval = 1.0
+ping-interval = 10
+
+animation-packetloss-0 = 
+animation-packetloss-0-foreground = ${colors.fg_warning}
+animation-packetloss-1 = 
+animation-packetloss-1-foreground = ${colors.fg_normal}
+animation-packetloss-framerate = 500
+
+format-connected = <ramp-signal> <label-connected>
+
+label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%essid%%{A}%{F-} (%{F#fff}%signal%%%{F-}) %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
+label-disconnected = %{A1:networkmanager_dmenu:}%{A}
+label-disconnected-foreground = #66
+
+ramp-signal-0 = 
+ramp-signal-1 = 
+ramp-signal-2 = 
+ramp-signal-3 = 
+ramp-signal-4 = 
+
+[module/wired]
+type = internal/network
+interface = net0
+interval = 1.0
+
+animation-packetloss-0 = 
+animation-packetloss-0-foreground = ${colors.fg_warning}
+animation-packetloss-1 = 
+animation-packetloss-1-foreground = ${colors.fg_normal}
+animation-packetloss-framerate = 500
+
+format-connected = <ramp-signal> <label-connected>
+
+label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
+label-disconnected =
+
+ramp-signal-0 = 
+
+[module/volume]
+type = internal/pulseaudio
+
+format-muted-prefix = " "
+format-volume = <ramp-volume> <label-volume>
+
+label-muted = %{F#920}%percentage%M%{F-}
+label-volume = %{F#fff}%percentage%%%{F-}
+
+ramp-volume-0 = 
+ramp-volume-1 = 
+
+[module/fs]
+type = internal/fs
+fixed-values = true
+interval = 10
+mount-0 = /media/data
+mount-1 = /
+
+spacing = 1
+
+format-mounted = <label-mounted>
+format-unmounted = <label-unmounted>
+
+label-mounted =  %{F#fff}%mountpoint%: %free%%{F-}
+label-unmounted =
+
+[module/title]
+type = internal/xwindow
+label = %title:0:35:...%

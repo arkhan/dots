@@ -1,0 +1,26 @@
+#!/bin/sh
+
+timestamp="$(date +%Y%m%d%H%M%S)"
+targetbase="$HOME/screenshots"
+mkdir -p $targetbase
+[ -d $targetbase ] || exit 1
+
+case $1 in
+  full)
+    type="$targetbase/full_screnshot_$timestamp.png"
+    /usr/bin/maim $type
+    notify-send "Archivo guardado en $type"
+    ;;
+  selected_window)
+    type="$targetbase/selected_window_$timestamp.png"
+    /usr/bin/maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage $type
+    notify-send "Archivo guardado en $type"
+    ;;
+  selected_area)
+    type="$targetbase/selected_area_$timestamp.png"
+    /usr/bin/maim -s $type | xclip -selection clipboard -t image/png
+    notify-send "Archivo guardado en $type"
+    ;;
+esac
+
+exit 0

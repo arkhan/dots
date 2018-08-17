@@ -1,0 +1,17 @@
+* python-mode
+** odoorpc
+from odoorpc import ODOO
+
+odoo = ODOO(host='${1:127.0.0.1}', port=${2:8069})
+odoo.login('${4:db}', login='${5:user}', password='${6:pwd}')
+** odoo api
+@api.${1:type}
+** odoo class
+   class ${1:ClassName}(models.${2:class_type}):
+       """
+       ${3:docstring}
+       """
+       _name = '${4:class.name}'
+       _description = __doc__
+
+       $0

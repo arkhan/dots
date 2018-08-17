@@ -1,0 +1,22 @@
+#!/bin/bash
+
+timestamp="$(date +%Y%m%d%H%M%S)"
+targetbase="$HOME/screencast"
+mkdir -p $targetbase
+
+# Obtener las coordenadas y el tamaño de la ventana seleccionada
+# Esto excluye la decoración de la ventana.
+unset x y w h
+eval $(xwininfo | sed -n -e "s/^ \+Absolute upper-left X: \+\([0-9]\+\).*/x=\1/p" \
+                      -e "s/^ \+Absolute upper-left Y: \+\([0-9]\+\).*/y=\1/p" \
+                     -e "s/^ \+Width: \+\([0-9]\+\).*/w=\1/p" \
+                     -e "s/^ \+Height: \+\([0-9]\+\).*/h=\1/p" )
+$w=$w + $w % 2 # que el ancho sea múltiplo de 2, sino ffmpeg se queja
+WIN_XY=$x","$y # dar formato a las coordenadas XY
+WIN_GEO=$w"x"$h # dar formato al tamaño de la ventana
+echo $WIN_XY
+echo $WIN_GEO
+# notify-send mostrará un mensaje indicando el inicio del screencast.
+# correr ffmpeg con los parámetros que se ajusten a tu configuración.
+[ -d $targetbase ] || exit 1
+notify-send "Iniciando screencast..." && ffmpeg -f alsa -ac 1 -i pulse -f x11grab -r 25 -s $WIN_GEO -i :0.0+$WIN_XY -acodec libmp3lame -async 1 -vcodec libx264 -preset ultrafast -crf 0 -threads 0 $targetbase/screencast_$timestamp.mkv

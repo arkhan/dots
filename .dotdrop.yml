@@ -1,0 +1,74 @@
+actions:
+  tangle: /usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'
+config:
+  backup: true
+  banner: true
+  create: true
+  dotpath: /media/data/dots
+  keepdot: false
+  link_by_default: false
+  longkey: false
+dotfiles:
+  d_bin:
+    dst: ~/.bin
+    src: bin
+  d_bspwm:
+    dst: ~/.config/bspwm
+    src: config/bspwm
+  d_dunst:
+    dst: ~/.config/dunst
+    src: config/dunst
+  d_emacs.d:
+    actions:
+    - tangle
+    dst: ~/.emacs.d
+    src: emacs
+  d_networkmanager-dmenu:
+    dst: ~/.config/networkmanager-dmenu
+    src: config/networkmanager-dmenu
+  d_polybar:
+    dst: ~/.config/polybar
+    src: config/polybar
+  d_ranger:
+    dst: ~/.config/ranger
+    src: config/ranger
+  d_rofi-pass:
+    dst: ~/.config/rofi-pass
+    src: config/rofi-pass
+  d_sxhkd:
+    dst: ~/.config/sxhkd
+    src: config/sxhkd
+  d_teiler:
+    dst: ~/.config/teiler
+    src: config/teiler
+  f_compton.conf:
+    dst: ~/.compton.conf
+    src: compton.conf
+  f_editorconfig:
+    dst: ~/.editorconfig
+    src: editorconfig
+  f_ncmpcpp:
+    dst: ~/.ncmpcpp/config
+    src: ncmpcpp/config
+  f_rtorrent.rc:
+    dst: ~/.rtorrent.rc
+    src: rtorrent.rc
+  f_safe-rm:
+    dst: ~/.config/safe-rm
+    src: config/safe-rm
+  f_tmux.conf:
+    dst: ~/.tmux.conf
+    src: tmux.conf
+  f_xprofile:
+    dst: ~/.xprofile
+    src: xprofile
+  f_xresources:
+    dst: ~/.Xresources
+    src: Xresources
+  f_zshrc:
+    dst: ~/.zshrc
+    src: zshrc
+profiles:
+  Pantheon:
+    dotfiles:
+    - ALL

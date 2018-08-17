@@ -1,0 +1,43 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: html5
+# key: html5
+# binding: direct-keybinding
+# --
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Estructura basica de una pagina web en HTML5</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="inicio.html">Inicio</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="opcion.html">Opcion</a>
+        <a href="opcion.html">Opcion</a>
+      </nav>
+    </header>
+    <aside>
+      <p>el contenido de aside es algo que no
+      tiene gran relevancia en la pagina, como un submenu,
+      buscador, formulario de contacto etc...</p>
+    </aside>
+    <section>
+      <p>un section es una manera de
+      dividir la pagina por "secciones" de tal modo que podemos
+      dividir el contenido de esta por temas</p>
+      <article>
+        <h1>El article es la parte mas importante del sitio</h1>
+        <p>Basicamente en el article pondremos lo
+        mas importante de la pagina, la informacion jerarquicamente
+        mas importante, un article puede tener header y footer, sin
+        estropear el SEO.</p>
+      </article>
+    </section>
+    <footer>
+      <p>Derechos reservados</p>
+      <p>Contactenos en info@tumaestroweb.com</p>
+    </footer>
+  </body>
+</html>

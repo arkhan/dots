@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Terminate already running bar instances
+killall -q polybar
+
+# Wait until the processes have been shut down
+while pgrep -x polybar >/dev/null; do sleep 1; done
+
+# Launch bar1 and bar2
+DISPLAY1="$(polybar -m | awk -F: '{print $1}' | grep 'eDP1\|VGA-0')"
+[[ ! -z "$DISPLAY1" ]] && xrandr --output $DISPLAY1 --auto --primary & MONITOR=$DISPLAY1 polybar top &
+
+DISPLAY2="$(polybar -m | awk -F: '{print $1}' | grep 'HDMI1\|HDMI-2')"
+[[ ! -z "$DISPLAY2" ]] && xrandr --output $DISPLAY2 --left-of $DISPLAY1 &
+echo "Bars launched..."

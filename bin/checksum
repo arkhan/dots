@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+# Import hashlib library (md5 method is part of it)
+import hashlib
+import sys
+
+# File to check
+file_name = sys.argv[1]
+
+# Correct original md5 goes here
+sums = sys.argv[2]
+
+# Open,close, read file and calculate MD5 on its contents
+with open(file_name, 'rb') as file_to_check:
+    # read contents of the file
+    data = file_to_check.read()
+    # pipe contents of the file through
+    md5_returned = hashlib.md5(data).hexdigest()
+
+# Finally compare original MD5 with freshly calculated
+if sums == md5_returned:
+    print("MD5 verified.")
+else:
+    print("MD5 verification failed!.")

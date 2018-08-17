@@ -1,0 +1,118 @@
+Xft.dpi: 96
+Xft.antialias: true
+Xft.hinting: true
+Xft.rgba: rgb
+Xft.autohint: false
+Xft.hintstyle: hintslight
+Xft.lcdfilter: lcddefault
+
+*.charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48,35:48,58:48,63:48,61:48,44:48,38:48,59:48
+*.saveLines: 4096
+*.scrollBar: false
+xterm*faceName: xft:mononoki:style=Regular:size=9
+xterm*dynamicColors: true
+xterm*utf8: 2
+xterm*eightBitInput: true
+xterm*saveLines: 512
+xterm*scrollKey: true
+xterm*scrollTtyOutput: false
+xterm*scrollBar: false
+xterm*rightScrollBar: flase
+xterm*jumpScroll: true
+xterm*multiScroll: true
+xterm*toolBar: false
+URxvt.iso14755: false
+URxvt*font: xft:mononoki:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldFont: xft:mononoki:bold:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*italicFont: xft:mononoki:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldItalicFont: xft:mononoki:bold:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*cursorUnderline: true
+URxvt.loginShell: true
+URxvt.scrollWithBuffer: true
+URxvt.scrollTtyKeypress: true
+URxvt.termName: rxvt-unicode-256color
+URxvt.borderColor: 0
+URxvt.internalBorder: 0
+URxvt.transparent: false
+URxvt.shading: 10
+URxvt*blurRadius: 5
+URxvt*cutchars: '\"'()*<>[]{|}
+! Perl Extentions
+URxvt.perl-ext-common: default,clipboard,tabbedex,resize-font,fullscreen,url-select
+! Url select
+URxvt.keysym.M-u: perl:url-select:select_next
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.url-select.underline: true
+! Font Resize
+URxvt.resize-font.smaller: C-Down
+URxvt.resize-font.bigger: C-Up
+! Clipboard
+URxvt.clipboard.copycmd: xsel -ib
+URxvt.clipboard.pastecmd: xsel -ob
+URxvt.keysym.S-C-C: perl:clipboard:copy
+URxvt.keysym.S-C-V: perl:clipboard:paste
+! Fullscreen
+URxvt.keysym.F11: perl:fullscreen:switch
+! Tabbedex
+URxvt.tabbed.autohide:  yes
+URxvt.tabbed.title: yes
+URxvt.tabbed.tab-bg: 0
+URxvt.tabbed.tab-fg: 15
+URxvt.tabbed.tabbar-bg: 0
+URxvt.tabbed.tabbar-fg: 8
+
+! black
+*.color0: #000000
+*.color8: #31363b
+
+! red
+*.color1: #c0392b
+*.color9: #f44f4f
+
+! green
+*.color2: #218058
+*.color10: #27ae60
+
+! yellow
+*.color3: #fdbc4b
+*.color11: #fdbc4b
+
+! blue
+*.color4: #2980b9
+*.color12: #0099ff
+
+! magenta
+*.color5: #8e44ad
+*.color13: #af81ff
+
+! cyan
+*.color6: #27aeae
+*.color14: #31dddd
+
+! white
+*.color7: #acada1
+*.color15: #cfd0c2
+
+! special
+*.foreground: #cfcfc2
+*.background: #000000
+
+*colorBD: #004DA6
+*colorUL: #008C8C
+*colorIT: #87af5f
+
+rofi.font: Misc Tamsyn 10
+rofi.height: 30
+rofi.hide-scrollbar: true
+rofi.location: 0
+rofi.line-margin: 5
+rofi.lines: 5
+rofi.separator-style: dash
+rofi.width: 30
+rofi.fixed-num-lines: false
+rofi.terminal: urxvtcd
+rofi.color-enabled: true
+rofi.color-active: #000000, #747474, #000000, #000000, #dddcff
+rofi.color-normal: #000000, #747474, #000000, #000000, #dddcff
+rofi.color-urgent: #000000, #cc9393, #000000, #000000, #e62424
+rofi.color-window: #000000, #292929, #747474

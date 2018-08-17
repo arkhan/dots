@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+export GIT_PS1_SHOWDIRTYSTATE=t
+export GIT_PS1_SHOWSTASHSTATE=t
+export GIT_PS1_SHOWUNTERACKEDFILES=t
+export GIT_PS1_SHOWUPSTREAM=t
+
+export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_PLATFORMTHEME=qt5ct
+export QT_PLATFORM_PLUGIN=qt5ct
+
+export DESKTOP_SESSION=gnome
+
+export RANGER_LOAD_DEFAULT_RC=FALSE
+export _JAVA_AWT_WM_NONREPARENTING=1
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+
+xsetroot -cursor_name left_ptr &
+
+unclutter &
+
+wmname LG3D &
+
+compton --xrender-sync --xrender-sync-fence --config ~/.compton.conf &

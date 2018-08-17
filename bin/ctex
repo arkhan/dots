@@ -1,0 +1,26 @@
+#!/bin/bash
+
+IGNORE_FILES=".*\.\(org\|pdf\|tex\|png\|PNG\|otf\)"
+IGNORE_FOLDERS="build|img|tex|font"
+
+dir=${PWD}
+builddir="$dir/build"
+
+[ -d "$builddir" ] || rm -rf "$builddir"
+
+mkdir -p $builddir
+
+xelatex_opts+=" -synctex=1"
+xelatex_opts+=" -interaction=nonstopmode"
+xelatex_opts+=" -shell-escape"
+
+echo -e "\n------------------ xelatex --------------------\n"
+
+for i in {1..2}
+do
+  xelatex $xelatex_opts $1
+  # if [ "$i" -eq "2" ]; then
+  #   find $dir \( ! -regex '.*/\..*' \) -type f ! -regex $IGNORE_FILES -exec mv -t $builddir {} +
+  #   find $dir -maxdepth 1 \( ! -regex '.*/\..*' \) -type d -not -path $dir | egrep -v $IGNORE_FOLDERS | xargs mv -t $builddir
+  # fi
+done

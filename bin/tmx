@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# ------------------------------------------------------------------------------
+#
+# Modified TMUX start script from:
+#	 http://forums.gentoo.org/viewtopic-t-836006-start-0.html
+#
+# Store it to `~/bin/tmx` and issue `chmod +x`.
+#
+# ------------------------------------------------------------------------------
+
+function check_session() {
+	local postfix="$1"
+	shift
+
+	"${tmux[@]}" -L "session-$postfix" list-sessions -F "#S" 2>/dev/null | grep -q "$base_session-$postfix"
+}
+
+tmux=( "tmux" )
+base_session="$USER"
+
+if [[ "$XDG_SESSION_ID" ]] && check_session "$XDG_SESSION_ID"; then
+	tmux+=( "-L" "session-$XDG_SESSION_ID" )
+	base_session+="-$XDG_SESSION_ID"
+fi
+
+# ------------------------------------------------------------------------------
+
+new_session="${base_session}-$$"
+
+if (( $("${tmux[@]}" ls | wc -l) == 0 )); then
+	exec "${tmux[@]}" new -s "$new_session"
+else
+	# Count tmux sessions (1 master + N slaves).
+	# If there are no slave sessions, do not create new windows.
+	if (( $("${tmux[@]}" ls | wc -l) > 1 )); then
+		NEW_WINDOW_COMMAND=("new-window" "$*" ";")
+	fi
+
+	# Create a new session (without attaching it) and link to base session to share windows
+	# Attach to the new session & kill it once orphaned
+	exec "${tmux[@]}" new-session -d -t "$base_session" -s "$new_session" \; \
+	                  attach-session -t "$new_session" \; \
+	                  "${NEW_WINDOW_COMMAND[@]}" \
+	                  set-option destroy-unattached
+fi
