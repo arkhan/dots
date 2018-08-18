@@ -1,0 +1,6 @@
+*.el
+*.pyc
+
+emacs/elpa/
+emacs/cache/
+emacs/straight/
