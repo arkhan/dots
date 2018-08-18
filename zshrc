@@ -43,7 +43,7 @@ antibody bundle zdharma/fast-syntax-highlighting
 #ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
 
 # Override highlighter colors
-#typeset -gA FAST_HIGHLIGHT_STYLES
+#typeset -gA ZSH_HIGHLIGHT_STYLES
 
 #ZSH_HIGHLIGHT_STYLES[default]=bold
 #ZSH_HIGHLIGHT_STYLES[line]=bold

@@ -757,12 +757,6 @@
 
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
 
-  (use-package company-childframe
-    :ensure t
-    :diminish company-posframe-mode
-    :after company
-    :config (add-hook 'company-mode-hook #'company-posframe-mode))
-
   (use-package company-quickhelp
     :ensure t
     :after company
