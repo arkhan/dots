@@ -253,12 +253,12 @@
                   ispell-really-hunspell t
                   ispell-check-comments  t
                   ispell-extra-args      '("-i" "utf-8")
-                  ispell-dictionary      "en_US-large")
+                  ispell-dictionary      "en_US")
 
     (defun switch-dictionary ()
       (interactive)
       (let* ((dic ispell-current-dictionary)
-             (change (if (string= dic "en_US-large") "es_EC" "en_US-large")))
+             (change (if (string= dic "en_US") "es_EC" "en_US")))
         (ispell-change-dictionary change)
         (message "Dictionary switched from %s to %s" dic change)))
 
