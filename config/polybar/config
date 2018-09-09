@@ -1,33 +1,41 @@
 [colors]
-bg_focus = "#b3020202"
 bg_normal = "#b3020202"
+bg_focus = "#b3020202"
 bg_urgent = "#2A1F1EAA"
 bg_warning = "#2A1F1EAA"
-fg_focus = "#DDDCFF"
+
 fg_normal = "#747474"
-fg_underline = "#00FF65"
+fg_focus = "#DDDCFF"
 fg_urgent = "#CC9393"
 fg_warning = #ffa900
 
+fg_underline = "#00FF65"
+
+[global/wm]
+margin-bottom = 2
+
 [bar/top]
-clickareas = 16
-height = 16
 monitor = ${env:MONITOR}
 width = 100%
+height = 16
+clickareas = 16
 
-tray-background = ${colors.bg_normal}
 tray-position = right
+tray-padding = 1
+tray-maxsize = 10
+tray-transparent = false
+tray-background = ${colors.bg_normal}
 
 background = ${colors.bg_normal}
 foreground = ${colors.fg_normal}
 
 dpi = 96
-separator = ""
+separator = " | "
 
-overline-color = ${colors.fg_urgent}
 overline-size = 0
-underline-color = ${colors.bg_urgent}
+overline-color = ${colors.fg_urgent}
 underline-size = 2
+underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
@@ -35,19 +43,15 @@ font-0 = Misc Termsyn:size=10;1
 font-1 = Wuncon Siji:size=12;1
 font-2 = FontAwesome:pixelsize=8;1
 
-modules-left = ws title
+modules-left = i3
 modules-center =
-modules-right = wireless wired volume battery fs date
+modules-right = wireless wired volume battery fs-data fs-root xkeyboard date
 
-wm-restack = bspwm
-
-[module/ws]
-type = internal/bspwm
-inline-mode = false
-fuzzy-match = true
+[module/i3]
+type = internal/i3
+index-sort = true
 
 pin-workspaces = true
-ws-icon-0 = 0;
 ws-icon-1 = 1;
 ws-icon-2 = 2;
 ws-icon-3 = 3;
@@ -60,42 +64,41 @@ ws-icon-9 = 9;
 ws-icon-10 = 10;
 ws-icon-11 = 11;
 ws-icon-12 = 12;
+ws-icon-0 = 0:
 ws-icon-default = 
 
-format = <label-state> <label-mode>
-
-label-dimmed-underline = ${colors.fg_normal}
-
 label-focused = %icon%
-label-focused-background = ${colors.bg_focus}
 label-focused-foreground = ${colors.fg_focus}
-label-focused-padding = 1
+label-focused-background = ${colors.bg_normal}
 label-focused-underline = ${colors.fg_underline}
+label-focused-padding = 1
 
-label-occupied = %icon%
-label-occupied-foreground = ${colors.fg_normal}
-label-occupied-padding = 1
-label-occupied-underline = ${colors.fg_normal}
+label-unfocused = %icon%
+label-unfocused-padding = 1
+label-unfocused-foreground = ${colors.fg_normal}
+label-unfocused-underline = ${colors.fg_normal}
+
+label-visible = %icon%
+label-visible-underline = ${colors.fg_normal}
+label-visible-padding = 1
 
 label-urgent = %icon%
+label-urgent-foreground = ${colors.fg_urgent}
 label-urgent-background = ${colors.bg_normal}
-label-urgent-foreground = ${colors.fg_normal}
-label-urgent-padding = 1
 label-urgent-underline = ${colors.fg_urgent}
-
-label-empty =
+label-urgent-padding = 1
 
 [module/battery]
 type = internal/battery
 full-at = 100
 time-format = %H:%M
 
+label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+label-discharging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+
 format-charging = <animation-charging> <label-charging>
 format-discharging = <ramp-capacity> <label-discharging>
 format-full = <ramp-capacity> <label-full>
-
-label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
-label-discharging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
 
 ramp-capacity-0 = 
 ramp-capacity-0-foreground = ${colors.fg_urgent}
@@ -108,6 +111,7 @@ ramp-capacity-5 = 
 ramp-capacity-6 = 
 ramp-capacity-7 = 
 ramp-capacity-8 = 
+
 
 animation-charging-0 = 
 animation-charging-1 = 
@@ -122,10 +126,10 @@ animation-charging-framerate = 750
 
 [module/date]
 type = internal/date
-date =  %%{F#fff}W%W, %Y/%m/%d%{F-}
 format = <label>
-label = %{A1:urxvtcd --geometry 100x30 -e calcurse:}%date%%{A} %time%
-time = %{F#fff}%R%{F-}
+date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}
+time =  %{F#fff}%R%{F-}
+label = %date% %time%
 
 [module/wireless]
 type = internal/network
@@ -133,14 +137,7 @@ interface = wlan0
 interval = 1.0
 ping-interval = 10
 
-animation-packetloss-0 = 
-animation-packetloss-0-foreground = ${colors.fg_warning}
-animation-packetloss-1 = 
-animation-packetloss-1-foreground = ${colors.fg_normal}
-animation-packetloss-framerate = 500
-
 format-connected = <ramp-signal> <label-connected>
-
 label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%essid%%{A}%{F-} (%{F#fff}%signal%%%{F-}) %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
 label-disconnected = %{A1:networkmanager_dmenu:}%{A}
 label-disconnected-foreground = #66
@@ -151,10 +148,21 @@ ramp-signal-2 = 
 ramp-signal-3 = 
 ramp-signal-4 = 
 
+animation-packetloss-0 = 
+animation-packetloss-0-foreground = ${colors.fg_warning}
+animation-packetloss-1 = 
+animation-packetloss-1-foreground = ${colors.fg_normal}
+animation-packetloss-framerate = 500
+
 [module/wired]
 type = internal/network
-interface = net0
+interface = eth0
 interval = 1.0
+format-connected = <ramp-signal> <label-connected>
+label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
+label-disconnected =
+
+ramp-signal-0 = 
 
 animation-packetloss-0 = 
 animation-packetloss-0-foreground = ${colors.fg_warning}
@@ -162,40 +170,36 @@ animation-packetloss-1 = 
 animation-packetloss-1-foreground = ${colors.fg_normal}
 animation-packetloss-framerate = 500
 
-format-connected = <ramp-signal> <label-connected>
-
-label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
-label-disconnected =
-
-ramp-signal-0 = 
-
 [module/volume]
-type = internal/pulseaudio
+type = internal/volume
+
+format-volume = <ramp-volume> <label-volume>
+label-volume = %{F#fff}%percentage%%%{F-}
 
 format-muted-prefix = " "
-format-volume = <ramp-volume> <label-volume>
-
 label-muted = %{F#920}%percentage%M%{F-}
-label-volume = %{F#fff}%percentage%%%{F-}
 
 ramp-volume-0 = 
 ramp-volume-1 = 
 
-[module/fs]
+[module/xkeyboard]
+type = internal/xkeyboard
+blacklist-0 = num lock
+blacklist-1 = caps lock
+format-prefix = 
+label-layout = %{F#fff} %layout% %{F-}
+label-indicator-padding = 1
+
+[module/fs-root]
 type = internal/fs
-fixed-values = true
 interval = 10
-mount-0 = /media/data
-mount-1 = /
-
-spacing = 1
-
-format-mounted = <label-mounted>
-format-unmounted = <label-unmounted>
-
-label-mounted =  %{F#fff}%mountpoint%: %free%%{F-}
+mount-0 = /
+label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
 label-unmounted =
 
-[module/title]
-type = internal/xwindow
-label = %title:0:35:...%
+[module/fs-data]
+type = internal/fs
+interval = 10
+mount-0 = /media/data
+label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
+label-unmounted =

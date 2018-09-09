@@ -1,37 +1,22 @@
 #!/bin/sh
-OPTIONS="Reboot system\nPower-off system\nSuspend system\nLock system\nLogout session"
-LAUNCHER="rofi -width 10 -dmenu -i -p rofi-power"
 
-# Show exit wm option if exit command is provided as an argument
-if [ ${#1} -gt 0 ]; then
-	OPTIONS="Exit window manager\n$OPTIONS"
-fi
+case $1 in
+  lock)
+    loginctl lock-session
+    ;;
+  logout)
+    session=`loginctl session-status | awk 'NR==1{print $1}'`
+    loginctl terminate-session $session
+    ;;
+  suspend)
+    systemctl suspend
+    ;;
+  reboot)
+    systemctl reboot
+    ;;
+  poweroff)
+    systemctl poweroff
+    ;;
+esac
 
-option=$(echo -e $OPTIONS | $LAUNCHER | awk '{print $1}' | tr -d '\r\n')
-echo $option
-if [ ${#option} -gt 0 ]; then
-	case $option in
-    Exit)
-      eval $1
-      ;;
-	  Lock)
-		  loginctl lock-session
-		  ;;
-	  Logout)
-		  session=$(loginctl session-status | awk 'NR==1{print $1}')
-		  loginctl terminate-session $session
-		  ;;
-	  Suspend)
-		  systemctl suspend
-		  ;;
-	  Reboot)
-		  systemctl reboot
-		  ;;
-	  Power-off)
-		  systemctl poweroff
-		  ;;
-    *)
-      ;;
-	esac
-fi
 exit 0

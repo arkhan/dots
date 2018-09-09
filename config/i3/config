@@ -1,0 +1,315 @@
+#clip -*- mode: i3wm-config -*-
+# Terminal
+set $term urxvtcd --geometry 100x30
+
+# Bin dir
+set $bin $HOME/.bin
+
+# Display
+set $edp1 eDP1
+set $hdmi1 HDMI1
+set $hdmi2 HDMI-2
+set $vga0 VGA-0
+
+# Mod key
+set $mod4 Mod4
+set $mod1 Mod1
+
+# Font for window titles.
+font pango:Misc Tamsyn 10
+
+# Use Mouse+$mod4 to drag floating windows to their wanted position
+floating_modifier $mod4
+
+# start a terminal
+bindsym $mod4+Return exec $term
+
+#start terminal with tmux session
+bindsym $mod4+Shift+Return exec $term -e $bin/tmx
+
+# kill focused window
+bindsym $mod4+Shift+q kill
+
+# launch rofi -show run (a program launcher)
+bindsym $mod4+d exec $bin/rofi-run
+
+# launch greenclip
+bindsym $mod1+c exec $bin/rofi-clip
+
+# rofi systemd
+bindsym $mod1+s exec $bin/rofi-systemd
+
+# rofi xrandr
+bindsym Control+F8 exec $bin/rofi-xrandr
+
+# Launch rofi -show window (a window shitcher)
+bindsym $mod1+Tab exec rofi -show window -width 32
+
+# Make the currently focused window a scratchpad
+bindsym $mod4+m move scratchpad
+# Show the first scratchpad window
+bindsym $mod4+n scratchpad show
+
+# Programs
+## Firefox
+bindsym $mod4+b exec firefox
+## Ranger
+bindsym $mod4+Control+t exec $term -name Ranger -e ranger /media/data
+## Weechat
+bindsym $mod4+Control+i exec $term -name Weechat -e weechat
+
+# Password Store
+## Copy Password
+bindsym $mod4+period exec rofi-pass
+
+# Pamixer Control
+## Toggle Mute
+bindsym $mod1+m exec pamixer -t
+## Increase
+bindsym $mod1+Up exec pamixer -i 1
+## Decrease
+bindsym $mod1+Down exec pamixer -d 1
+
+# change focus
+bindsym $mod4+j focus left
+bindsym $mod4+k focus down
+bindsym $mod4+l focus up
+bindsym $mod4+h focus right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod4+Left focus left
+bindsym $mod4+Down focus down
+bindsym $mod4+Up focus up
+bindsym $mod4+Right focus right
+
+# move focused window
+bindsym $mod4+Shift+j move left
+bindsym $mod4+Shift+k move down
+bindsym $mod4+Shift+l move up
+bindsym $mod4+Shift+h move right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod4+Shift+Left move left
+bindsym $mod4+Shift+Down move down
+bindsym $mod4+Shift+Up move up
+bindsym $mod4+Shift+Right move right
+
+# split in horizontal orientation
+bindsym $mod4+Control+h split h
+
+# split in vertical orientation
+bindsym $mod4+Control+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod4+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod4+s layout stacking
+bindsym $mod4+w layout tabbed
+bindsym $mod4+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod4+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod4+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod4+a focus parent
+
+# focus the child container
+#bindsym $mod4+d focus child
+
+set $ws0 0
+set $ws1 1
+set $ws2 2
+set $ws3 3
+set $ws4 4
+set $ws5 5
+set $ws6 6
+set $ws7 7
+set $ws8 8
+set $ws9 9
+set $wsa 10
+set $wsb 11
+set $wsc 12
+
+workspace $ws0 output $hdmi1
+workspace $ws0 output $hdmi2
+
+workspace $ws1 output $edp1
+workspace $ws2 output $edp1
+workspace $ws3 output $edp1
+workspace $ws4 output $edp1
+workspace $ws5 output $edp1
+workspace $ws6 output $edp1
+workspace $ws7 output $edp1
+workspace $ws8 output $epd1
+workspace $ws9 output $epd1
+workspace $wsa output $epd1
+workspace $wsb output $epd1
+workspace $wsc output $epd1
+
+workspace $ws1 output $vga0
+workspace $ws2 output $vga0
+workspace $ws3 output $vga0
+workspace $ws4 output $vga0
+workspace $ws5 output $vga0
+workspace $ws6 output $vga0
+workspace $ws7 output $vga0
+workspace $ws8 output $vga0
+workspace $ws9 output $vga0
+workspace $wsa output $vga0
+workspace $wsb output $vga0
+workspace $wsc output $vga0
+
+# switch to workspace
+bindsym $mod4+1 workspace $ws1
+bindsym $mod4+2 workspace $ws2
+bindsym $mod4+3 workspace $ws3
+bindsym $mod4+4 workspace $ws4
+bindsym $mod4+5 workspace $ws5
+bindsym $mod4+6 workspace $ws6
+bindsym $mod4+7 workspace $ws7
+bindsym $mod4+8 workspace $ws8
+bindsym $mod4+9 workspace $ws9
+
+# move focused container to workspace
+bindsym $mod4+Shift+1 move container to workspace $ws1
+bindsym $mod4+Shift+2 move container to workspace $ws2
+bindsym $mod4+Shift+3 move container to workspace $ws3
+bindsym $mod4+Shift+4 move container to workspace $ws4
+bindsym $mod4+Shift+5 move container to workspace $ws5
+bindsym $mod4+Shift+6 move container to workspace $ws6
+bindsym $mod4+Shift+7 move container to workspace $ws7
+bindsym $mod4+Shift+8 move container to workspace $ws8
+bindsym $mod4+Shift+9 move container to workspace $ws9
+
+# Switch workspace
+bindsym $mod4+Control+Left workspace prev
+bindsym $mod4+Control+Right workspace next
+
+# reload the configuration file
+bindsym $mod4+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod4+Shift+r restart
+# exit i3 (logs you out of your X session)
+bindsym $mod4+Shift+e exec "i3-`nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym j resize shrink width 10 px or 10 ppt
+        bindsym k resize grow height 10 px or 10 ppt
+        bindsym l resize shrink height 10 px or 10 ppt
+        bindsym semicolon resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym $mod4+r mode "resize"
+
+exec_always --no-startup-id $bin/panel
+
+# System mode
+set $mode_system System [l]ock | l[o]gout | [s]uspend | [r]eboot | [p]oweroff
+mode "$mode_system" {
+    bindsym l exec --no-startup-id $bin/exit lock, mode "default"
+    bindsym s exec --no-startup-id $bin/exit suspend, mode "default"
+    bindsym p exec --no-startup-id $bin/exit poweroff, mode "default"
+    bindsym r exec --no-startup-id $bin/exit reboot, mode "default"
+    bindsym o exec --no-startup-id $bin/exit logout, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod4+Escape mode "$mode_system"
+
+# Print Screen mode
+bindsym Print exec teiler
+
+# <normal|1pixel|pixel xx|none|pixel> #
+new_window pixel 1
+new_float normal
+for_window [class="^.*"] title_format ">_ %title"
+for_window [class="^.*"] border pixel 1
+
+# Colors
+# class                 border  backgr  text    indicator child_border
+client.focused          #333333 #000000 #ffffff #333333   #333333
+client.focused_inactive #292929 #000000 #ffffff #292929   #292929
+client.unfocused        #000000 #000000 #888888 #000000   #000000
+client.urgent           #CC9393 #000000 #747474 #CC9393   #CC9393
+client.placeholder      #000000 #000000 #747474 #000000   #0c0c0c
+client.background       #000000
+
+# Xresources
+exec --no-startup-id xrdb $HOME/.Xresources
+# Wallpaper
+exec --no-startup-id $HOME/.fehbg
+# i3lock Fancy
+exec --no-startup-id xss-lock -- i3lock-fancy -p
+# Clipboard
+exec --no-startup-id $bin/clipboard
+# udiskie
+exec --no-startup-id udiskie
+
+assign [title="Firefox|Iceweasel|qutebrowser|Webmacs"] $ws1
+assign [title="Telegram"] $ws2
+assign [class="URxvt" instance="Weechat"] $ws2
+assign [class="(?i)tuxcmd|Spacefm|doublecmd"] $ws4
+assign [class="URxvt" instance="Ranger"] $ws4
+assign [class="(?i)thunderbird|(?i)icedove"] $ws3
+assign [class="JDownloader|Syncthing GTK"] $ws5
+assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
+assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
+assign [class="(?i)lyx"] $ws8
+assign [title="(?i)LibreOffice*"] $ws8
+assign [class="(?i)emacs"] $ws9
+assign [title="zathura"] $wsa
+assign [title="nomacs"] $wsb
+assign [class="Wine"] $wsc
+
+# Floating
+for_window [class="(?i)lxappearance"] floating enable
+for_window [title="(?i)systemsettings"] floating enable
+for_window [class="(?i)qt5ct"] floating enable
+for_window [class="(?i)urxvt"] floating enable
+for_window [title="Redac(?i)"] floating enable
+for_window [title="Cop(?i)"] floating enable
+for_window [class="(?i)pinentry"] floating enable
+for_window [class="(?i)GtkLP"] floating enable
+
+# Tabbed
+for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
+for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
+for_window [class="(?i)tuxcmd"] floating disable layout tabbed
+# for_window [class="(?i)emacs"] floating disable layout tabbed focus
+for_window [title="zathura"] floating disable layout tabbed
+for_window [class="(?i)mpv"] floating disable layout tabbed focus
+for_window [class="(?i)smplayer"] floating disable layout tabbed focus
+
+# Stuff
+workspace_auto_back_and_forth yes
+force_display_urgency_hint 0 ms
+focus_on_window_activation urgent
+floating_minimum_size -1 x -1
+floating_maximum_size -1 x -1
+
+# i3-gaps
+gaps inner 2
+gaps outer 2

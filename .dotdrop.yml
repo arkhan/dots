@@ -27,6 +27,10 @@ dotfiles:
     dst: ~/.emacs.d
     link: true
     src: emacs
+  d_i3:
+    dst: ~/.config/i3
+    link: true
+    src: config/i3
   d_networkmanager-dmenu:
     dst: ~/.config/networkmanager-dmenu
     link: true
