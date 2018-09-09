@@ -30,7 +30,7 @@ background = ${colors.bg_normal}
 foreground = ${colors.fg_normal}
 
 dpi = 96
-separator = " | "
+separator = "|"
 
 overline-size = 0
 overline-color = ${colors.fg_urgent}
