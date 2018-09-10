@@ -43,11 +43,11 @@ font-0 = Misc Termsyn:size=10;1
 font-1 = Wuncon Siji:size=12;1
 font-2 = FontAwesome:pixelsize=8;1
 
-modules-left = i3
+modules-left = ws
 modules-center =
-modules-right = wireless wired volume battery fs-data fs-root xkeyboard date
+modules-right = wireless wired volume battery fs-data fs-root date
 
-[module/i3]
+[module/ws]
 type = internal/i3
 index-sort = true
 
@@ -124,13 +124,6 @@ animation-charging-7 = 
 animation-charging-8 = 
 animation-charging-framerate = 750
 
-[module/date]
-type = internal/date
-format = <label>
-date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}
-time =  %{F#fff}%R%{F-}
-label = %date% %time%
-
 [module/wireless]
 type = internal/network
 interface = wlan0
@@ -182,14 +175,6 @@ label-muted = %{F#920}%percentage%M%{F-}
 ramp-volume-0 = 
 ramp-volume-1 = 
 
-[module/xkeyboard]
-type = internal/xkeyboard
-blacklist-0 = num lock
-blacklist-1 = caps lock
-format-prefix = 
-label-layout = %{F#fff} %layout% %{F-}
-label-indicator-padding = 1
-
 [module/fs-root]
 type = internal/fs
 interval = 10
@@ -203,3 +188,10 @@ interval = 10
 mount-0 = /media/data
 label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
 label-unmounted =
+
+[module/date]
+type = internal/date
+format = <label>
+date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}
+time =  %{F#fff}%R%{F-}
+label = %date% %time%
