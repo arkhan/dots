@@ -494,7 +494,9 @@
       (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
       (setq org-agenda-include-diary t
             org-agenda-tags-todo-honor-ignore-options t
-            org-agenda-start-on-weekday 0
+            org-agenda-start-on-weekday nil
+            org-agenda-start-day "-1d"
+            org-agenda-span 7
             org-agenda-timegrid-use-ampm 1
             org-agenda-inhibit-startup t
             org-agenda-files (quote ("~/org/work.org" "~/org/fromwork.org"
@@ -1970,7 +1972,8 @@
     (setq dashboard-startup-banner "~/.emacs.d/static/img/emacs.png"
           dashboard-banner-logo-title (concat "GNU Emacs " emacs-version " kernel " (car (split-string (shell-command-to-string "uname -r") "-")) " x86_64 ArchLinux GTK+ " gtk-version-string)
           dashboard-page-separator "\n\f\f\n")
-    (setq dashboard-items '((recents  . 5)
+    (setq show-week-agenda-p t
+          dashboard-items '((recents  . 5)
                             (projects . 5)
                             (agenda . 5)))
     (setq initial-buffer-choice (lambda () (switch-to-buffer "*dashboard*"))))
