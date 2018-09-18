@@ -43,7 +43,7 @@ font-0 = Misc Termsyn:size=10;1
 font-1 = Wuncon Siji:size=12;1
 font-2 = FontAwesome:pixelsize=8;1
 
-modules-left = ws
+modules-left = ws title
 modules-center =
 modules-right = wireless wired volume battery fs-data fs-root date
 
@@ -195,3 +195,7 @@ format = <label>
 date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}
 time =  %{F#fff}%R%{F-}
 label = %date% %time%
+
+[module/title]
+type = internal/xwindow
+label = %title:0:35:...%
