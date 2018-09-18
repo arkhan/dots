@@ -9,7 +9,7 @@ Xft.lcdfilter: lcddefault
 *.charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48,35:48,58:48,63:48,61:48,44:48,38:48,59:48
 *.saveLines: 4096
 *.scrollBar: false
-xterm*faceName: xft:mononoki:style=Regular:size=9
+xterm*faceName: xft:mononoki Nerd Font:style=Regular:size=9
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -22,10 +22,10 @@ xterm*jumpScroll: true
 xterm*multiScroll: true
 xterm*toolBar: false
 URxvt.iso14755: false
-URxvt*font: xft:mononoki:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldFont: xft:mononoki:bold:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*italicFont: xft:mononoki:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldItalicFont: xft:mononoki:bold:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*font: xft:mononoki Nerd Font:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldFont: xft:mononoki Nerd Font:bold:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*italicFont: xft:mononoki Nerd Font:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldItalicFont: xft:mononoki Nerd Font:bold:italic:autohint=true:size=9,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
