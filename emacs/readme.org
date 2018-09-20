@@ -1607,6 +1607,7 @@
   (use-package tramp
     :config
     (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
+    (setq explicit-shell-file-name "/bin/bash")
     (setq tramp-default-method "ssh"
           tramp-persistency-file-name (concat no-littering-var-directory "tramp")
           tramp-auto-save-directory (concat no-littering-var-directory "tramp-autosave")
@@ -1945,8 +1946,9 @@
                   sml/shorten-modes t)
     (sml/setup)
     (add-to-list 'mode-line-misc-info
-                   '(:eval (if (in-git-p)
-                               (concat (git-remote-status) " " (git-parse-status))))))
+                 '(:eval (when (not (tramp-tramp-file-p default-directory))
+                           (if (in-git-p)
+                               (concat (git-remote-status) " " (git-parse-status)))))))
  #+END_SRC
 ** Switch Windows
 #+BEGIN_SRC emacs-lisp
@@ -1989,8 +1991,8 @@
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'default nil
-                      :family "FantasqueSansMono Nerd Font"
-                      :height 95)
+                      :font "mononoki Nerd Font"
+                      :height 85)
 #+END_SRC
 ** Transparent
 #+BEGIN_SRC emacs-lisp :tangle no
