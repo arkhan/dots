@@ -30,7 +30,7 @@ map <A-\<> goto top
 map <A-\>> goto bottom
 map <A-v> scroll full-up
 
-set font 'mononoki 9'
+set font 'FantasqueSansMono 9.5'
 
 set default-bg "#000000" #00
 set default-fg "#F7F7F6" #01
