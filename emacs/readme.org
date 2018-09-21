@@ -492,7 +492,7 @@
 
       ;; agenda & diary
       (setq org-columns-default-format "%50ITEM(Task) %10CLOCKSUM %16TIMESTAMP_IA")
-      (setq org-agenda-include-diary t
+      (setq org-agenda-include-diary nil
             org-agenda-tags-todo-honor-ignore-options t
             org-agenda-start-on-weekday nil
             org-agenda-start-day "-1d"
