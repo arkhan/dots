@@ -1057,7 +1057,6 @@
 
     (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
 #+END_SRC
-#+END_SRC
 *** Iedit
 #+BEGIN_SRC emacs-lisp
   (use-package iedit
@@ -1607,8 +1606,7 @@
   (use-package tramp
     :config
     (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
-    (setq explicit-shell-file-name "/bin/bash")
-    (setq tramp-default-method "ssh"
+    (setq tramp-default-method "scp"
           tramp-persistency-file-name (concat no-littering-var-directory "tramp")
           tramp-auto-save-directory (concat no-littering-var-directory "tramp-autosave")
           tramp-debug-buffer t
