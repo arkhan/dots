@@ -521,13 +521,13 @@
                                                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
                                                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
       ;; capture
-      (setq org-capture-templates '(("w" "Work TODO" entry (file+olp "~/org/work.org" "Work" "Tasks") "* TODO %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
-                                    ("o" "Work Overtime" entry (file+olp "~/org/work.org" "Work" "COMMENT Overtime") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CREATED: %U\n:END:")
-                                    ("m" "Work Meetings" entry (file+olp "~/org/work.org" "Work" "Meetings") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
-                                    ("t" "Work Training's" entry (file+olp "~/org/work.org" "Work" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")
-                                    ("S" "Stuff TODO" entry (file+olp "~/org/stuff.org" "Stuff" "Tasks") "* TODO %? \n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
-                                    ("M" "Stuff Meetings" entry (file+olp "~/org/stuff.org" "Stuff" "Meetings") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
-                                    ("T" "Stuff Training's" entry (file+olp "~/org/stuff.org" "Stuff" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")))
+      (setq org-capture-templates '(("w" "Work TODO" entry (file+olp "~/org/work.org" "Tasks") "* TODO %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+                                    ("o" "Work Overtime" entry (file+olp "~/org/work.org" "COMMENT Overtime") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CREATED: %U\n:END:")
+                                    ("m" "Work Meetings" entry (file+olp "~/org/work.org" "Meetings") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+                                    ("t" "Work Training's" entry (file+olp "~/org/work.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")
+                                    ("S" "Stuff TODO" entry (file+olp "~/org/stuff.org" "Tasks") "* TODO %? \n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+                                    ("M" "Stuff Meetings" entry (file+olp "~/org/stuff.org" "Meetings") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+                                    ("T" "Stuff Training's" entry (file+olp "~/org/stuff.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")))
 
       ;; configure the external apps to open files
       (add-to-list (quote org-file-apps)
@@ -1988,9 +1988,9 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil
-                      :font "mononoki Nerd Font"
-                      :height 90)
+  (set-face-attribute 'default nil :family "mononoki Nerd Font" :height 90)
+  (set-fontset-font "fontset-default" nil
+                    (font-spec :size 20 :name "Symbola"))
 #+END_SRC
 ** Transparent
 #+BEGIN_SRC emacs-lisp :tangle no
