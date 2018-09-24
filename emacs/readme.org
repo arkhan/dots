@@ -1989,7 +1989,7 @@
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'default nil
-                      :font "monaco"
+                      :font "mononoki Nerd Font"
                       :height 90)
 #+END_SRC
 ** Transparent
