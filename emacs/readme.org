@@ -429,6 +429,7 @@
                   (turn-on-auto-fill)
                   (switch-dictionary)))
 
+      (setq org-toggle-inline-images t)
       ;; set the modules enabled by default
       (setq org-modules
             '(org-bbdb
@@ -585,9 +586,9 @@
                org-babel-execute:bash
                org-babel-expand-body:bash))
 
-  (use-package org-super-agenda
+  (use-package org-timeline
     :ensure t
-    :config (add-hook 'org-agenda-mode-hook 'org-super-agenda-mode))
+    :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
   (use-package org-bullets
     :ensure t
