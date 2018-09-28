@@ -28,16 +28,16 @@ antibody bundle robbyrussell/oh-my-zsh folder:plugins/shrink-path
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/sudo
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/virtualenvwrapper
 
+[[ $INSIDE_EMACS != *"term"* ]] && antibody bundle zsh-users/zsh-autosuggestions
+antibody bundle zsh-users/zsh-syntax-highlighting
+antibody bundle zsh-users/zsh-completions
+antibody bundle zsh-users/zsh-history-substring-search
+
 antibody bundle olivierverdier/zsh-git-prompt
 antibody bundle Cloudstek/zsh-plugin-appup
 
-[[ $INSIDE_EMACS != *"term"* ]] && antibody bundle zimfw/zimfw folder:modules/autosuggestions
-antibody bundle zimfw/zimfw folder:modules/completion
 antibody bundle zimfw/zimfw folder:modules/history
-antibody bundle zimfw/zimfw folder:modules/history-substring-search
 antibody bundle zimfw/zimfw folder:modules/spectrum
-
-antibody bundle zsh-users/zsh-syntax-highlighting
 
 # Enable highlighters
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
