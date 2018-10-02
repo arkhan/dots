@@ -34,13 +34,13 @@ bindsym $mod4+Shift+q kill
 bindsym $mod4+d exec $bin/rofi-run
 
 # rofi clipboard
-bindsym $mod1+c exec $bin/rofi-clip
+bindsym $mod4+c exec $bin/rofi-clip
 
 # rofi xrandr
 bindsym Control+F8 exec $bin/rofi-xrandr
 
 # Launch rofi -show window (a window shitcher)
-bindsym $mod1+Tab exec rofi -show window -width 32
+bindsym $mod4+Tab exec rofi -show window -width 32
 
 # Make the currently focused window a scratchpad
 bindsym $mod4+m move scratchpad
