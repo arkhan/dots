@@ -1198,6 +1198,7 @@
     (setq projectile-known-projects-file (concat no-littering-var-directory "projectile-bookmarks.eld")
           projectile-cache-file (concat no-littering-var-directory "projectile.cache")
           projectile-file-exists-remote-cache-expire (* 10 60)
+          projectile-indexing-method 'alien
           projectile-enable-caching t
           projectile-completion-system 'ivy)
     (projectile-mode))
@@ -1650,7 +1651,6 @@
   (setq-default indent-tabs-mode nil
                 tab-width 4)
 
-  (add-hook 'window-setup-hook 'toggle-frame-maximized t)
   (global-set-key (kbd "RET") 'newline-and-indent)
   (global-set-key (kbd "<f5>") 'revert-buffer)
   (global-set-key "\M-p" 'backward-paragraph)

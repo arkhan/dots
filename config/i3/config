@@ -304,7 +304,7 @@ for_window [class="(?i)GtkLP"] floating enable
 for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
 for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
-# for_window [class="(?i)emacs"] floating disable layout tabbed focus
+for_window [class="(?i)emacs"] floating disable layout tabbed focus
 for_window [title="zathura"] floating disable layout tabbed
 for_window [class="(?i)mpv"] floating disable layout tabbed focus
 for_window [class="(?i)smplayer"] floating disable layout tabbed focus

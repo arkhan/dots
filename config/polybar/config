@@ -39,9 +39,9 @@ underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
-font-0 = Misc Termsyn:size=10;1
+font-0 = Misc Tamsyn:size=12;1
 font-1 = Wuncon Siji:size=12;1
-font-2 = Hasklug NF:size=12;1
+font-2 = mononoki NF:size=12;1
 
 modules-left = ws title
 modules-center =
