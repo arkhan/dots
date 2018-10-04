@@ -1629,6 +1629,8 @@
 ** Básico
 #+BEGIN_SRC emacs-lisp
   (validate-setq inhibit-startup-screen t
+                 use-dialog-box nil
+                 use-file-dialog nil
                  initial-scratch-message nil
                  large-file-warning-threshold (* 15 1024 1024))
 

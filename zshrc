@@ -12,21 +12,25 @@ fi
 
 source <(antibody init)
 
-export WORKON_HOME=~/.virtualenvs/
-ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh"
+export WORKON_HOME="${HOME}/.virtualenvs/"
+export ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
 
+antibody bundle robbyrussell/oh-my-zsh
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/command-not-found
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/copydir
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/copyfile
+antibody bundle robbyrussell/oh-my-zsh folder:plugins/cp
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/docker-compose
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/emacs
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/extract
+antibody bundle robbyrussell/oh-my-zsh folder:plugins/git
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/history
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/pass
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/python
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/shrink-path
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/sudo
 antibody bundle robbyrussell/oh-my-zsh folder:plugins/virtualenvwrapper
+antibody bundle robbyrussell/oh-my-zsh folder:plugins/zsh_reload
 
 [[ $INSIDE_EMACS != *"term"* ]] && antibody bundle zsh-users/zsh-autosuggestions
 antibody bundle zsh-users/zsh-syntax-highlighting
