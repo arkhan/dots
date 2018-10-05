@@ -63,6 +63,10 @@ dotfiles:
     dst: ~/.compton.conf
     link: true
     src: compton.conf
+  d_qutebrowser:
+    dst: ~/.config/qutebrowser
+    link: true
+    src: config/qutebrowser
   f_editorconfig:
     dst: ~/.editorconfig
     link: true
