@@ -38,7 +38,6 @@ antibody bundle zsh-users/zsh-completions
 antibody bundle zsh-users/zsh-history-substring-search
 
 antibody bundle olivierverdier/zsh-git-prompt
-antibody bundle Cloudstek/zsh-plugin-appup
 
 antibody bundle zimfw/zimfw folder:modules/history
 antibody bundle zimfw/zimfw folder:modules/spectrum

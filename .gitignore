@@ -8,3 +8,5 @@ emacs/straight/
 /config/qutebrowser/autoconfig.yml
 /config/qutebrowser/quickmarks
 /config/qutebrowser/bookmarks/urls
+*.extmap
+/config/qutebrowser/qsettings/
