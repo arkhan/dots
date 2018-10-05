@@ -5,3 +5,6 @@ emacs/elpa/
 emacs/cache/
 emacs/straight/
 /config/teiler/profiles/webm-noaudio
+/config/qutebrowser/autoconfig.yml
+/config/qutebrowser/quickmarks
+/config/qutebrowser/bookmarks/urls

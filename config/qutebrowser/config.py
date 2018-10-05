@@ -22,7 +22,67 @@ config.set("content.javascript.enabled", True, "chrome://*/*")
 # Type: Bool
 config.set("content.javascript.enabled", True, "qute://*/*")
 
-config.bind("<z><p><f>", "spawn --userscript password_fill")
+# Prompt the user for the download location. If set to false,
+# `downloads.location.directory` will be used.
+# Type: Bool
+c.downloads.location.prompt = False
+
+# Where to show the downloaded files.
+# Type: VerticalPosition
+# Valid values:
+#   - top
+#   - bottom
+c.downloads.position = "bottom"
+
+# Languages to use for spell checking. You can check for available
+# languages and install dictionaries using scripts/dictcli.py. Run the
+# script with -h/--help for instructions.
+# Type: List of String
+# Valid values:
+#   - af-ZA: Afrikaans (South Africa)
+#   - bg-BG: Bulgarian (Bulgaria)
+#   - ca-ES: Catalan (Spain)
+#   - cs-CZ: Czech (Czech Republic)
+#   - da-DK: Danish (Denmark)
+#   - de-DE: German (Germany)
+#   - el-GR: Greek (Greece)
+#   - en-AU: English (Australia)
+#   - en-CA: English (Canada)
+#   - en-GB: English (United Kingdom)
+#   - en-US: English (United States)
+#   - es-ES: Spanish (Spain)
+#   - et-EE: Estonian (Estonia)
+#   - fa-IR: Farsi (Iran)
+#   - fo-FO: Faroese (Faroe Islands)
+#   - fr-FR: French (France)
+#   - he-IL: Hebrew (Israel)
+#   - hi-IN: Hindi (India)
+#   - hr-HR: Croatian (Croatia)
+#   - hu-HU: Hungarian (Hungary)
+#   - id-ID: Indonesian (Indonesia)
+#   - it-IT: Italian (Italy)
+#   - ko: Korean
+#   - lt-LT: Lithuanian (Lithuania)
+#   - lv-LV: Latvian (Latvia)
+#   - nb-NO: Norwegian (Norway)
+#   - nl-NL: Dutch (Netherlands)
+#   - pl-PL: Polish (Poland)
+#   - pt-BR: Portuguese (Brazil)
+#   - pt-PT: Portuguese (Portugal)
+#   - ro-RO: Romanian (Romania)
+#   - ru-RU: Russian (Russia)
+#   - sh: Serbo-Croatian
+#   - sk-SK: Slovak (Slovakia)
+#   - sl-SI: Slovenian (Slovenia)
+#   - sq: Albanian
+#   - sr: Serbian
+#   - sv-SE: Swedish (Sweden)
+#   - ta-IN: Tamil (India)
+#   - tg-TG: Tajik (Tajikistan)
+#   - tr-TR: Turkish (Turkey)
+#   - uk-UA: Ukrainian (Ukraine)
+#   - vi-VN: Vietnamese (Viet Nam)
+c.spellcheck.languages = ["es-ES"]
 
 # When to show the tab bar.
 # Type: String
@@ -33,18 +93,81 @@ config.bind("<z><p><f>", "spawn --userscript password_fill")
 #   - switching: Show the tab bar when switching tabs.
 c.tabs.show = "never"
 
+# Background color of the completion widget for odd rows.
+# Type: QssColor
+c.colors.completion.odd.bg = "#000000"
+
+# Background color of the completion widget for even rows.
+# Type: QssColor
+c.colors.completion.even.bg = "#000000"
+
+# Background color of the completion widget category headers.
+# Type: QssColor
+c.colors.completion.category.bg = "#000000"
+
+# Foreground color of the selected completion item.
+# Type: QtColor
+c.colors.completion.item.selected.fg = "#ffffff"
+
+# Background color of the selected completion item.
+# Type: QssColor
+c.colors.completion.item.selected.bg = "#191919"
+
+# Top border color of the completion widget category headers.
+# Type: QssColor
+c.colors.completion.item.selected.border.top = "#191919"
+
+# Bottom border color of the selected completion item.
+# Type: QssColor
+c.colors.completion.item.selected.border.bottom = "#191919"
+
+# Foreground color of the matched text in the completion.
+# Type: QtColor
+c.colors.completion.match.fg = "#ffcc00"
+
+# Default monospace fonts. Whenever "monospace" is used in a font
+# setting, it's replaced with the fonts listed here.
+# Type: Font
+c.fonts.monospace = "mononoki NF"
+
 # Font used in the completion widget.
 # Type: Font
-c.fonts.completion.entry = "bold 9pt mononoki NF"
+c.fonts.completion.entry = "bold 9pt monospace"
 
 # Font used in the completion categories.
 # Type: Font
-c.fonts.completion.category = "bold 9pt mononoki NF"
+c.fonts.completion.category = "bold 9pt monospace"
+
+# Font used for the downloadbar.
+# Type: Font
+c.fonts.downloads = "9pt monospace"
+
+# Font used for error messages.
+# Type: Font
+c.fonts.messages.error = "9pt monospace"
+
+# Font used for warning messages.
+# Type: Font
+c.fonts.messages.warning = "9pt monospace"
 
 # Font used for prompts.
 # Type: Font
-c.fonts.prompts = "9pt mononoki NF"
+c.fonts.prompts = "9pt monospace"
 
 # Font used in the statusbar.
 # Type: Font
-c.fonts.statusbar = "9pt mononoki NF"
+c.fonts.statusbar = "9pt monospace"
+
+# Bindings for normal mode
+config.bind("/", None)
+config.bind(":", None)
+config.bind("<Alt+x>", "set-cmd-text :")
+config.bind("<Ctrl+c><Ctrl+p>", "spawn --userscript password_fill")
+config.bind("<Ctrl+s>", "set-cmd-text /")
+config.bind("<Ctrl+w>", None)
+config.bind("<Ctrl+x>", None)
+config.bind("<Ctrl+x><Ctrl+c>", "quit")
+config.bind("<Ctrl+x><Ctrl+s>", "download")
+config.bind("<Ctrl+x>k", "tab-close")
+config.bind("<Ctrl+x>l", "open")
+config.bind("<Ctrl+x>t", "open -t")
