@@ -12,25 +12,24 @@ fi
 
 source <(antibody init)
 
-export WORKON_HOME="${HOME}/.virtualenvs/"
-export ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
+WORKON_HOME="${HOME}/.virtualenvs/"
+ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
 
 antibody bundle robbyrussell/oh-my-zsh
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/command-not-found
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/copydir
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/copyfile
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/cp
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/docker-compose
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/emacs
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/extract
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/git
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/history
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/pass
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/python
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/shrink-path
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/sudo
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/virtualenvwrapper
-antibody bundle robbyrussell/oh-my-zsh folder:plugins/zsh_reload
+antibody bundle robbyrussell/oh-my-zsh path:plugins/command-not-found
+antibody bundle robbyrussell/oh-my-zsh path:plugins/copydir
+antibody bundle robbyrussell/oh-my-zsh path:plugins/copyfile
+antibody bundle robbyrussell/oh-my-zsh path:plugins/cp
+antibody bundle robbyrussell/oh-my-zsh path:plugins/docker-compose
+antibody bundle robbyrussell/oh-my-zsh path:plugins/emacs
+antibody bundle robbyrussell/oh-my-zsh path:plugins/extract
+antibody bundle robbyrussell/oh-my-zsh path:plugins/git
+antibody bundle robbyrussell/oh-my-zsh path:plugins/history
+antibody bundle robbyrussell/oh-my-zsh path:plugins/pass
+antibody bundle robbyrussell/oh-my-zsh path:plugins/python
+antibody bundle robbyrussell/oh-my-zsh path:plugins/shrink-path
+antibody bundle robbyrussell/oh-my-zsh path:plugins/sudo
+antibody bundle robbyrussell/oh-my-zsh path:plugins/virtualenvwrapper
 
 [[ $INSIDE_EMACS != *"term"* ]] && antibody bundle zsh-users/zsh-autosuggestions
 antibody bundle zsh-users/zsh-syntax-highlighting
@@ -39,8 +38,7 @@ antibody bundle zsh-users/zsh-history-substring-search
 
 antibody bundle olivierverdier/zsh-git-prompt
 
-antibody bundle zimfw/zimfw folder:modules/history
-antibody bundle zimfw/zimfw folder:modules/spectrum
+antibody bundle zimfw/zimfw path:modules/history
 
 # Enable highlighters
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
