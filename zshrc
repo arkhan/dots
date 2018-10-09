@@ -24,6 +24,7 @@ antibody bundle robbyrussell/oh-my-zsh path:plugins/docker-compose
 antibody bundle robbyrussell/oh-my-zsh path:plugins/emacs
 antibody bundle robbyrussell/oh-my-zsh path:plugins/extract
 antibody bundle robbyrussell/oh-my-zsh path:plugins/git
+antibody bundle robbyrussell/oh-my-zsh path:plugins/git-prompt
 antibody bundle robbyrussell/oh-my-zsh path:plugins/history
 antibody bundle robbyrussell/oh-my-zsh path:plugins/pass
 antibody bundle robbyrussell/oh-my-zsh path:plugins/python
@@ -35,8 +36,6 @@ antibody bundle robbyrussell/oh-my-zsh path:plugins/virtualenvwrapper
 antibody bundle zsh-users/zsh-syntax-highlighting
 antibody bundle zsh-users/zsh-completions
 antibody bundle zsh-users/zsh-history-substring-search
-
-antibody bundle olivierverdier/zsh-git-prompt
 
 antibody bundle zimfw/zimfw path:modules/history
 
