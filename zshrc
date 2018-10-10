@@ -58,9 +58,6 @@ autoload -U complist
 autoload -U colors
 colors
 
-zstyle :prompt:shrink_path fish yes
-setopt prompt_subst
-
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 function virtualenv_status() {
@@ -78,7 +75,7 @@ ZSH_THEME_GIT_PROMPT_SUFFIX=""
 ZSH_THEME_GIT_PROMPT_SEPARATOR=" "
 
 PROMPT='$(virtualenv_status) %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) '
-RPROMPT='%B%F{black}$(shrink_path)%f%b$(git_status)'
+RPROMPT='%B%F{black}$(shrink_path -f)%f%b$(git_status)'
 # Color command correction prompt
 export SPROMPT="$fg[cyan]Correct $fg[red]%R$reset_color $fg[magenta]to $fg[green]%r?$reset_color ($fg[white]Si :: No :: Abortar :: Editar$fg[white])"
 
