@@ -2,8 +2,8 @@
 #+CAPTION: Normal Mode
 | original                                                                           | Emacs Like                                                          | Status |
 |------------------------------------------------------------------------------------+---------------------------------------------------------------------+--------|
-| <Escape>: clear-keychain ;; search ;; fullscreen --leave                           |                                                                     | TODO   |
-| o: set-cmd-text -s :open                                                           | config.bind("<Ctrl+x>l", "set-cmd-text -s :open")                   | DONE   |
+| ~<Escape>: clear-keychain ;; search ;; fullscreen --leave~                         |                                                                     | TODO   |
+| ~o: set-cmd-text -s :open~                                                         | ~config.bind("<Ctrl+x>l", "set-cmd-text -s :open")~                 | DONE   |
 | go: set-cmd-text :open {url:pretty}                                                | config.bind("<Ctrl+x>L", "set-cmd-text :open {url:pretty}")         | DONE   |
 | O: set-cmd-text -s :open -t                                                        | config.bind("<Ctrl+x>t", "set-cmd-text -s :open -t")                | DONE   |
 | gO: set-cmd-text :open -t -r {url:pretty}                                          | config.bind("<Ctrl+x>T", "set-cmd-text :open -t -r {url:pretty}")   | DONE   |
