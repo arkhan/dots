@@ -1,5 +1,5 @@
 * Emacs like binds
-Normal Mode
+#+CAPTION: Normal Mode
 | original                                                                           | Emacs Like                                                          | Status |
 |------------------------------------------------------------------------------------+---------------------------------------------------------------------+--------|
 | <Escape>: clear-keychain ;; search ;; fullscreen --leave                           |                                                                     | TODO   |
