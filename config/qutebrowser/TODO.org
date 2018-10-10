@@ -1,0 +1,180 @@
+* Emacs like binds
+Normal Mode
+| original                                                                           | Emacs Like                                                          | Status |
+|------------------------------------------------------------------------------------+---------------------------------------------------------------------+--------|
+| <Escape>: clear-keychain ;; search ;; fullscreen --leave                           |                                                                     | TODO   |
+| o: set-cmd-text -s :open                                                           | config.bind("<Ctrl+x>l", "set-cmd-text -s :open")                   | DONE   |
+| go: set-cmd-text :open {url:pretty}                                                | config.bind("<Ctrl+x>L", "set-cmd-text :open {url:pretty}")         | DONE   |
+| O: set-cmd-text -s :open -t                                                        | config.bind("<Ctrl+x>t", "set-cmd-text -s :open -t")                | DONE   |
+| gO: set-cmd-text :open -t -r {url:pretty}                                          | config.bind("<Ctrl+x>T", "set-cmd-text :open -t -r {url:pretty}")   | DONE   |
+| xo: set-cmd-text -s :open -b                                                       |                                                                     | TODO   |
+| xO: set-cmd-text :open -b -r {url:pretty}                                          |                                                                     | TODO   |
+| wo: set-cmd-text -s :open -w                                                       |                                                                     | TODO   |
+| wO: set-cmd-text :open -w {url:pretty}                                             |                                                                     | TODO   |
+| /: set-cmd-text /                                                                  | config.bind("<Ctrl+s>", "set-cmd-text /")                           | DONE   |
+| ?: set-cmd-text ?                                                                  |                                                                     | TODO   |
+| ":": "set-cmd-text :"                                                              | config.bind("<Alt+x>", "set-cmd-text :")                            | DONE   |
+| ga: open -t                                                                        |                                                                     | TODO   |
+| <Ctrl-T>: open -t                                                                  |                                                                     | TODO   |
+| <Ctrl-N>: open -w                                                                  |                                                                     | TODO   |
+| <Ctrl-Shift-N>: open -p                                                            |                                                                     | TODO   |
+| d: tab-close                                                                       |                                                                     | TODO   |
+| <Ctrl-W>: tab-close                                                                | config.bind("<Ctrl+x>k", "tab-close")                               | DONE   |
+| <Ctrl-Shift-W>: close                                                              |                                                                     | TODO   |
+| D: tab-close -o                                                                    |                                                                     | TODO   |
+| co: tab-only                                                                       |                                                                     | TODO   |
+| T: tab-focus                                                                       |                                                                     | TODO   |
+| gm: tab-move                                                                       |                                                                     | TODO   |
+| gl: tab-move -                                                                     |                                                                     | TODO   |
+| gr: tab-move +                                                                     |                                                                     | TODO   |
+| J: tab-next                                                                        |                                                                     | TODO   |
+| <Ctrl-PgDown>: tab-next                                                            |                                                                     | TODO   |
+| K: tab-prev                                                                        |                                                                     | TODO   |
+| <Ctrl-PgUp>: tab-prev                                                              |                                                                     | TODO   |
+| gC: tab-clone                                                                      |                                                                     | TODO   |
+| r: reload                                                                          |                                                                     | TODO   |
+| <F5>: reload                                                                       |                                                                     | TODO   |
+| R: reload -f                                                                       |                                                                     | TODO   |
+| <Ctrl-F5>: reload -f                                                               |                                                                     | TODO   |
+| H: back                                                                            |                                                                     | TODO   |
+| <back>: back                                                                       |                                                                     | TODO   |
+| th: back -t                                                                        |                                                                     | TODO   |
+| wh: back -w                                                                        |                                                                     | TODO   |
+| L: forward                                                                         |                                                                     | TODO   |
+| <forward>: forward                                                                 |                                                                     | TODO   |
+| tl: forward -t                                                                     |                                                                     | TODO   |
+| wl: forward -w                                                                     |                                                                     | TODO   |
+| <F11>: fullscreen                                                                  |                                                                     | TODO   |
+| f: hint                                                                            |                                                                     | TODO   |
+| F: hint all tab                                                                    |                                                                     | TODO   |
+| wf: hint all window                                                                |                                                                     | TODO   |
+| ;b: hint all tab-bg                                                                |                                                                     | TODO   |
+| ;f: hint all tab-fg                                                                |                                                                     | TODO   |
+| ;h: hint all hover                                                                 |                                                                     | TODO   |
+| ;i: hint images                                                                    |                                                                     | TODO   |
+| ;I: hint images tab                                                                |                                                                     | TODO   |
+| ;o: hint links fill :open {hint-url}                                               |                                                                     | TODO   |
+| ;O: hint links fill :open -t -r {hint-url}                                         |                                                                     | TODO   |
+| ;y: hint links yank                                                                |                                                                     | TODO   |
+| ;Y: hint links yank-primary                                                        |                                                                     | TODO   |
+| ;r: hint --rapid links tab-bg                                                      |                                                                     | TODO   |
+| ;R: hint --rapid links window                                                      |                                                                     | TODO   |
+| ;d: hint links download                                                            |                                                                     | TODO   |
+| ;t: hint inputs                                                                    |                                                                     | TODO   |
+| gi: hint inputs --first                                                            |                                                                     | TODO   |
+| h: scroll left                                                                     | config.bind("<Ctrl+b>", "scroll left")                              | DONE   |
+| j: scroll down                                                                     | config.bind("<Ctrl+n>", "scroll down")                              | DONE   |
+| k: scroll up                                                                       | config.bind("<Ctrl+p>", "scroll up")                                | DONE   |
+| l: scroll right                                                                    | config.bind("<Ctrl+f>", "scroll right")                             | DONE   |
+| u: undo                                                                            | config.bind("<Ctrl+u>", "undo")                                     | DONE   |
+| <Ctrl-Shift-T>: undo                                                               |                                                                     | TODO   |
+| gg: scroll-to-perc 0                                                               |                                                                     | TODO   |
+| G: scroll-to-perc                                                                  |                                                                     | TODO   |
+| n: search-next                                                                     |                                                                     | TODO   |
+| N: search-prev                                                                     |                                                                     | TODO   |
+| i: enter-mode insert                                                               |                                                                     | TODO   |
+| v: enter-mode caret                                                                |                                                                     | TODO   |
+| "`": enter-mode set_mark                                                           |                                                                     | TODO   |
+| "'": enter-mode jump_mark                                                          |                                                                     | TODO   |
+| yy: yank                                                                           |                                                                     | TODO   |
+| yY: yank -s                                                                        |                                                                     | TODO   |
+| yt: yank title                                                                     |                                                                     | TODO   |
+| yT: yank title -s                                                                  |                                                                     | TODO   |
+| yd: yank domain                                                                    |                                                                     | TODO   |
+| yD: yank domain -s                                                                 |                                                                     | TODO   |
+| yp: yank pretty-url                                                                |                                                                     | TODO   |
+| yP: yank pretty-url -s                                                             |                                                                     | TODO   |
+| pp: open -- {clipboard}                                                            |                                                                     | TODO   |
+| pP: open -- {primary}                                                              |                                                                     | TODO   |
+| Pp: open -t -- {clipboard}                                                         |                                                                     | TODO   |
+| PP: open -t -- {primary}                                                           |                                                                     | TODO   |
+| wp: open -w -- {clipboard}                                                         |                                                                     | TODO   |
+| wP: open -w -- {primary}                                                           |                                                                     | TODO   |
+| m: quickmark-save                                                                  |                                                                     | TODO   |
+| b: set-cmd-text -s :quickmark-load                                                 |                                                                     | TODO   |
+| B: set-cmd-text -s :quickmark-load -t                                              |                                                                     | TODO   |
+| wb: set-cmd-text -s :quickmark-load -w                                             |                                                                     | TODO   |
+| M: bookmark-add                                                                    |                                                                     | TODO   |
+| gb: set-cmd-text -s :bookmark-load                                                 |                                                                     | TODO   |
+| gB: set-cmd-text -s :bookmark-load -t                                              |                                                                     | TODO   |
+| wB: set-cmd-text -s :bookmark-load -w                                              |                                                                     | TODO   |
+| sf: save                                                                           |                                                                     | TODO   |
+| ss: set-cmd-text -s :set                                                           |                                                                     | TODO   |
+| sl: set-cmd-text -s :set -t                                                        |                                                                     | TODO   |
+| sk: set-cmd-text -s :bind                                                          |                                                                     | TODO   |
+| -: zoom-out                                                                        |                                                                     | TODO   |
+| +: zoom-in                                                                         |                                                                     | TODO   |
+| #ERROR                                                                             |                                                                     | TODO   |
+| "[[": navigate prev                                                                  |                                                                     | TODO   |
+| "]]": navigate next                                                                  |                                                                     | TODO   |
+| "{{": navigate prev -t                                                             |                                                                     | TODO   |
+| "}}": navigate next -t                                                             |                                                                     | TODO   |
+| gu: navigate up                                                                    |                                                                     | TODO   |
+| gU: navigate up -t                                                                 |                                                                     | TODO   |
+| <Ctrl-A>: navigate increment                                                       |                                                                     | TODO   |
+| <Ctrl-X>: navigate decrement                                                       |                                                                     | TODO   |
+| wi: inspector                                                                      |                                                                     | TODO   |
+| gd: download                                                                       | config.bind("<Ctrl+x><Ctrl+s>", "download")                         | DONE   |
+| ad: download-cancel                                                                |                                                                     | TODO   |
+| cd: download-clear                                                                 |                                                                     | TODO   |
+| gf: view-source                                                                    |                                                                     | TODO   |
+| gt: set-cmd-text -s :buffer                                                        |                                                                     | TODO   |
+| <Ctrl-Tab>: tab-focus last                                                         |                                                                     | TODO   |
+| <Ctrl-Shift-Tab>: nop                                                              |                                                                     | TODO   |
+| <Ctrl-^>: tab-focus last                                                           |                                                                     | TODO   |
+| <Ctrl-V>: enter-mode passthrough                                                   |                                                                     | TODO   |
+| <Ctrl-Q>: quit                                                                     |                                                                     | TODO   |
+| ZQ: quit                                                                           |                                                                     | TODO   |
+| ZZ: quit --save                                                                    |                                                                     | TODO   |
+| <Ctrl-F>: scroll-page 0 1                                                          |                                                                     | TODO   |
+| <Ctrl-B>: scroll-page 0 -1                                                         |                                                                     | TODO   |
+| <Ctrl-D>: scroll-page 0 0.5                                                        |                                                                     | TODO   |
+| <Ctrl-U>: scroll-page 0 -0.5                                                       |                                                                     | TODO   |
+| <Alt-1>: tab-focus 1                                                               |                                                                     | TODO   |
+| g0: tab-focus 1                                                                    |                                                                     | TODO   |
+| g^: tab-focus 1                                                                    |                                                                     | TODO   |
+| <Alt-2>: tab-focus 2                                                               |                                                                     | TODO   |
+| <Alt-3>: tab-focus 3                                                               |                                                                     | TODO   |
+| <Alt-4>: tab-focus 4                                                               |                                                                     | TODO   |
+| <Alt-5>: tab-focus 5                                                               |                                                                     | TODO   |
+| <Alt-6>: tab-focus 6                                                               |                                                                     | TODO   |
+| <Alt-7>: tab-focus 7                                                               |                                                                     | TODO   |
+| <Alt-8>: tab-focus 8                                                               |                                                                     | TODO   |
+| <Alt-9>: tab-focus -1                                                              |                                                                     | TODO   |
+| g$: tab-focus -1                                                                   |                                                                     | TODO   |
+| <Ctrl-h>: home                                                                     |                                                                     | TODO   |
+| <Ctrl-s>: stop                                                                     |                                                                     | TODO   |
+| <Ctrl-Alt-p>: print                                                                |                                                                     | TODO   |
+| Ss: open qute://settings                                                           |                                                                     | TODO   |
+| Sb: open qute://bookmarks#bookmarks                                                |                                                                     | TODO   |
+| Sq: open qute://bookmarks                                                          |                                                                     | TODO   |
+| Sh: open qute://history                                                            |                                                                     | TODO   |
+| <Return>: follow-selected                                                          |                                                                     | TODO   |
+| <Ctrl-Return>: follow-selected -t                                                  |                                                                     | TODO   |
+| .: repeat-command                                                                  |                                                                     | TODO   |
+| <Ctrl-p>: tab-pin                                                                  |                                                                     | TODO   |
+| <Alt-m>: tab-mute                                                                  |                                                                     | TODO   |
+| gD: tab-give                                                                       |                                                                     | TODO   |
+| q: record-macro                                                                    |                                                                     | TODO   |
+| "@": run-macro                                                                     |                                                                     | TODO   |
+| tsh: config-cycle -p -t -u *://{url:host}/* content.javascript.enabled ;; reload   |                                                                     | TODO   |
+| tSh: config-cycle -p -u *://{url:host}/* content.javascript.enabled ;; reload      |                                                                     | TODO   |
+| tsH: config-cycle -p -t -u *://*.{url:host}/* content.javascript.enabled ;; reload |                                                                     | TODO   |
+| tSH: config-cycle -p -u *://*.{url:host}/* content.javascript.enabled ;; reload    |                                                                     | TODO   |
+| tsu: config-cycle -p -t -u {url} content.javascript.enabled ;; reload              |                                                                     | TODO   |
+| tSu: config-cycle -p -u {url} content.javascript.enabled ;; reload                 |                                                                     | TODO   |
+| tph: config-cycle -p -t -u *://{url:host}/* content.plugins ;; reload              |                                                                     | TODO   |
+| tPh: config-cycle -p -u *://{url:host}/* content.plugins ;; reload                 |                                                                     | TODO   |
+| tpH: config-cycle -p -t -u *://*.{url:host}/* content.plugins ;; reload            |                                                                     | TODO   |
+| tPH: config-cycle -p -u *://*.{url:host}/* content.plugins ;; reload               |                                                                     | TODO   |
+| tpu: config-cycle -p -t -u {url} content.plugins ;; reload                         |                                                                     | TODO   |
+| tPu: config-cycle -p -u {url} content.plugins ;; reload                            |                                                                     | TODO   |
+| tih: config-cycle -p -t -u *://{url:host}/* content.images ;; reload               |                                                                     | TODO   |
+| tIh: config-cycle -p -u *://{url:host}/* content.images ;; reload                  |                                                                     | TODO   |
+| tiH: config-cycle -p -t -u *://*.{url:host}/* content.images ;; reload             |                                                                     | TODO   |
+| tIH: config-cycle -p -u *://*.{url:host}/* content.images ;; reload                |                                                                     | TODO   |
+| tiu: config-cycle -p -t -u {url} content.images ;; reload                          |                                                                     | TODO   |
+| tIu: config-cycle -p -u {url} content.images ;; reload                             |                                                                     | TODO   |
+|                                                                                    | config.bind("<Ctrl+c><Ctrl+p>", "spawn --userscript password_fill") | DONE   |
+|                                                                                    | config.bind("<Ctrl+x><Ctrl+c>", "close")                            | DONE   |
+#+TBLFM: $3='(if (eq $2 "") "TODO" "DONE"))
