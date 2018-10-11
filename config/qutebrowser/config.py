@@ -5,10 +5,17 @@
 
 # Uncomment this to still load settings configured via autoconfig.yml
 # config.load_autoconfig()
+c = c  # noqa
+config = config  # noqa
 
-# pylint: disable=C0111
-c = c  # noqa: F821 pylint: disable=E0602,C0103
-config = config  # noqa: F821 pylint: disable=E0602,C0103
+# Require a confirmation before quitting the application.
+# Type: ConfirmQuit
+# Valid values:
+#   - always: Always show a confirmation.
+#   - multiple-tabs: Show a confirmation if multiple tabs are opened.
+#   - downloads: Show a confirmation if downloads are running
+#   - never: Never show a confirmation.
+c.confirm_quit = ["multiple-tabs", "downloads"]
 
 # Enable JavaScript.
 # Type: Bool
@@ -178,6 +185,10 @@ config.bind("<Ctrl+x>T", "set-cmd-text :open -t -r {url:pretty}")
 config.bind("<Ctrl+x>k", "tab-close")
 config.bind("<Ctrl+x>l", "set-cmd-text -s :open")
 config.bind("<Ctrl+x>t", "set-cmd-text -s :open -t")
+config.bind("B", "back")
+config.bind("F", "forward")
+config.bind("H", None)
+config.bind("L", None)
 config.bind("O", None)
 config.bind("gO", None)
 config.bind("go", None)
