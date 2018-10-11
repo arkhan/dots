@@ -1,3 +1,11 @@
 * dotfiles
-
 Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
+** getting started
+*** Install from pypi
+#+BEGIN_SRC sh
+  sudo pip3 install dotdrop
+#+END_SRC
+*** Install from AUR
+#+BEGIN_SRC sh
+  yay -S dotdrop-git
+#+END_SRC
