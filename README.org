@@ -1,7 +1,4 @@
 * dotfiles
-  :PROPERTIES:
-  :CUSTOM_ID: dotfiles
-  :END:
 
 Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
 
@@ -9,9 +6,6 @@ Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
 [[https://imgur.com/SDMJ5aY][https://imgur.com/SDMJ5aY]]
 
 ** Getting started
-   :PROPERTIES:
-   :CUSTOM_ID: getting-started
-   :END:
 *** Install from pypi
 #+BEGIN_EXAMPLE
   pip3 install --user dotdrop
