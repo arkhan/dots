@@ -1,5 +1,5 @@
 * dotfiles
-Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
+  Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
 ** getting started
 *** Install from pypi
 #+BEGIN_SRC sh
