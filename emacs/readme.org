@@ -2130,7 +2130,7 @@
           clipmon-transform-function nil))
 #+END_SRC
 ** elfeed
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package elfeed-org
     :ensure t
     :bind ("C-x w" . elfeed)
