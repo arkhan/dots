@@ -2129,19 +2129,6 @@
           clipmon-transform-suffix "\n\n"
           clipmon-transform-function nil))
 #+END_SRC
-** elfeed
-#+BEGIN_SRC emacs-lisp
-  (use-package elfeed-org
-    :ensure t
-    :bind ("C-x w" . elfeed)
-    :init (elfeed-org)
-    :config
-    (setq rmh-elfeed-org-files (list "~/org/elfeed.org")
-          elfeed-db-directory (concat no-littering-var-directory "elfeed"))
-    (add-hook 'elfeed-new-entry-hook
-              (elfeed-make-tagger :before "3 days ago"
-                                  :remove 'unread)))
-#+END_SRC
 ** GraphViz
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package graphviz-dot-mode
