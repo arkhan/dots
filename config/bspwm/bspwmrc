@@ -26,7 +26,7 @@ bspc config external_rules_command "$XDG_CONFIG_HOME/bspwm/rules"
 # Workspaces
 bspc rule -a 'Firefox:Navigator' follow=on desktop=^1
 bspc rule -a 'Firefox Developer Edition:Navigator' follow=on desktop=^1
-bspc rule -a Qutebrowser follow=on desktop=^1
+bspc rule -a qutebrowser follow=on desktop=^1
 bspc rule -a Iceweasel follow=on desktop=^1
 bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
 bspc rule -a URxvt:chat follow=on desktop=^2 state=tiled

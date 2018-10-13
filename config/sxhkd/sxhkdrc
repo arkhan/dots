@@ -7,10 +7,10 @@
 
 # Program Launcher
 super + space
-  ~/.bin/rofi_run
+  ~/.bin/rofi-run
 
 # Clipboard
-alt + c
+super + c
   ~/.bin/roficlip
 
 # Password Manager
@@ -22,7 +22,7 @@ super + F8
   ~/.bin/rofi-xrandr
 
 # Window Switch
-alt + Tab
+super + Tab
   rofi -show window -width 36
 
 # Exit Menu

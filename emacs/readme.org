@@ -500,9 +500,8 @@
             org-agenda-span 7
             org-agenda-timegrid-use-ampm 1
             org-agenda-inhibit-startup t
-            org-agenda-files (quote ("~/org/work.org" "~/org/fromwork.org"
-                                     "~/org/stuff.org" "~/org/fromstuff.org"
-                                     "~/org/notes.org")))
+            org-agenda-files (quote ("~/org/work.org"
+                                     "~/org/stuff.org")))
       (setq org-agenda-custom-commands
             '(("Q" . "Custom queries") ;; gives label to "Q"
               ("Qa" "Archive search" search "" ((org-agenda-files (file-expand-wildcards "~/org/archive.org"))))
@@ -1431,9 +1430,12 @@
       "Add a break point"
       (interactive)
       (newline-and-indent)
-      (insert "import pudb; pudb.set_trace()"))
+      (insert "import wdb; wdb.set_trace()"))
 
     (define-key elpy-mode-map (kbd "C-c C-b") 'add-breakpoint))
+
+  (use-package pyvenv
+    :config (defalias 'workon 'pyvenv-workon))
 
   (use-package py-isort
     :ensure t
@@ -1706,6 +1708,19 @@
     (setq ibuffer-expert t))
 
 #+END_SRC
+** Sidebar
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package ov :straight t)
+  (use-package frame-local :straight t)
+  (add-to-list 'load-path "~/.local/share/icons-in-terminal/")
+
+  (use-package font-lock+
+    :straight (font-lock+ :type git :host github :repo "emacsmirror/font-lock-plus"))
+
+  (use-package sidebar
+    :straight (sidebar.el :type git :host github :repo "samangh/sidebar.el")
+    :bind ("M-1" . sidebar-open))
+#+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp
   (use-package shrink-path
@@ -1784,6 +1799,7 @@
           '(("*Calendar*" :select t :size 0.3 :align below)
             ("*Compile-Log*" :ignore t)
             ("*Completions*" :size 0.3  :align t)
+            ("*format-all-errors*" :select t :size 0.1 :align below)
             ("*Help*" :select t :inhibit-window-quit t :other t)
             ("*Messages*" :select nil :inhibit-window-quit t :other t)
             ("*Process List*" :select t :size 0.3 :align below)
@@ -2074,12 +2090,15 @@
           org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
           org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
           org-icalendar-with-timestamps t
+          org-icalender-sync-todo t
           org-icalendar-timezone "America/Guayaquil")
 
-    (setq org-caldav-calendars '((:calendar-id "arkhan/work" :files ("~/org/work.org")
-                                               :inbox "~/org/fromwork.org")
-                                 (:calendar-id "arkhan/stuff" :files ("~/org/stuff.org")
-                                               :inbox "~/org/fromstuff.org"))
+    (setq org-caldav-calendars '((:calendar-id "arkhan/work"
+                                               :files ("~/org/work.org")
+                                               :inbox "~/org/inbox.org")
+                                 (:calendar-id "arkhan/stuff"
+                                               :files ("~/org/stuff.org")
+                                               :inbox "~/org/inbox.org"))
           org-caldav-files org-agenda-files
           org-caldav-save-directory (concat user-emacs-directory "cache")
           org-caldav-show-sync-results nil
