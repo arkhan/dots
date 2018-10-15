@@ -27,7 +27,7 @@ super + Tab
 
 # Exit Menu
 super + Escape
-  ~/.bin/exit
+  ~/.bin/rofi-exit
 
 # Take Screenshot
 Print
