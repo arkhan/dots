@@ -416,7 +416,7 @@
 #+END_SRC
 * Orgmode
 #+BEGIN_SRC emacs-lisp
-  (use-package org
+ (use-package org
     :ensure org-plus-contrib
     :pin org
     :defer 1
@@ -647,12 +647,11 @@
     :ensure t)
 
   ;; (when (file-exists-p "~/.sync.el")
-  ;;   (use-package org-sync
-  ;;     :ensure t
-  ;;     :config
-  ;;     (mapc 'load
-  ;;           '("org-sync" "org-sync-gitlab" "org-sync-github"))
-  ;;     (load-file "~/.sync.el")))
+  ;;    (use-package org-sync
+  ;;      :ensure t
+  ;;      :config
+  ;;      (mapc 'load '("org-sync" "org-sync-gitlab" "org-sync-github"))
+  ;;      (load-file "~/.sync.el")))
 #+END_SRC
 * Pdf Tools
 #+BEGIN_SRC emacs-lisp

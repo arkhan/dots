@@ -30,7 +30,6 @@ bspc rule -a qutebrowser follow=on desktop=^1
 bspc rule -a Iceweasel follow=on desktop=^1
 bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
 bspc rule -a URxvt:chat follow=on desktop=^2 state=tiled
-bspc rule -a URxvt:URxvtQuake sticky=on state=floating
 bspc rule -a Thunderbird follow=on desktop=^3
 bspc rule -a Icedove follow=on desktop=^3
 bspc rule -a Doublecmd follow=on desktop=^4
@@ -72,3 +71,5 @@ xrdb ~/.Xresources &
 [[ -z `pgrep udiskie` ]] && udiskie &
 # sxhkd
 [[ -z `pgrep sxhkd` ]] && sxhkd &
+
+# https://github.com/aguslr/bspwm-config/blob/master/.config/sxhkd/sxhkdrc

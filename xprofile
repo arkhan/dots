@@ -21,4 +21,4 @@ unclutter &
 
 wmname LG3D &
 
-compton --xrender-sync --xrender-sync-fence --config ~/.compton.conf &
+compton --config ~/.compton.conf &
