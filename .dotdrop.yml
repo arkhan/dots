@@ -13,10 +13,6 @@ dotfiles:
     dst: ~/.bin
     link: true
     src: bin
-  d_bspwm:
-    dst: ~/.config/bspwm
-    link: true
-    src: config/bspwm
   d_dunst:
     dst: ~/.config/dunst
     link: true
@@ -47,10 +43,6 @@ dotfiles:
     dst: ~/.config/rofi-pass
     link: true
     src: config/rofi-pass
-  d_sxhkd:
-    dst: ~/.config/sxhkd
-    link: true
-    src: config/sxhkd
   d_teiler:
     dst: ~/.config/teiler
     link: true

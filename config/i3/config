@@ -220,6 +220,7 @@ mode "resize" {
 bindsym $mod4+r mode "resize"
 
 exec_always --no-startup-id $bin/panel
+exec_always --no-startup-id $bin/i3-switch-if-workspace-empty.py
 
 # System mode
 set $mode_system System [l]ock | l[o]gout | [s]uspend | [r]eboot | [p]oweroff
