@@ -101,6 +101,9 @@
   (use-package package-utils
     :ensure t
     :bind* ("C-x M-c" . package-utils-upgrade-all-and-restart))
+
+  (straight-use-package 'el-patch)
+  (setq el-patch-enable-use-package-integration t)
 #+END_SRC
 ** Validación de Esquema
 #+BEGIN_SRC emacs-lisp
@@ -112,40 +115,12 @@
   (use-package async
     :defer t
     :ensure t
-    :config
-    (setq async-bytecomp-package-mode t))
+    :config (setq async-bytecomp-package-mode t))
 #+END_SRC
 ** Try
 #+BEGIN_SRC emacs-lisp
 (use-package try
   :ensure t)
-#+END_SRC
-** System Packages
-#+BEGIN_SRC emacs-lisp
-  (use-package system-packages
-    :ensure t
-    :config
-    (add-to-list 'system-packages-supported-package-managers
-                 '(aurman .
-                        ((default-sudo . nil)
-                         (install . "aurman -S")
-                         (search . "aurman -Ss")
-                         (uninstall . "aurman -Rs")
-                         (update . "aurman -Syu")
-                         (clean-cache . "aurman -Sc")
-                         (log . "cat /var/log/pacman.log")
-                         (get-info . "aurman -Qi")
-                         (get-info-remote . "aurman -Si")
-                         (list-files-provided-by . "aurman -Ql")
-                         (verify-all-packages . "aurman -Qkk")
-                         (verify-all-dependencies . "aurman -Dk")
-                         (remove-orphaned . "aurman -Rns $(pacman -Qtdq)")
-                         (list-installed-packages . "aurman -Qe")
-                         (list-installed-packages-all . "aurman -Q")
-                         (list-dependencies-of . "aurman -Qi")
-                         (noconfirm . "--noconfirm"))))
-    (setq system-packages-use-sudo nil
-          system-packages-package-manager 'aurman))
 #+END_SRC
 * Cache
 *** Directorios
