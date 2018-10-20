@@ -1798,6 +1798,16 @@
 #+END_SRC
 ** Status Line
 #+BEGIN_SRC emacs-lisp
+  (use-package    feebleline
+    :ensure t
+    :config
+    (setq feebleline-show-git-branch t
+          feebleline-show-dir t
+          feebleline-show-time nil
+          feebleline-show-previous-buffer nil)
+    (feebleline-mode 1))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tange no
   ;; Original http://kitchingroup.cheme.cmu.edu/blog/2014/09/19/A-git-status-Emacs-modeline/
 
   (defun in-git-p ()
@@ -1954,7 +1964,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "FantasqueSansMono NF" :height 100)
+  (set-face-attribute 'default nil :family "Monaco" :height 100)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC

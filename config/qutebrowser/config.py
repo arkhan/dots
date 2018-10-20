@@ -135,7 +135,7 @@ c.colors.completion.match.fg = "#ffcc00"
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "FantasqueSansMono NF"
+c.fonts.monospace = "Monaco"
 
 # Bindings for normal mode
 config.bind("/", None)
