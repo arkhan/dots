@@ -135,35 +135,7 @@ c.colors.completion.match.fg = "#ffcc00"
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "mononoki NF"
-
-# Font used in the completion widget.
-# Type: Font
-c.fonts.completion.entry = "bold 9pt monospace"
-
-# Font used in the completion categories.
-# Type: Font
-c.fonts.completion.category = "bold 9pt monospace"
-
-# Font used for the downloadbar.
-# Type: Font
-c.fonts.downloads = "9pt monospace"
-
-# Font used for error messages.
-# Type: Font
-c.fonts.messages.error = "9pt monospace"
-
-# Font used for warning messages.
-# Type: Font
-c.fonts.messages.warning = "9pt monospace"
-
-# Font used for prompts.
-# Type: Font
-c.fonts.prompts = "9pt monospace"
-
-# Font used in the statusbar.
-# Type: Font
-c.fonts.statusbar = "9pt monospace"
+c.fonts.monospace = "FantasqueSansMono NF"
 
 # Bindings for normal mode
 config.bind("/", None)
@@ -182,6 +154,7 @@ config.bind("<Ctrl+x><Ctrl+c>", "close")
 config.bind("<Ctrl+x><Ctrl+s>", "download")
 config.bind("<Ctrl+x>L", "set-cmd-text :open {url:pretty}")
 config.bind("<Ctrl+x>T", "set-cmd-text :open -t -r {url:pretty}")
+config.bind("<Ctrl+x>b", "set-cmd-text -s :buffer")
 config.bind("<Ctrl+x>k", "tab-close")
 config.bind("<Ctrl+x>l", "set-cmd-text -s :open")
 config.bind("<Ctrl+x>t", "set-cmd-text -s :open -t")
@@ -192,6 +165,7 @@ config.bind("L", None)
 config.bind("O", None)
 config.bind("gO", None)
 config.bind("go", None)
+config.bind("gt", None)
 config.bind("h", None)
 config.bind("j", None)
 config.bind("k", None)

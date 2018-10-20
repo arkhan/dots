@@ -620,6 +620,12 @@
   (use-package ob-translate
     :ensure t)
 
+  (use-package ox-reveal
+    :ensure t)
+
+  (use-package htmlize
+    :ensure t)
+
   ;; (when (file-exists-p "~/.sync.el")
   ;;    (use-package org-sync
   ;;      :ensure t
@@ -1948,12 +1954,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (mapc (lambda (face)
-          (when (eq (face-attribute face :weight) 'bold)
-            (set-face-attribute face nil :weight 'normal)))
-        (face-list))
-
-  (set-face-attribute 'default nil :family "Monaco" :height 90)
+  (set-face-attribute 'default nil :family "FantasqueSansMono NF" :height 100)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC

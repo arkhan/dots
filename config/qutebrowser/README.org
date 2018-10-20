@@ -118,7 +118,7 @@
 | ad: download-cancel                                                                |                                                      | TODO   |
 | cd: download-clear                                                                 |                                                      | TODO   |
 | gf: view-source                                                                    |                                                      | TODO   |
-| gt: set-cmd-text -s :buffer                                                        |                                                      | TODO   |
+| ~gt: set-cmd-text -s :buffer~                                                      | ~<Crtl+x>b: set-cmd-text -s :buffer~                 | DONE   |
 | <Ctrl-Tab>: tab-focus last                                                         |                                                      | TODO   |
 | <Ctrl-Shift-Tab>: nop                                                              |                                                      | TODO   |
 | <Ctrl-^>: tab-focus last                                                           |                                                      | TODO   |
