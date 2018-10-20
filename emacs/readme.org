@@ -1379,6 +1379,18 @@
       (validate-setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
       (add-hook 'elpy-mode-hook 'flycheck-mode))
 
+    (use-package flycheck-pycheckers
+      :ensure t
+      :after flycheck
+      :config (setq flycheck-pycheckers-checkers (quote (pylint pep8 flake8 bandit))
+                    flycheck-pycheckers-ignore-codes (quote ("C0411" "C0413" "C0103" "C0111"
+                                                             "W0142" "W0201" "W0232" "W0403"
+                                                             "W0511" "E1002" "E1101" "E1103"
+                                                             "R0201" "R0801" "R0903" "R0904"
+                                                             "R0914" "W0212" "C0301")))
+
+      :hook (flycheck-mode . flycheck-pycheckers-setup))
+
     (defun format-all-on-save ()
       (interactive)
       (add-hook 'before-save-hook 'format-all-buffer nil t))
@@ -1608,7 +1620,7 @@
   (global-set-key (kbd "C--") 'text-scale-decrease)
   (global-set-key "\M-p" 'backward-paragraph)
   (global-set-key "\M-n" 'forward-paragraph)
-  (global-set-key (kbd "C-x k") 'kill-this-buffer)
+  (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
   (show-paren-mode)
 
 #+END_SRC
@@ -1798,16 +1810,6 @@
 #+END_SRC
 ** Status Line
 #+BEGIN_SRC emacs-lisp
-  (use-package    feebleline
-    :ensure t
-    :config
-    (setq feebleline-show-git-branch t
-          feebleline-show-dir t
-          feebleline-show-time nil
-          feebleline-show-previous-buffer nil)
-    (feebleline-mode 1))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tange no
   ;; Original http://kitchingroup.cheme.cmu.edu/blog/2014/09/19/A-git-status-Emacs-modeline/
 
   (defun in-git-p ()
