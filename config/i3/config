@@ -59,6 +59,9 @@ bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 ## Copy Password
 bindsym $mod4+period exec rofi-pass
 
+# Systemd
+bindsym $mod4+comma exec $bin/rofi-systemd
+
 # Pamixer Control
 ## Toggle Mute
 bindsym $mod1+m exec pamixer -t

@@ -1563,6 +1563,12 @@
   (use-package yaml-mode
     :ensure t)
 #+END_SRC
+* PATH
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :init (exec-path-from-shell-initialize))
+#+END_SRC
 * Tramp
 #+BEGIN_SRC emacs-lisp
   (use-package tramp
@@ -1622,7 +1628,6 @@
   (global-set-key "\M-n" 'forward-paragraph)
   (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
   (show-paren-mode)
-
 #+END_SRC
 ** Cursor
 #+BEGIN_SRC emacs-lisp
@@ -1966,7 +1971,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Monaco" :height 90)
+  (set-face-attribute 'default nil :family "mononoki NF" :height 90)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC
