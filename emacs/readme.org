@@ -1971,7 +1971,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "mononoki NF" :height 90)
+  (set-face-attribute 'default nil :family "CodeNewRoman NF" :height 100)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC
