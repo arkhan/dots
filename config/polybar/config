@@ -39,13 +39,13 @@ underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
-font-0 = xos4 Terminus:size=9;1
+font-0 = Misc Tamsyn:size=12;0
 font-1 = Wuncon Siji:size=12;1
 font-2 = DejaVuSansMono NF:size=12;1
 
 modules-left = ws title
 modules-center =
-modules-right = wireless wired volume battery fs-data fs-root date
+modules-right = wireless wired volume cpu memory fs-data fs-root battery date
 
 [module/ws]
 type = internal/i3
@@ -189,6 +189,16 @@ interval = 10
 mount-0 = /media/data
 label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
 label-unmounted =
+
+[module/memory]
+type = internal/memory
+interval = 3
+label =  %{F#fff}%gb_used%/%gb_total%%{F-}
+
+[module/cpu]
+type = internal/cpu
+interval = 0.5
+label =  %{F#fff}%percentage%%%{F-}
 
 [module/date]
 type = internal/date
