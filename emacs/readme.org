@@ -2215,6 +2215,7 @@
         (when (fboundp 'writegood-mode)
           (setq modi/writegood-mode-state writegood-mode)
           (writegood-mode -1))
+        (toggle-frame-fullscreen)
         (text-scale-set modi/org-tree-slide-text-scale))
       (add-hook 'org-tree-slide-play-hook #'modi/org-tree-slide-start)
 
@@ -2225,6 +2226,7 @@
                    modi/writegood-mode-state)
           (writegood-mode 1)
           (setq modi/writegood-mode-state nil))
+        (toggle-frame-fullscreen)
         (text-scale-set 0))
       (add-hook 'org-tree-slide-stop-hook #'modi/org-tree-slide-stop)
 
