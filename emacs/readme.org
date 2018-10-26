@@ -547,9 +547,15 @@
     :ensure t
     :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
+  (use-package secretaria
+    :ensure t
+    :init
+    (setf secretaria-clocked-task-save-file "~/.secretaria-tarea")
+    (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
+
   (use-package org-bullets
     :ensure t
-    :hook (org-mode . (lambda () (org-bullets-mode 1))))
+    :hook (org-mode . org-bullets-mode))
 
   (use-package org-inlinetask
     :config
