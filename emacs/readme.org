@@ -48,7 +48,12 @@
   (defun tangle-init ()
     "If the current buffer is 'readme.org' the code-blocks are
     tangled, and the tangled file is compiled."
-    (when (equal (buffer-name) "readme.org")
+    (when
+        (or
+         (equal (buffer-file-name)
+                (expand-file-name (concat user-emacs-directory "readme.org")))
+         (equal (buffer-file-name)
+                (expand-file-name "~/.dots/emacs/readme.org")))
       (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\"")))
 
   (add-hook 'after-save-hook 'tangle-init)
@@ -403,7 +408,6 @@
                   (turn-on-auto-fill)
                   (switch-dictionary)))
 
-      (setq org-toggle-inline-images t)
       ;; set the modules enabled by default
       (setq org-modules '(org-bbdb org-bibtex org-docview org-mhe org-rmail org-crypt
                                    org-protocol org-gnus org-id org-info org-habit
@@ -500,12 +504,8 @@
       (setq-default org-catch-invisible-edits  'error
                     org-ctrl-k-protect-subtree 'error)
 
-      ;; show images inline
-      ;; only works in GUI, but is a nice feature to have
-      (if (display-graphic-p)
-          (setq org-startup-with-inline-images t))
       ;; limit images width
-      (setq org-image-actual-width '(800))
+      (setq org-image-actual-width (/ (display-pixel-width) 5))
 
       ;; :::::: Org-Babel ::::::
 
@@ -542,6 +542,18 @@
                org-babel-expand-body:sh
                org-babel-execute:bash
                org-babel-expand-body:bash))
+
+  (use-package ob-plantuml
+    :defer t
+    :ensure org-plus-contrib
+    :commands (org-babel-execute:plantuml))
+
+  (use-package secretaria
+    :ensure t
+    :config
+    ;; use this for getting a reminder every 30 minutes of those tasks scheduled
+    ;; for today and which have no time of day defined.
+    (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
 
   (use-package org-timeline
     :ensure t
@@ -2158,14 +2170,15 @@
     :mode "PKGBUILD\\'")
 #+END_SRC
 ** Plantuml
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package plantuml-mode
     :ensure t
-    :config (setq plantuml-jar-path "~/.bin/plantuml.jar"
-                  org-plantuml-jar-path "~/.bin/plantuml.jar"))
+    :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
+                  org-plantuml-jar-path "/opt/plantuml/plantuml.jar"))
 
   (use-package flycheck-plantuml
     :ensure t
+    :after flycheck
     :config (flycheck-plantuml-setup))
 #+END_SRC
 ** Presentación
@@ -2218,7 +2231,6 @@
           (setq modi/writegood-mode-state writegood-mode)
           (writegood-mode -1))
         (flyspell-mode -1)
-        (org-display-inline-images 1)
         (toggle-frame-fullscreen)
         (text-scale-set modi/org-tree-slide-text-scale))
       (add-hook 'org-tree-slide-play-hook #'modi/org-tree-slide-start)
@@ -2231,7 +2243,6 @@
           (writegood-mode 1)
           (setq modi/writegood-mode-state nil))
         (flyspell-mode 1)
-        (org-display-inline-images -1)
         (toggle-frame-fullscreen)
         (text-scale-set 0))
       (add-hook 'org-tree-slide-stop-hook #'modi/org-tree-slide-stop)
