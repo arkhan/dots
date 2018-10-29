@@ -59,28 +59,43 @@
   (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 * Configuración de Paquetes
+** Directorio Temporal
+#+BEGIN_SRC emacs-lisp
+  (defvar conf:local-dir (concat user-emacs-directory "local/"))
+  (unless (file-exists-p conf:local-dir)
+    (make-directory conf:local-dir))
+  (defvar conf:cache-dir (concat conf:local-dir "cache/"))
+  (unless (file-exists-p conf:cache-dir)
+    (make-directory conf:cache-dir))
+  (defvar conf:pkg-dir (concat conf:local-dir "pkg/"))
+  (unless (file-exists-p conf:pkg-dir)
+    (make-directory conf:pkg-dir))
+#+END_SRC
+
 ** Repositorios
 #+BEGIN_SRC emacs-lisp
-  (setq package-archives
-	'(("gnu" . "http://elpa.gnu.org/packages/")
-	  ("melpa" . "http://melpa.org/packages/")
-	  ("org" . "https://orgmode.org/elpa/"))
-	package-archive-priorities
-	'(("melpa" . 10)
-	  ("gnu" . 5)
-	  ("org" . 0)))
+  (setq nsm-settings-file (concat conf:cache-dir "network-security.data"))
+  (setq network-security-level 'high)
+  (setq package-user-dir (concat conf:pkg-dir "elpa")
+        package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                           ("melpa" . "http://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/"))
+        package-archive-priorities '(("melpa" . 10)
+                                     ("gnu" . 5)
+                                     ("org" . 0)))
 #+END_SRC
 ** Straight, use-package, bind-key
 #+BEGIN_SRC emacs-lisp
-  (let ((bootstrap-file (concat user-emacs-directory "straight/repos/straight.el/bootstrap.el"))
-        (bootstrap-version 3))
+  (defvar bootstrap-version)
+  (let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
   (straight-use-package 'use-package)
@@ -97,7 +112,7 @@
     (package-refresh-contents))
 
   (setq package-enable-at-startup nil
-        package--init-file-ensured t)
+	package--init-file-ensured t)
 
   (eval-when-compile
     (require 'use-package))
@@ -129,22 +144,15 @@
 * Cache
 *** Directorios
 #+BEGIN_SRC emacs-lisp
-  (use-package no-littering
-    :ensure t
-    :init
-    (setq no-littering-var-directory (expand-file-name "cache/var/" user-emacs-directory)
-          no-littering-etc-directory (expand-file-name "cache/etc/" user-emacs-directory)))
-
-
-  (setq-default semanticdb-default-save-directory (concat no-littering-var-directory "semanticdb")
-                url-configuration-directory (concat no-littering-var-directory "url")
-                eshell-directory-name (concat no-littering-var-directory "eshell" ))
+  (setq-default semanticdb-default-save-directory (concat conf:cache-dir "semanticdb")
+                url-configuration-directory (concat conf:cache-dir "url")
+                eshell-directory-name (concat conf:cache-dir "eshell" ))
 #+END_SRC
 *** Bookmarks
 #+BEGIN_SRC emacs-lisp
   (use-package bookmark
     :config
-    (setq bookmark-default-file  (concat no-littering-var-directory "bookmarks"))
+    (setq bookmark-default-file  (concat conf:cache-dir "bookmarks"))
     (when (file-exists-p bookmark-default-file)
       (bookmark-load bookmark-default-file t)))
 #+END_SRC
@@ -154,7 +162,7 @@
     :diminish abbrev-mode
     :config
     (abbrev-mode t)
-    (setq abbrev-file-name (concat no-littering-var-directory "abbrev.el")
+    (setq abbrev-file-name (concat conf:cache-dir "abbrev.el")
           save-abbrevs 'silently
           default-abbrev-mode t
           save-abbrevs t)
@@ -163,7 +171,7 @@
 #+END_SRC
 *** custom.el
 #+BEGIN_SRC emacs-lisp
-  (validate-setq custom-file (concat no-littering-var-directory "custom.el"))
+  (validate-setq custom-file (concat conf:cache-dir "custom.el"))
   (unless (file-exists-p custom-file)
     (with-temp-buffer
       (write-file custom-file)))
@@ -172,7 +180,7 @@
 *** Historial
 #+BEGIN_SRC emacs-lisp
   (setq-default history-length 1000)
-  (setq savehist-file (concat no-littering-var-directory "history")
+  (setq savehist-file (concat conf:cache-dir "history")
         history-delete-duplicates t
         savehist-save-minibuffer-history 1
         savehist-additional-variables
@@ -185,13 +193,13 @@
 #+BEGIN_SRC emacs-lisp
   (use-package recentf
     :config
-    (setq recentf-save-file (concat no-littering-var-directory "recentf")
+    (setq recentf-save-file (concat conf:cache-dir "recentf")
           recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/")
           recentf-max-saved-items 15
           recentf-max-menu-items 15
           recentf-auto-cleanup 'never)
-    (add-to-list 'recentf-exclude no-littering-etc-directory)
-    (add-to-list 'recentf-exclude no-littering-var-directory)
+    (add-to-list 'recentf-exclude conf:cache-dir)
+    (add-to-list 'recentf-exclude conf:pkg-dir)
     (recentf-mode +1))
 #+END_SRC
 *** Saveplace
@@ -202,7 +210,7 @@
     (save-place-mode)
     :config
     (progn
-      (validate-setq save-place-file (concat no-littering-var-directory "saveplace.el"))
+      (validate-setq save-place-file (concat conf:cache-dir "saveplace.el"))
       (setq-default save-place t)))
 #+END_SRC
 * Datos Personales
@@ -284,7 +292,7 @@
   (use-package prescient
     :ensure t
     :config
-    (setq prescient-save-file (concat no-littering-var-directory "prescient.el"))
+    (setq prescient-save-file (concat conf:cache-dir "prescient.el"))
     (prescient-persist-mode))
 #+END_SRC
 * Ivy, Counsel, Swiper
@@ -308,7 +316,7 @@
           ivy-on-del-error-function nil
           ivy-initial-inputs-alist nil)
 
-    (defun cfg/ivy-format-function-arrow (cands)
+    (defun conf:ivy-format-function-arrow (cands)
       "Transform CAND-PAIRS into a string for minibuffer."
       (ivy--format-function-generic
        (lambda (str)
@@ -317,7 +325,7 @@
          (concat "   " str))
        cands
        "\n"))
-    (setq ivy-format-function 'cfg/ivy-format-function-arrow)
+    (setq ivy-format-function 'conf:ivy-format-function-arrow)
     (ivy-mode 1))
 
   (use-package ivy-prescient
@@ -516,10 +524,10 @@
                (org . t))))
       (setq org-babel-python-command "python")
 
-      (defun cfg/org-confirm-babel-evaluate (lang body)
+      (defun conf:org-confirm-babel-evaluate (lang body)
         (not (member lang '("emacs-lisp" "python" "sh"))))
 
-      (setq org-confirm-babel-evaluate 'cfg/org-confirm-babel-evaluate)
+      (setq org-confirm-babel-evaluate 'conf:org-confirm-babel-evaluate)
 
       ;; refresh images after execution
       (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
@@ -649,6 +657,83 @@
   (use-package htmlize
     :ensure t)
 
+  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
+  (use-package org-tree-slide
+    :ensure t
+    :config
+    (progn
+      (setq org-tree-slide--lighter " Slide")
+
+      (defvar conf:org-tree-slide-text-scale 4
+        "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
+
+      (defun conf:org-tree-slide-set-profile ()
+        "Customize org-tree-slide variables."
+        (interactive)
+        (setq org-tree-slide-header t)
+        (setq org-tree-slide-slide-in-effect nil)
+        (setq org-tree-slide-heading-emphasis t)
+        (setq org-tree-slide-cursor-init t) ;Move cursor to the head of buffer
+        (setq org-tree-slide-modeline-display 'lighter)
+        (setq org-tree-slide-skip-done nil)
+        (setq org-tree-slide-skip-comments t)
+        (setq org-tree-slide-activate-message
+              (concat "Starting Org presentation. "
+                      "Use arrow keys to navigate the slides."))
+        (setq org-tree-slide-deactivate-message "Ended presentation.")
+        (message "Custom `org-tree-slide' profile: ON"))
+
+      (defvar conf:writegood-mode-state nil
+        "Variable to store the state of `writegood-mode'.")
+
+      (defun conf:org-tree-slide-start ()
+        "Set up the frame for the slideshow."
+        (interactive)
+        (when (fboundp 'writegood-mode)
+          (setq conf:writegood-mode-state writegood-mode)
+          (writegood-mode -1))
+        (flyspell-mode -1)
+        (text-scale-set conf:org-tree-slide-text-scale))
+      (add-hook 'org-tree-slide-play-hook #'modi/org-tree-slide-start)
+
+      (defun conf:org-tree-slide-stop()
+        "Undo the frame setup for the slideshow."
+        (interactive)
+        (when (and (fboundp 'writegood-mode)
+                   conf:writegood-mode-state)
+          (writegood-mode 1)
+          (setq conf:writegood-mode-state nil))
+        (flyspell-mode 1)
+        (text-scale-set 0))
+      (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
+
+      (defun conf:org-tree-slide-text-scale-reset ()
+        "Reset time scale to `modi/org-tree-slide-text-scale'."
+        (interactive)
+        (text-scale-set modi/org-tree-slide-text-scale))
+
+      (defun conf:org-tree-slide-text-scale-inc1 ()
+        "Increase text scale by 1."
+        (interactive)
+        (text-scale-increase 1))
+
+      (defun conf:org-tree-slide-text-scale-dec1 ()
+        "Decrease text scale by 1."
+        (interactive)
+        (text-scale-decrease 1))
+
+      (bind-keys
+       :map org-tree-slide-mode-map
+       ("C-b" . org-tree-slide-move-previous-tree)
+       ("C-f" . org-tree-slide-move-next-tree)
+       ("C-0" . conf:org-tree-slide-text-scale-reset)
+       ("C-+" . conf:org-tree-slide-text-scale-inc1)
+       ("C--" . conf:org-tree-slide-text-scale-dec1)
+       ("C-1" . org-tree-slide-content)
+       ("C-2" . conf:org-tree-slide-set-profile)
+       ("C-3" . org-tree-slide-simple-profile)
+       ("C-4" . org-tree-slide-presentation-profile))))
+
   ;; (when (file-exists-p "~/.sync.el")
   ;;    (use-package org-sync
   ;;      :ensure t
@@ -681,17 +766,16 @@
                 ("s"  . pdf-occur)
                 ("b"  . pdf-view-set-slice-from-bounding-box)
                 ("r"  . pdf-view-reset-slice))
-    :init
-    (pdf-tools-install)
-    (pdf-loader-install)
+    :init (pdf-loader-install t t)
     :config
     (setq pdf-misc-print-programm "/usr/bin/gtklp"
           pdf-misc-print-programm-args (quote ("-o media=A4" "-o fitplot"))
           pdf-view-display-size 'fit-page
           pdf-view-use-imagemagick t
-          pdf-view-midnight-colors '("white smoke" . "gray5"))
-    (use-package org-pdfview
-      :ensure t))
+          pdf-view-midnight-colors '("white smoke" . "gray5")))
+
+  (use-package org-pdfview
+    :ensure t)
 #+END_SRC
 * Programación
 ** Configuración genérica
@@ -1049,8 +1133,7 @@
   (electric-pair-mode 1)
 
   (use-package paren
-    :init
-    (show-paren-mode)
+    :init (show-paren-mode)
     :config
     (set-face-background 'show-paren-match (face-background 'default))
     (set-face-foreground 'show-paren-match "#def")
@@ -1166,8 +1249,8 @@
     :ensure t
     :diminish projectile-mode
     :config
-    (setq projectile-known-projects-file (concat no-littering-var-directory "projectile-bookmarks.eld")
-          projectile-cache-file (concat no-littering-var-directory "projectile.cache")
+    (setq projectile-known-projects-file (concat conf:cache-dir "projectile-bookmarks.eld")
+          projectile-cache-file (concat conf:cache-dir "projectile.cache")
           projectile-file-exists-remote-cache-expire (* 10 60)
           projectile-indexing-method 'alien
           projectile-enable-caching t
@@ -1214,7 +1297,7 @@
     :init
     (progn
       (global-undo-tree-mode)
-      (setq undo-tree-dir (concat no-littering-var-directory "undo/"))
+      (setq undo-tree-dir (concat conf:cache-dir "undo/"))
       (make-directory undo-tree-dir :parents)
       (validate-setq undo-tree-history-directory-alist `(("." . ,undo-tree-dir))
                      undo-tree-auto-save-history t
@@ -1602,8 +1685,8 @@
     :config
     (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
     (setq tramp-default-method "scp"
-          tramp-persistency-file-name (concat no-littering-var-directory "tramp")
-          tramp-auto-save-directory (concat no-littering-var-directory "tramp-autosave")
+          tramp-persistency-file-name (concat conf:cache-dir "tramp")
+          tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
           tramp-debug-buffer t
           tramp-verbose 10
           tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
@@ -1654,7 +1737,6 @@
   (global-set-key "\M-p" 'backward-paragraph)
   (global-set-key "\M-n" 'forward-paragraph)
   (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
-  (show-paren-mode)
 #+END_SRC
 ** Cursor
 #+BEGIN_SRC emacs-lisp
@@ -1948,16 +2030,17 @@
 
   (use-package smart-mode-line
     :ensure t
-    :config (setq sml/no-confirm-load-theme t
-                  sml/theme 'dark
-                  sml/vc-mode-show-backend t
-                  sml/mode-width 'full
-                  sml/shorten-modes t)
-    (sml/setup)
+    :config
+    (setq sml/no-confirm-load-theme t
+          sml/theme 'dark
+          sml/shorten-directory t
+          sml/show-client t
+          sml/show-encoding t)
     (add-to-list 'mode-line-misc-info
                  '(:eval (when (not (tramp-tramp-file-p default-directory))
                            (if (in-git-p)
-                               (concat (git-remote-status) " " (git-parse-status)))))))
+                               (concat (git-remote-status) " " (git-parse-status))))))
+    (sml/setup))
 
  #+END_SRC
 ** Switch Windows
@@ -2017,7 +2100,10 @@
   (setq-default buffer-file-coding-system 'utf-8-auto-unix
                 x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
-
+** Which-function
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'which-function-mode)
+#+END_SRC
 ** Which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -2169,6 +2255,11 @@
     :mode
     ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 #+END_SRC
+** Pacfiles
+#+BEGIN_SRC emacs-lisp
+  (use-package pacfiles-mode
+    :ensure t)
+#+END_SRC
 ** Pkgbuil
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
@@ -2197,88 +2288,6 @@
                                                  (presentation-mode 0)
                                                (presentation-mode 1))
                                              (toggle-frame-fullscreen))))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp
-  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
-  (use-package org-tree-slide
-    :ensure t
-    :config
-    (progn
-      (setq org-tree-slide--lighter " Slide"
-            org-tree-slide-heading-emphasis t)
-
-      (defvar modi/org-tree-slide-text-scale 3
-        "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
-
-      (defun modi/org-tree-slide-set-profile ()
-        "Customize org-tree-slide variables."
-        (interactive)
-        (setq modi/org-tree-slide-text-scale 2)
-        (setq org-tree-slide-header nil)
-        (setq org-tree-slide-slide-in-effect t)
-        (setq org-tree-slide-heading-emphasis nil)
-        (setq org-tree-slide-cursor-init t) ;Move cursor to the head of buffer
-        (setq org-tree-slide-modeline-display 'lighter)
-        (setq org-tree-slide-skip-done nil)
-        (setq org-tree-slide-skip-comments t)
-        (setq org-tree-slide-activate-message
-              (concat "Starting Org presentation. "
-                      "Use arrow keys to navigate the slides."))
-        (setq org-tree-slide-deactivate-message "Ended presentation.")
-        (message "my custom `org-tree-slide' profile: ON"))
-
-      (defvar modi/writegood-mode-state nil
-        "Variable to store the state of `writegood-mode'.")
-
-      (defun modi/org-tree-slide-start ()
-        "Set up the frame for the slideshow."
-        (interactive)
-        (when (fboundp 'writegood-mode)
-          (setq modi/writegood-mode-state writegood-mode)
-          (writegood-mode -1))
-        (flyspell-mode -1)
-        (toggle-frame-fullscreen)
-        (text-scale-set modi/org-tree-slide-text-scale))
-      (add-hook 'org-tree-slide-play-hook #'modi/org-tree-slide-start)
-
-      (defun modi/org-tree-slide-stop()
-        "Undo the frame setup for the slideshow."
-        (interactive)
-        (when (and (fboundp 'writegood-mode)
-                   modi/writegood-mode-state)
-          (writegood-mode 1)
-          (setq modi/writegood-mode-state nil))
-        (flyspell-mode 1)
-        (toggle-frame-fullscreen)
-        (text-scale-set 0))
-      (add-hook 'org-tree-slide-stop-hook #'modi/org-tree-slide-stop)
-
-      (defun modi/org-tree-slide-text-scale-reset ()
-        "Reset time scale to `modi/org-tree-slide-text-scale'."
-        (interactive)
-        (text-scale-set modi/org-tree-slide-text-scale))
-
-      (defun modi/org-tree-slide-text-scale-inc1 ()
-        "Increase text scale by 1."
-        (interactive)
-        (text-scale-increase 1))
-
-      (defun modi/org-tree-slide-text-scale-dec1 ()
-        "Decrease text scale by 1."
-        (interactive)
-        (text-scale-decrease 1))
-
-      (bind-keys
-       :map org-tree-slide-mode-map
-       ("<left>" . org-tree-slide-move-previous-tree)
-       ("<right>" . org-tree-slide-move-next-tree)
-       ("C-0" . modi/org-tree-slide-text-scale-reset)
-       ("C-=" . modi/org-tree-slide-text-scale-inc1)
-       ("C--" . modi/org-tree-slide-text-scale-dec1)
-       ("C-1" . org-tree-slide-content)
-       ("C-2" . modi/org-tree-slide-set-profile)
-       ("C-3" . org-tree-slide-simple-profile)
-       ("C-4" . org-tree-slide-presentation-profile))))
 #+END_SRC
 ** Sudo
 #+BEGIN_SRC emacs-lisp

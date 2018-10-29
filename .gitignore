@@ -1,8 +1,8 @@
 *.el
 *.pyc
 
-emacs/elpa/
 emacs/cache/
+emacs/local/
 emacs/straight/
 /config/teiler/profiles/
 /config/qutebrowser/autoconfig.yml
