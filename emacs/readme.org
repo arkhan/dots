@@ -70,19 +70,31 @@
   (setq nsm-settings-file (concat conf:cache-dir "network-security.data"))
   (setq network-security-level 'high)
 #+END_SRC
-** Straight, el-patch, use-package, bind-key
+** Elpa, Straight, el-patch, use-package, bind-key
 #+BEGIN_SRC emacs-lisp
+  (setq package-user-dir (concat conf:cache-dir "elpa")
+        package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                           ("melpa" . "http://melpa.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/"))
+        package-archive-priorities '(("melpa" . 10)
+                                     ("gnu" . 5)
+                                     ("org" . 0)))
+
+
+
   (defvar bootstrap-version)
   (let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	(bootstrap-version 5))
+    (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	   'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+      (url-retrieve-synchronously
+       "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+       'silent 'inhibit-cookies)
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
+
+  (setq straight-check-for-modifications 'live)
 
   (straight-use-package 'use-package)
   (setq straight-enable-use-package-integration nil)
@@ -92,6 +104,13 @@
   ;; avoid problems with files newer than their byte-compiled counterparts
   ;; it's better a lower startup than load an outdated and maybe bugged package
   (setq load-prefer-newer t)
+  ;; initialize the packages and create the packages list if not exists
+  (package-initialize)
+  (when (not package-archive-contents)
+    (package-refresh-contents))
+
+  (setq package-enable-at-startup nil
+        package--init-file-ensured t)
 
   (eval-when-compile
     (require 'use-package))
@@ -102,13 +121,13 @@
 ** Validación de Esquema
 #+BEGIN_SRC emacs-lisp
   (use-package validate
-    :straight t)
+    :ensure t)
 #+END_SRC
 ** Async
 #+BEGIN_SRC emacs-lisp
   (use-package async
     :defer t
-    :straight t
+    :ensure t
     :config (setq async-bytecomp-package-mode t))
 #+END_SRC
 * Cache
@@ -167,13 +186,14 @@
           recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/" "conf:cache-dir")
           recentf-max-saved-items 15
           recentf-max-menu-items 15
+          recentf-keep '(file-remote-p file-readable-p)
           recentf-auto-cleanup 'never)
     (recentf-mode +1))
 #+END_SRC
 *** Saveplace
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
-    :straight t
+    :ensure t
     :init
     (save-place-mode)
     :config
@@ -242,7 +262,7 @@
     (define-key flyspell-mode-map [(control ?\')] 'flyspell-add-word-to-dict))
 
   (use-package flyspell-popup
-    :straight t
+    :ensure t
     :after flyspell
     :bind (:map flyspell-mode-map
                 ("C-;" . #'flyspell-popup-correct)))
@@ -250,17 +270,17 @@
 * Prescient
 #+BEGIN_SRC emacs-lisp
   (use-package prescient
-    :straight t
+    :ensure t
     :config
     (setq prescient-save-file (concat conf:cache-dir "prescient.el"))
     (prescient-persist-mode))
 #+END_SRC
 * Ivy, Counsel, Swiper
 #+BEGIN_SRC emacs-lisp
-  (use-package flx :straight t)
+  (use-package flx :ensure t)
 
   (use-package ivy
-    :straight t
+    :ensure t
     :diminish ivy-mode
     :bind (:map ivy-mode-map
                 ("C-'" . ivy-avy))
@@ -289,14 +309,14 @@
     (ivy-mode 1))
 
   (use-package ivy-prescient
-    :straight t
+    :ensure t
     :after ivy
     :init (ivy-prescient-mode))
 
   (setq confirm-nonexistent-file-or-buffer t)
 
   (use-package swiper
-    :straight t
+    :ensure t
     :bind* (("C-s" . swiper)
             ("C-r" . swiper)
             ("C-M-s" . swiper-all))
@@ -305,7 +325,7 @@
           ("C-r" . counsel-expression-history)))
 
   (use-package counsel
-    :straight t
+    :ensure t
     :bind (("M-x" . counsel-M-x)
            ("C-c b" . counsel-imenu)
            ("C-x C-f" . counsel-find-file)
@@ -320,7 +340,7 @@
                    counsel-rg-base-command "rg -uuu -S --no-heading --line-number --color never %s ."))
 
   (use-package ivy-rich
-    :straight t
+    :ensure t
     :config
     '(ivy-switch-buffer
       (:columns
@@ -360,40 +380,13 @@
 #+END_SRC
 * Orgmode
 #+BEGIN_SRC emacs-lisp
-  (use-package git :straight t)
+  (use-package git :ensure t)
   (use-package org
-    :straight org-plus-contrib
+    :ensure org-plus-contrib
     :defer 1
     :bind (("C-x a" . org-agenda-list)
            ("C-x c" . org-capture))
     :config
-    (defun org-git-version ()
-      "The Git version of org-mode.
-    Inserted by installing org-mode or when a release is made."
-      (require 'git)
-      (let ((git-repo (expand-file-name
-                       "straight/repos/org/" user-emacs-directory)))
-        (string-trim
-         (git-run "describe"
-                  "--match=release\*"
-                  "--abbrev=6"
-                  "HEAD"))))
-
-    (defun org-release ()
-      "The release version of org-mode.
-    Inserted by installing org-mode or when a release is made."
-      (require 'git)
-      (let ((git-repo (expand-file-name
-                       "straight/repos/org/" user-emacs-directory)))
-        (string-trim
-         (string-remove-prefix
-          "release_"
-          (git-run "describe"
-                   "--match=release\*"
-                   "--abbrev=0"
-                   "HEAD")))))
-
-    (provide 'org-version)
     (progn
       (add-hook 'org-mode-hook
                 (lambda ()
@@ -524,12 +517,12 @@
 
   (use-package ob-python
     :defer t
-    :straight org-plus-contrib
+    :ensure org-plus-contrib
     :commands (org-babel-execute:python))
 
   (use-package ob-shell
     :defer t
-    :straight org-plus-contrib
+    :ensure org-plus-contrib
     :commands (org-babel-execute:sh
                org-babel-expand-body:sh
                org-babel-execute:bash
@@ -537,28 +530,28 @@
 
   (use-package ob-plantuml
     :defer t
-    :straight org-plus-contrib
+    :ensure org-plus-contrib
     :commands (org-babel-execute:plantuml))
 
   (use-package secretaria
-    :straight t
+    :ensure t
     :config
     ;; use this for getting a reminder every 30 minutes of those tasks scheduled
     ;; for today and which have no time of day defined.
     (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
 
   (use-package org-timeline
-    :straight t
+    :ensure t
     :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
   (use-package secretaria
-    :straight t
+    :ensure t
     :init
     (setf secretaria-clocked-task-save-file "~/.secretaria-tarea")
     (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
 
   (use-package org-bullets
-    :straight t
+    :ensure t
     :hook (org-mode . org-bullets-mode))
 
   (use-package org-inlinetask
@@ -630,20 +623,20 @@
     (define-key org-mode-map (kbd "RET") 'org-power-return))
 
   (use-package ob-async
-    :straight t)
+    :ensure t)
 
   (use-package ob-translate
-    :straight t)
+    :ensure t)
 
   (use-package ox-reveal
-    :straight t)
+    :ensure t)
 
   (use-package htmlize
-    :straight t)
+    :ensure t)
 
   ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
   (use-package org-tree-slide
-    :straight t
+    :ensure t
     :config
     (progn
       (setq org-tree-slide--lighter " Slide")
@@ -728,7 +721,7 @@
 * Pdf Tools
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
-    :straight t
+    :ensure t
     :bind (:map pdf-view-mode-map
                 ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
                 ("g"  . pdf-view-first-page)
@@ -760,14 +753,14 @@
 
   (use-package org-pdfview
     :after org
-    :straight t)
+    :ensure t)
 #+END_SRC
 * Programación
 ** Configuración genérica
 *** Anzu
 #+BEGIN_SRC emacs-lisp
     (use-package anzu
-      :straight t
+      :ensure t
       :bind (("M-%" . anzu-query-replace)
              ("C-M-%" . anzu-query-replace-regexp))
       :init (global-anzu-mode)
@@ -797,13 +790,13 @@
 *** Comment-dwim-2
 #+BEGIN_SRC emacs-lisp
   (use-package comment-dwim-2
-    :straight t
+    :ensure t
     :bind* ("M-;" . comment-dwim-2))
 #+END_SRC
 *** Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :straight t
+    :ensure t
     :init
     (setq company-backends '((company-files
                               company-keywords
@@ -820,7 +813,7 @@
     (global-company-mode))
 
   (use-package company-prescient
-    :straight t
+    :ensure t
     :after company
     :init (company-prescient-mode))
 
@@ -837,14 +830,14 @@
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
 
   (use-package company-quickhelp
-    :straight t
+    :ensure t
     :after company
     :config (company-quickhelp-mode 1))
 #+END_SRC
 *** Csv
 #+BEGIN_SRC emacs-lisp
   (use-package csv-mode
-    :straight t
+    :ensure t
     :mode ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
     :config (setq csv-separators '("," ";" "|" " ")))
 #+END_SRC
@@ -853,19 +846,19 @@
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
     :mode "Dockerfile\\'"
-    :straight t)
+    :ensure t)
 #+END_SRC
 **** Docker Compose
 #+BEGIN_SRC emacs-lisp
   (use-package docker-compose-mode
-    :straight t
+    :ensure t
     :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
 #+END_SRC
 
 *** dumb-jump
 #+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
-    :straight t
+    :ensure t
     :bind (("M-g o" . dumb-jump-go-other-window)
            ("M-g j" . dumb-jump-go)
            ("M-g i" . dumb-jump-go-prompt)
@@ -899,7 +892,7 @@
 *** EditorConfig
 #+BEGIN_SRC emacs-lisp
   (use-package editorconfig
-    :straight t
+    :ensure t
     :diminish ""
     :config
     (editorconfig-mode))
@@ -912,7 +905,7 @@
 *** Fill Column Indicator
 #+BEGIN_SRC emacs-lisp
   (use-package fill-column-indicator
-    :straight t
+    :ensure t
     :commands (fci-mode)
     :init (setq fci-rule-width 5
                 fci-rule-column 79))
@@ -920,7 +913,7 @@
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :straight t
+    :ensure t
     :bind (("C-c e n" . flycheck-next-error)
            ("C-c e p" . flycheck-previous-error))
     :config
@@ -937,7 +930,7 @@
 *** Format-all
 #+BEGIN_SRC emacs-lisp
   (use-package format-all
-    :straight t
+    :ensure t
     :bind (:map prog-mode-map
                 ("<M-f8>" . format-all-buffer)))
 #+END_SRC
@@ -948,7 +941,7 @@
         vc-handled-backends nil)
 
   (use-package magit
-    :straight t
+    :ensure t
     :bind (("C-x g c" . magit-commit)
            ("C-x g e" . magit-ediff-resolve)
            ("C-x g g" . magit-grep)
@@ -1001,7 +994,7 @@
             magit-log-buffer-file-locket t)))
 
   (use-package git-gutter
-    :straight t
+    :ensure t
     :defer 1
     :bind (("C-x C-g" . git-gutter)
            ("C-x v =" . git-gutter:popup-hunk)
@@ -1013,7 +1006,7 @@
     :config
     (if (display-graphic-p)
         (use-package git-gutter-fringe
-          :straight t))
+          :ensure t))
     (global-git-gutter-mode t)
     (setq-default fringes-outside-margins t)
     (setq indicate-empty-lines nil)
@@ -1063,30 +1056,30 @@
         (message "NO git-gutters!"))))
 
   (use-package gitconfig-mode
-    :straight t
+    :ensure t
     :mode ("/\\.?git/?config$"
            "/\\.gitmodules$")
     :init (add-hook 'gitconfig-mode-hook 'flyspell-mode))
 
   (use-package gitignore-mode
-    :straight t
+    :ensure t
     :mode ("/\\.gitignore$"
            "/\\.git/info/exclude$"
            "/git/ignore$"))
 
   (use-package gitattributes-mode
-    :straight t
+    :ensure t
     :defer t)
 
   (use-package git-timemachine
-    :straight t
+    :ensure t
     :commands git-timemachine
     :bind (:map git-timemachine-mode
                 ("c" . git-timemachine-show-current-revision)
                 ("b" . git-timemachine-switch-branch)))
 
   (use-package smerge-mode
-    :straight t
+    :ensure t
     :config
     (defun enable-smerge-maybe ()
       (when (and buffer-file-name (vc-backend buffer-file-name))
@@ -1100,12 +1093,12 @@
 *** Iedit
 #+BEGIN_SRC emacs-lisp
   (use-package iedit
-    :straight t)
+    :ensure t)
 #+END_SRC
 *** move-dup
 #+BEGIN_SRC emacs-lisp
   (use-package move-dup
-    :straight t
+    :ensure t
     :diminish move-dup-mode
     :bind (("S-M-<up>" . md/move-lines-up)
            ("S-M-<down>" . md/move-lines-down)
@@ -1125,7 +1118,7 @@
     (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
 
   (use-package smartparens
-    :straight t
+    :ensure t
     :commands
     (smartparens-mode
      smartparens-strict-mode)
@@ -1139,14 +1132,14 @@
     (require 'smartparens-config))
 
   (use-package rainbow-delimiters
-    :straight t
+    :ensure t
     :config
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
 *** PO
 #+BEGIN_SRC emacs-lisp
   (use-package po-mode
-    :straight t
+    :ensure t
     :config
     ;; Fuente: https://www.emacswiki.org/emacs/PoMode
     (defun po-wrap ()
@@ -1231,7 +1224,7 @@
 *** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :straight t
+    :ensure t
     :diminish projectile-mode
     :config
     (setq projectile-known-projects-file (concat conf:cache-dir "projectile-bookmarks.eld")
@@ -1243,7 +1236,7 @@
     (projectile-mode))
 
   (use-package counsel-projectile
-    :straight t
+    :ensure t
     :bind ("C-x r R" . counsel-projectile-rg)
     :config
     (setq counsel-projectile-rg-options-history (list "-uuu"))
@@ -1251,16 +1244,16 @@
     (add-hook 'prog-mode-hook 'counsel-projectile-mode))
 
   (use-package term-projectile
-    :straight t)
+    :ensure t)
 
   (use-package rg
-    :straight t
+    :ensure t
     :config (setq rg-command-line-flags (list "-uuu")))
 #+END_SRC
 *** Rainbow
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
-    :straight t
+    :ensure t
     :diminish rainbow-mode
     :config
     (add-hook 'prog-mode-hook 'rainbow-mode)
@@ -1269,7 +1262,7 @@
 *** Shell
 #+BEGIN_SRC emacs-lisp
   (use-package terminal-here
-    :straight t
+    :ensure t
     :bind (("C-<f5>" . terminal-here-launch)
            ("C-<f6>" . terminal-here-project-launch))
     :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
@@ -1277,7 +1270,7 @@
 *** Undo Tree
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :straight t
+    :ensure t
     :diminish undo-tree-mode
     :init
     (progn
@@ -1294,19 +1287,19 @@
 *** Yassnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :straight t
+    :ensure t
     :defer 2
     :config
     (yas-global-mode)
     (validate-setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
   (use-package yasnippet-snippets
-    :straight t)
+    :ensure t)
 #+END_SRC
 *** Ztree
 #+BEGIN_SRC emacs-lisp
   (use-package ztree
-    :straight t
+    :ensure t
     :bind (("C-c z" . ztree-diff))
     :config
     (setq ztree-draw-unicode-lines t
@@ -1316,24 +1309,24 @@
 *** Jinja
 #+BEGIN_SRC emacs-lisp
   (use-package jinja2-mode
-    :straight t)
+    :ensure t)
 #+END_SRC
 *** JS
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
-    :straight t
+    :ensure t
     :config
     (add-hook 'js-mode-hook 'tern-mode))
 
   (use-package js-format
-    :straight t
+    :ensure t
     :after js2-mode
     :config (add-hook 'js2-mode-hook
                       (lambda()
                         (js-format-setup "standard"))))
 
   (use-package tern
-    :straight t
+    :ensure t
     :config
     ;; Force restart of tern in new projects
     ;; $ M-x delete-tern-process
@@ -1344,7 +1337,7 @@
       (delete-process "Tern")))
 
   (use-package company-tern
-    :straight t
+    :ensure t
     :init
     (defun cfg:js-mode-hook ()
       (add-to-list 'company-backends 'company-tern))
@@ -1355,7 +1348,7 @@
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package tex
     :defer t
-    :straight auctex
+    :ensure auctex
     :bind
     ("C-c c" . TeX-clean)
     :init
@@ -1383,7 +1376,7 @@
     (add-hook 'TeX-mode-hook 'turn-on-auto-fill)
     (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
     (use-package cdlatex
-      :straight t)
+      :ensure t)
     (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)
 
     ;; Use pdf-tools to open PDF files
@@ -1424,7 +1417,7 @@
                   (set-fill-column 120)))))
 
   (use-package company-auctex
-    :straight t
+    :ensure t
     :config
     (defun cfg:TeX-mode-hook ()
       (company-auctex-init))
@@ -1442,7 +1435,7 @@
             '(lambda () (when (empty-buffer?) (python-template))))
 
   (use-package elpy
-    :straight t
+    :ensure t
     :diminish elpy-mode
     :config
     (elpy-enable)
@@ -1473,7 +1466,7 @@
       (add-hook 'elpy-mode-hook 'flycheck-mode))
 
     (use-package flycheck-pycheckers
-      :straight t
+      :ensure t
       :after flycheck
       :config (setq flycheck-pycheckers-checkers (quote (pylint pep8 flake8 bandit))
                     flycheck-pycheckers-ignore-codes (quote ("C0411" "C0413" "C0103" "C0111"
@@ -1501,18 +1494,18 @@
     :config (defalias 'workon 'pyvenv-workon))
 
   (use-package py-isort
-    :straight t
+    :ensure t
     :config
     (setq py-isort-options '("--lines=100"))
     (add-hook 'before-save-hook 'py-isort-before-save))
 
   (use-package auto-virtualenv
-    :straight t
+    :ensure t
     :config
     (add-hook 'elpy-mode-hook 'auto-virtualenv-set-virtualenv))
 
   (use-package virtualenvwrapper
-    :straight t
+    :ensure t
     :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
     :init
     (venv-initialize-interactive-shells)
@@ -1522,31 +1515,31 @@
     (add-hook 'venv-postmkvirtualenv-hook
               (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
 
-  (use-package pyimport :straight t)
+  (use-package pyimport :ensure t)
 
-  (use-package pippel :straight t)
+  (use-package pippel :ensure t)
 
-  (use-package pip-requirements :straight t)
+  (use-package pip-requirements :ensure t)
 #+END_SRC
 *** SQL
 #+BEGIN_SRC emacs-lisp
   (use-package edbi-database-url
-    :straight t)
+    :ensure t)
 
   (use-package edbi-minor-mode
-    :straight t
+    :ensure t
     :config
     (add-hook 'sql-mode-hook 'edbi-minor-mode))
 
   (use-package company-edbi
-    :straight t
+    :ensure t
     :init
     (defun cfg:edbi-mode-hook()
       (add-to-list 'company-backends 'company-edbi))
     (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
 
   (use-package sqlup-mode
-    :straight t
+    :ensure t
     :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
     :init
     (add-hook 'sql-mode-hook 'sqlup-mode)
@@ -1554,7 +1547,7 @@
     (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 
   (use-package sql-indent
-    :straight t
+    :ensure t
     :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer)))
     :config (eval-after-load "sql"
               '(load-library "sql-indent")))
@@ -1562,10 +1555,10 @@
 *** Web
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package php-mode
-    :straight t)
+    :ensure t)
 
   (use-package company-php
-    :straight t
+    :ensure t
     :config
     (defun cfg:php-mode-hook ()
       (interactive)
@@ -1576,7 +1569,7 @@
     (add-hook 'php-mode-hook 'cfg:php-mode-hook))
 
   (use-package web-mode
-    :straight t
+    :ensure t
     :mode
     (("\\.phtml\\'" . web-mode)
      ("\\.tpl\\'" . web-mode)
@@ -1654,12 +1647,12 @@
 *** Yaml
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode
-    :straight t)
+    :ensure t)
 #+END_SRC
 * PATH
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
-    :straight t
+    :ensure t
     :init
     (setq exec-path-from-shell-check-startup-files nil)
     (exec-path-from-shell-initialize))
@@ -1679,7 +1672,7 @@
                                            (tramp-parse-sconfig "~/.ssh/config"))))
 
   (use-package counsel-tramp
-    :straight t
+    :ensure t
     :bind ("C-c s" . counsel-tramp)
     :config
     (add-hook 'counsel-tramp-pre-command-hook '(lambda () (projectile-mode 0)
@@ -1779,24 +1772,24 @@
 #+END_SRC
 ** Sidebar
 #+BEGIN_SRC emacs-lisp :tangle no
-  (use-package ov :straight t)
-  (use-package frame-local :straight t)
+  (use-package ov :ensure t)
+  (use-package frame-local :ensure t)
   (add-to-list 'load-path "~/.local/share/icons-in-terminal/")
 
   (use-package font-lock+
-    :straight (font-lock+ :type git :host github :repo "emacsmirror/font-lock-plus"))
+    :ensure (font-lock+ :type git :host github :repo "emacsmirror/font-lock-plus"))
 
   (use-package sidebar
-    :straight (sidebar.el :type git :host github :repo "samangh/sidebar.el")
+    :ensure (sidebar.el :type git :host github :repo "samangh/sidebar.el")
     :bind ("M-1" . sidebar-open))
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp
   (use-package shrink-path
-    :straight t)
+    :ensure t)
 
   (use-package neotree
-    :straight t
+    :ensure t
     :bind (:map neotree-mode-map
                 ("<C-return>" . neotree-change-root)
                 ("C" . neotree-change-root)
@@ -1859,7 +1852,7 @@
         scroll-down-aggressively 0.02)
 
   (use-package smooth-scrolling
-    :straight t
+    :ensure t
     :config
     (validate-setq smooth-scroll-margin 5))
 #+END_SRC
@@ -1867,7 +1860,7 @@
 ** Shackle
 #+BEGIN_SRC emacs-lisp
   (use-package shackle
-    :straight t
+    :ensure t
     :init (shackle-mode)
     :config
     (setq shackle-default-size 0.4)
@@ -1899,7 +1892,7 @@
 ** SSH
 #+BEGIN_SRC emacs-lisp
   (use-package ssh
-    :straight t
+    :ensure t
     :init
     (add-hook 'ssh-mode-hook
               (lambda ()
@@ -2014,13 +2007,13 @@
                  column-number-mode t)
 
   (use-package smart-mode-line
-    :straight t
+    :ensure t
     :config
     (setq sml/no-confirm-load-theme t
           sml/theme 'dark
-          sml/shorten-directory t
           sml/show-client t
           sml/show-encoding t)
+
     (add-to-list 'mode-line-misc-info
                  '(:eval (when (not (tramp-tramp-file-p default-directory))
                            (if (in-git-p)
@@ -2031,7 +2024,7 @@
 ** Switch Windows
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window
-    :straight t
+    :ensure t
     :bind (("C-x o" . switch-window)
            ("C-x 1" . switch-window-then-maximize)
            ("C-x 2" . switch-window-then-split-below)
@@ -2041,12 +2034,12 @@
 ** Tablero
 #+BEGIN_SRC emacs-lisp
   (use-package page-break-lines
-    :straight t
+    :ensure t
     :diminish page-break-lines-mode
     :config (turn-on-page-break-lines-mode))
 
   (use-package dashboard
-    :straight t
+    :ensure t
     :config
     (dashboard-setup-startup-hook)
     (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version " kernel " (car (split-string (shell-command-to-string "uname -r") "-")) " x86_64 ArchLinux GTK+ " gtk-version-string)
@@ -2071,11 +2064,6 @@
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC
-** Transparent
-#+BEGIN_SRC emacs-lisp :tangle no
-  (set-frame-parameter (selected-frame) 'alpha '(90 90))
-  (add-to-list 'default-frame-alist '(alpha 90 90))
-#+END_SRC
 ** UTF-8
 #+BEGIN_SRC emacs-lisp
   (prefer-coding-system       'utf-8)
@@ -2092,7 +2080,7 @@
 ** Which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :straight t
+    :ensure t
     :diminish which-key-mode
     :config
     (setq which-key-sort-order 'which-key-key-order-alpha)
@@ -2102,13 +2090,13 @@
 ** auth-password-store
 #+BEGIN_SRC emacs-lisp
   (use-package password-store
-    :straight t
+    :ensure t
     :config
     (progn
       (setq password-store-password-length 30)))
 
   (use-package pass
-    :straight t
+    :ensure t
     :commands pass
     :init
     (progn
@@ -2139,7 +2127,7 @@
       (setq auth-source-do-cache nil)))
 
   (use-package auth-source-pass
-    :straight t
+    :ensure t
     :demand t
     :after auth-source
     :init
@@ -2157,13 +2145,13 @@
 ** Bughunter
 #+BEGIN_SRC emacs-lisp
   (use-package bug-hunter
-    :straight t
+    :ensure t
     :commands (bug-hunter-file bug-hunter-init-file))
 #+END_SRC
 ** Caldav
 #+BEGIN_SRC emacs-lisp
   (use-package org-caldav
-    :straight t
+    :ensure t
     :bind ("<f6>" . org-caldav-sync)
     :config
     (setq org-icalendar-alarm-time 30
@@ -2187,10 +2175,10 @@
           org-caldav-url "https://cloud.disroot.org/remote.php/dav/calendars"))
 
   (use-package calfw
-    :straight t
+    :ensure t
     :bind ("C-c f" . cfw:open-org-calendar)
     :config
-    (use-package calfw-org :straight t)
+    (use-package calfw-org :ensure t)
     (setq cfw:org-overwrite-default-keybinding t
           cfw:display-calendar-holidays nil
           calendar-week-start-day 1))
@@ -2198,7 +2186,7 @@
 ** Clipboard
 #+BEGIN_SRC emacs-lisp
   (use-package clipmon
-    :straight t
+    :ensure t
     :config
     (add-to-list 'after-init-hook 'clipmon-mode-start)
     (setq kill-ring-max 500
@@ -2214,7 +2202,7 @@
 ** GraphViz
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package graphviz-dot-mode
-    :straight t)
+    :ensure t)
 #+END_SRC
 ** i3wm
 #+BEGIN_SRC emacs-lisp
@@ -2224,7 +2212,7 @@
 ** Logview
 #+BEGIN_SRC emacs-lisp
   (use-package logview
-    :straight t
+    :ensure t
     :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+END_SRC
 ** Makefile
@@ -2236,37 +2224,37 @@
 ** Nginx
 #+BEGIN_SRC emacs-lisp
   (use-package nginx-mode
-    :straight t
+    :ensure t
     :mode
     ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 #+END_SRC
 ** Pacfiles
 #+BEGIN_SRC emacs-lisp
   (use-package pacfiles-mode
-    :straight t)
+    :ensure t)
 #+END_SRC
 ** Pkgbuil
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
-    :straight t
+    :ensure t
     :mode "PKGBUILD\\'")
 #+END_SRC
 ** Plantuml
 #+BEGIN_SRC emacs-lisp
   (use-package plantuml-mode
-    :straight t
+    :ensure t
     :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
                   org-plantuml-jar-path "/opt/plantuml/plantuml.jar"))
 
   (use-package flycheck-plantuml
-    :straight t
+    :ensure t
     :after flycheck
     :config (flycheck-plantuml-setup))
 #+END_SRC
 ** Presentación
 #+BEGIN_SRC emacs-lisp
   (use-package presentation
-    :straight t
+    :ensure t
     :config (global-set-key (kbd "<M-f5>") (lambda ()
                                              (interactive)
                                              (if presentation-mode
@@ -2277,7 +2265,7 @@
 ** Sudo
 #+BEGIN_SRC emacs-lisp
   (use-package sudo-edit
-    :straight t)
+    :ensure t)
 #+END_SRC
 ** xrdb
 #+BEGIN_SRC emacs-lisp
