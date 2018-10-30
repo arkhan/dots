@@ -380,7 +380,6 @@
 #+END_SRC
 * Orgmode
 #+BEGIN_SRC emacs-lisp
-  (use-package git :ensure t)
   (use-package org
     :ensure org-plus-contrib
     :defer 1
@@ -400,7 +399,8 @@
                                    org-man org-panel org-toc ox-md))
 
       ;; set default directories
-      (setq org-directory "~/org"
+      (setq org-id-locations-file (concat conf:cache-dir "org-id.el")
+            org-directory "~/org"
             org-default-notes-file (concat org-directory "/notes.org"))
 
       ;; set the archive
@@ -2170,9 +2170,11 @@
                                                :files ("~/org/stuff.org")
                                                :inbox "~/org/inbox.org"))
           org-caldav-files org-agenda-files
-          org-caldav-save-directory (concat user-emacs-directory "cache")
+          org-caldav-save-directory (concat conf:cache-dir "dav")
           org-caldav-show-sync-results nil
-          org-caldav-url "https://cloud.disroot.org/remote.php/dav/calendars"))
+          org-caldav-url "https://cloud.disroot.org/remote.php/dav/calendars")
+    (make-directory org-caldav-save-directory :parents))
+
 
   (use-package calfw
     :ensure t
