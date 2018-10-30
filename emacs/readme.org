@@ -754,6 +754,57 @@
     :after org
     :ensure t)
 #+END_SRC
+* Harcode
+#+BEGIN_SRC emacs-lisp
+  (use-package hardcore-mode
+    :ensure t
+    :config
+    (global-set-key "\M-p" 'backward-paragraph)
+    (global-set-key "\M-n" 'forward-paragraph)
+    (define-key key-translation-map [?\C-h] [?\C-?])
+    (global-set-key (kbd "<f1>") 'help-command)
+    (define-key hardcore-mode-map
+      (kbd "<C-up>") (lambda ()
+                       (interactive)
+                       (message "This key is disabled. Use M-p instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<C-down>") (lambda ()
+                         (interactive)
+                         (message "This key is disabled. Use M-n instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<C-left>") (lambda ()
+                         (interactive)
+                         (message "This key is disabled. Use M-b instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<C-right>") (lambda ()
+                          (interactive)
+                          (message "This key is disabled. Use M-f instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<prior>") (lambda ()
+                        (interactive)
+                        (message "This key is disabled. Use M-v instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<next>") (lambda ()
+                       (interactive)
+                       (message "This key is disabled. Use C-v instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<home>") (lambda ()
+                       (interactive)
+                       (message "This key is disabled. Use C-a instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<C-home>") (lambda ()
+                         (interactive)
+                         (message "This key is disabled. Use M-< instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<end>") (lambda ()
+                      (interactive)
+                      (message "This key is disabled. Use C-e instead.")))
+    (define-key hardcore-mode-map
+      (kbd "<C-end>") (lambda ()
+                        (interactive)
+                        (message "This key is disabled. Use M-> instead.")))
+    (global-hardcore-mode))
+#+END_SRC
 * Programación
 ** Configuración genérica
 *** Anzu
@@ -796,6 +847,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
+    :diminish company-mode
     :init
     (setq company-backends '((company-files
                               company-keywords
@@ -895,6 +947,11 @@
     :diminish ""
     :config
     (editorconfig-mode))
+#+END_SRC
+*** Eldoc
+#+BEGIN_SRC emacs-lisp
+  (use-package eldoc
+    :diminish eldoc-mode)
 #+END_SRC
 *** Empty Buffer
 #+BEGIN_SRC emacs-lisp
@@ -1094,6 +1151,30 @@
   (use-package iedit
     :ensure t)
 #+END_SRC
+*** LSP
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :config
+
+    ;; make sure we have lsp-imenu everywhere we have LSP
+    (require 'lsp-imenu)
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    ;; get lsp-python-enable defined
+    ;; NB: use either projectile-project-root or ffip-get-project-root-directory
+    ;;     or any other function that can be used to find the root directory of a project
+
+    ;; lsp extras
+    (use-package lsp-ui
+      :ensure t
+      :config
+      (setq lsp-ui-sideline-ignore-duplicate t)
+      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+    (use-package company-lsp
+      :config
+      (push 'company-lsp company-backends)))
+#+END_SRC
 *** move-dup
 #+BEGIN_SRC emacs-lisp
   (use-package move-dup
@@ -1288,6 +1369,7 @@
   (use-package yasnippet
     :ensure t
     :defer 2
+    :diminish yas-minor-mode
     :config
     (yas-global-mode)
     (validate-setq yas-snippet-dirs '("~/.emacs.d/snippets")))
@@ -1430,66 +1512,33 @@
     (interactive)
     (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
 
-  (add-hook 'elpy-mode-hook
+  (add-hook 'python-mode-hook
             '(lambda () (when (empty-buffer?) (python-template))))
 
-  (use-package elpy
+  (use-package lsp-python
     :ensure t
-    :diminish elpy-mode
+    :after lsp-mode
     :config
-    (elpy-enable)
-    (setq elpy-rpc-backend "jedi"
-          elpy-shell-echo-input nil
-          elpy-modules (dolist (elem
-                                '(elpy-module-sane-defaults
-                                  elpy-module-company
-                                  elpy-module-eldoc
-                                  elpy-module-highlight-indentation
-                                  elpy-module-pyvenv
-                                  elpy-module-yasnippet))))
+    (lsp-define-stdio-client lsp-python "python"
+                             #'projectile-project-root
+                             '("pyls"))
 
-    (add-to-list 'company-backends 'elpy-company-backend)
-    (require 'smartparens-python)
-    (with-eval-after-load 'python
-      (defun python-shell-completion-native-try ()
-        "Return non-nil if can trigger native completion."
-        (let ((python-shell-completion-native-enable t)
-              (python-shell-completion-native-output-timeout
-               python-shell-completion-native-try-output-timeout))
-          (python-shell-completion-native-get-completions
-           (get-buffer-process (current-buffer))
-           nil "_"))))
+    (add-hook 'python-mode-hook
+              (lambda ()
+                (lsp-python-enable)))
+    (defun lsp-set-cfg ()
+      (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
+        (lsp--set-configuration lsp-cfg)))
 
-    (when (require 'flycheck nil t)
-      (validate-setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg))
 
-    (use-package flycheck-pycheckers
-      :ensure t
-      :after flycheck
-      :config (setq flycheck-pycheckers-checkers (quote (pylint pep8 flake8 bandit))
-                    flycheck-pycheckers-ignore-codes (quote ("C0411" "C0413" "C0103" "C0111"
-                                                             "W0142" "W0201" "W0232" "W0403"
-                                                             "W0511" "E1002" "E1101" "E1103"
-                                                             "R0201" "R0801" "R0903" "R0904"
-                                                             "R0914" "W0212" "C0301" "E501")))
-
-      :hook (flycheck-mode . flycheck-pycheckers-setup))
-
-    (defun format-all-on-save ()
-      (interactive)
-      (add-hook 'before-save-hook 'format-all-buffer nil t))
-    (add-hook 'elpy-mode-hook 'format-all-on-save)
-
-    (defun add-breakpoint ()
-      "Add a break point"
-      (interactive)
-      (newline-and-indent)
-      (insert "import wdb; wdb.set_trace()"))
-
-    (define-key elpy-mode-map (kbd "C-c C-b") 'add-breakpoint))
+  (use-package blacken
+    :ensure t
+    :after (python-mode)
+    :hook ('python-mode . blacken-mode))
 
   (use-package pyvenv
+    :ensure t
     :config (defalias 'workon 'pyvenv-workon))
 
   (use-package py-isort
@@ -1501,7 +1550,7 @@
   (use-package auto-virtualenv
     :ensure t
     :config
-    (add-hook 'elpy-mode-hook 'auto-virtualenv-set-virtualenv))
+    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
   (use-package virtualenvwrapper
     :ensure t
