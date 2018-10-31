@@ -2137,10 +2137,6 @@
   (setq-default buffer-file-coding-system 'utf-8-auto-unix
                 x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
-** Which-function
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'which-function-mode)
-#+END_SRC
 ** Which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
