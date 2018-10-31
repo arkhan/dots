@@ -673,7 +673,7 @@
           (writegood-mode -1))
         (flyspell-mode -1)
         (text-scale-set conf:org-tree-slide-text-scale))
-      (add-hook 'org-tree-slide-play-hook #'modi/org-tree-slide-start)
+      (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
 
       (defun conf:org-tree-slide-stop()
         "Undo the frame setup for the slideshow."
@@ -689,7 +689,7 @@
       (defun conf:org-tree-slide-text-scale-reset ()
         "Reset time scale to `modi/org-tree-slide-text-scale'."
         (interactive)
-        (text-scale-set modi/org-tree-slide-text-scale))
+        (text-scale-set conf:org-tree-slide-text-scale))
 
       (defun conf:org-tree-slide-text-scale-inc1 ()
         "Increase text scale by 1."
@@ -1169,6 +1169,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
+    :diminish lsp-mode
     :config
     (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
