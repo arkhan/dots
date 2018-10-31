@@ -758,7 +758,7 @@
     :ensure t)
 #+END_SRC
 * Harcode
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package hardcore-mode
     :ensure t
     :config
@@ -1149,6 +1149,17 @@
 
     (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
 #+END_SRC
+*** Imenu
+#+BEGIN_SRC emacs-lisp
+  (use-package imenu-list
+    :ensure t
+    :bind ("M-2" . imenu-list-smart-toggle)
+    :config
+    (setq imenu-list-size 36
+          imenu-list-position 'left
+          imenu-list-focus-after-activation t
+          imenu-list-after-jump-hook nil))
+#+END_SRC
 *** Iedit
 #+BEGIN_SRC emacs-lisp
   (use-package iedit
@@ -1160,18 +1171,18 @@
     :ensure t
     :config
     (require 'lsp-imenu)
-    :hook (lsp-after-open-hook . lsp-enable-imenu))
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
 
-  (use-package lsp-ui
-    :ensure t
-    :config
-    (setq lsp-ui-sideline-ignore-duplicate t)
-    :hook (lsp-mode-hook . lsp-ui-mode))
+    (use-package lsp-ui
+      :ensure t
+      :config
+      (setq lsp-ui-sideline-ignore-duplicate t)
+      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-  (use-package company-lsp
-    :ensure t
-    :config
-    (push 'company-lsp company-backends))
+    (use-package company-lsp
+      :ensure t
+      :config
+      (push 'company-lsp company-backends)))
 #+END_SRC
 *** move-dup
 #+BEGIN_SRC emacs-lisp
@@ -1336,6 +1347,13 @@
     :config
     (add-hook 'prog-mode-hook 'rainbow-mode)
     (add-hook 'conf-mode-hook 'rainbow-mode))
+#+END_SRC
+*** Semantic
+#+BEGIN_SRC emacs-lisp
+  (use-package semantic
+    :ensure t
+    :init
+    (semantic-mode 1))
 #+END_SRC
 *** Shell
 #+BEGIN_SRC emacs-lisp
@@ -1505,67 +1523,66 @@
 #+END_SRC
 *** Python
 #+BEGIN_SRC emacs-lisp
-  (setq ansi-color-for-comint-mode t)
-  (defun python-template ()
-    (interactive)
-    (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
-
-  (add-hook 'python-mode-hook
-            '(lambda () (when (empty-buffer?) (python-template))))
-
-  (use-package lsp-python
-    :ensure t
-    :after lsp-mode
-    :config
-    (lsp-define-stdio-client lsp-python "python"
-                             #'projectile-project-root
-                             '("pyls"))
+    (setq ansi-color-for-comint-mode t)
+    (defun python-template ()
+      (interactive)
+      (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
 
     (add-hook 'python-mode-hook
-              (lambda ()
-                (lsp-python-enable)))
-    (defun lsp-set-cfg ()
-      (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
-        (lsp--set-configuration lsp-cfg)))
+              '(lambda () (when (empty-buffer?) (python-template))))
 
-    (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg))
+    (use-package lsp-python
+      :ensure t
+      :config
+      (lsp-define-stdio-client lsp-python "python"
+                               #'projectile-project-root
+                               '("pyls"))
 
-  (use-package blacken
-    :ensure t
-    :after (python-mode)
-    :hook (python-mode . blacken-mode))
+      (add-hook 'python-mode-hook
+                (lambda ()
+                  (lsp-python-enable)))
 
-  (use-package pyvenv
-    :ensure t
-    :config (defalias 'workon 'pyvenv-workon))
+      (defun lsp-set-cfg ()
+        (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
+          (lsp--set-configuration lsp-cfg)))
 
-  (use-package py-isort
-    :ensure t
-    :config
-    (setq py-isort-options '("--lines=100"))
-    (add-hook 'before-save-hook 'py-isort-before-save))
+      (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg))
 
-  (use-package auto-virtualenv
-    :ensure t
-    :config
-    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+    (use-package blacken
+      :ensure t
+      :config (add-hook 'python-mode-hook 'blacken-mode))
 
-  (use-package virtualenvwrapper
-    :ensure t
-    :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
-    :init
-    (venv-initialize-interactive-shells)
-    (venv-initialize-eshell)
-    (setq venv-location "~/.virtualenvs")
-    :config
-    (add-hook 'venv-postmkvirtualenv-hook
-              (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
+    (use-package pyvenv
+      :ensure t
+      :config (defalias 'workon 'pyvenv-workon))
 
-  (use-package pyimport :ensure t)
+    (use-package py-isort
+      :ensure t
+      :config
+      (setq py-isort-options '("--lines=100"))
+      (add-hook 'before-save-hook 'py-isort-before-save))
 
-  (use-package pippel :ensure t)
+    (use-package auto-virtualenv
+      :ensure t
+      :config
+      (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
-  (use-package pip-requirements :ensure t)
+    (use-package virtualenvwrapper
+      :ensure t
+      :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
+      :init
+      (venv-initialize-interactive-shells)
+      (venv-initialize-eshell)
+      (setq venv-location "~/.virtualenvs")
+      :config
+      (add-hook 'venv-postmkvirtualenv-hook
+                (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
+
+    (use-package pyimport :ensure t)
+
+    (use-package pippel :ensure t)
+
+    (use-package pip-requirements :ensure t)
 #+END_SRC
 *** SQL
 #+BEGIN_SRC emacs-lisp
