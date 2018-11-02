@@ -1173,17 +1173,19 @@
     :config
     (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
 
-    (use-package lsp-ui
-      :ensure t
-      :config
-      (setq lsp-ui-sideline-ignore-duplicate t)
-      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-    (use-package company-lsp
-      :ensure t
-      :config
-      (push 'company-lsp company-backends)))
+  (use-package lsp-ui
+    :ensure t
+    :config
+    (setq lsp-ui-sideline-ignore-duplicate t)
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+  (use-package company-lsp
+    :ensure t
+    :config
+    (push 'company-lsp company-backends))
 #+END_SRC
 *** move-dup
 #+BEGIN_SRC emacs-lisp
@@ -2012,29 +2014,29 @@
           (concat
            (if (not (= C 0))
                (propertize
-                (format "\u2716%d" C)
+                (format "✖%d" C)
                 'face '(:foreground "firebrick")
                 'help-echo C-files))
 
            (if (not (= S 0))
                (propertize
-                (format "\u25cf%d" S)
+                (format "●%d" S)
                 'face '(:foreground "firebrick")
                 'help-echo S-files))
 
            (if (> M 0)
                (propertize
-                (format "\u271a%d" M)
+                (format "+%d" M)
                 'face '(:foreground "RoyalBlue")
                 'help-echo M-files))
 
            (if (> U 0)
                (propertize
-                (format "\u2026%d" U)
+                (format "…%d" U)
                 'help-echo U-files))
            " ")
         (propertize
-         "\u2714 "
+         "✔ "
          'face '(:foreground "LimeGreen")))))
 
   (defun git-remote-status ()
@@ -2063,9 +2065,9 @@
         (format "%s" branch)
         'face (list :foreground "MediumPurple3"))
        (if (> (string-to-number local) 0)
-           (format "\u2191%s" local))
+           (format "↑%s" local))
        (if (> (string-to-number remotes) 0)
-           (format "\u2193%s" remotes)))))
+           (format "↓%s" remotes)))))
 
   (validate-setq line-number-mode t
                  column-number-mode t)
@@ -2124,7 +2126,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Hasklig" :height 90)
+  (set-face-attribute 'default nil :family "Fantasque Sans Mono" :height 100)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC
