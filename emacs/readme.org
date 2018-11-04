@@ -1526,66 +1526,60 @@
 #+END_SRC
 *** Python
 #+BEGIN_SRC emacs-lisp
-    (setq ansi-color-for-comint-mode t)
-    (defun python-template ()
-      (interactive)
-      (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
+  (setq ansi-color-for-comint-mode t)
+  (defun python-template ()
+    (interactive)
+    (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
+
+  (add-hook 'python-mode-hook
+            '(lambda () (when (empty-buffer?) (python-template))))
+
+  (use-package lsp-python
+    :ensure t
+    :config
+    (lsp-define-stdio-client lsp-python "python"
+                             #'projectile-project-root
+                             '("pyls"))
 
     (add-hook 'python-mode-hook
-              '(lambda () (when (empty-buffer?) (python-template))))
+              (lambda ()
+                (lsp-python-enable))))
 
-    (use-package lsp-python
-      :ensure t
-      :config
-      (lsp-define-stdio-client lsp-python "python"
-                               #'projectile-project-root
-                               '("pyls"))
+  (use-package blacken
+    :ensure t
+    :config (add-hook 'python-mode-hook 'blacken-mode))
 
-      (add-hook 'python-mode-hook
-                (lambda ()
-                  (lsp-python-enable)))
+  (use-package pyvenv
+    :ensure t
+    :config (defalias 'workon 'pyvenv-workon))
 
-      (defun lsp-set-cfg ()
-        (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
-          (lsp--set-configuration lsp-cfg)))
+  (use-package py-isort
+    :ensure t
+    :config
+    (setq py-isort-options '("--lines=100"))
+    (add-hook 'before-save-hook 'py-isort-before-save))
 
-      (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg))
+  (use-package auto-virtualenv
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
-    (use-package blacken
-      :ensure t
-      :config (add-hook 'python-mode-hook 'blacken-mode))
+  (use-package virtualenvwrapper
+    :ensure t
+    :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
+    :init
+    (venv-initialize-interactive-shells)
+    (venv-initialize-eshell)
+    (setq venv-location "~/.virtualenvs")
+    :config
+    (add-hook 'venv-postmkvirtualenv-hook
+              (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
 
-    (use-package pyvenv
-      :ensure t
-      :config (defalias 'workon 'pyvenv-workon))
+  (use-package pyimport :ensure t)
 
-    (use-package py-isort
-      :ensure t
-      :config
-      (setq py-isort-options '("--lines=100"))
-      (add-hook 'before-save-hook 'py-isort-before-save))
+  (use-package pippel :ensure t)
 
-    (use-package auto-virtualenv
-      :ensure t
-      :config
-      (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
-
-    (use-package virtualenvwrapper
-      :ensure t
-      :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
-      :init
-      (venv-initialize-interactive-shells)
-      (venv-initialize-eshell)
-      (setq venv-location "~/.virtualenvs")
-      :config
-      (add-hook 'venv-postmkvirtualenv-hook
-                (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
-
-    (use-package pyimport :ensure t)
-
-    (use-package pippel :ensure t)
-
-    (use-package pip-requirements :ensure t)
+  (use-package pip-requirements :ensure t)
 #+END_SRC
 *** SQL
 #+BEGIN_SRC emacs-lisp
