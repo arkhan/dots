@@ -2126,7 +2126,7 @@
 #+END_SRC
 ** Tipografía
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Fantasque Sans Mono" :height 100)
+  (set-face-attribute 'default nil :family "FantasqueSansMono NF" :height 100)
   (set-fontset-font "fontset-default" nil
                     (font-spec :size 20 :name "Symbola"))
 #+END_SRC
