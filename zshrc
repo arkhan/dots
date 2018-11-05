@@ -220,7 +220,6 @@ function __calc_plugin {
 aliases[calc]='noglob __calc_plugin'
 aliases[=]='noglob __calc_plugin'
 
-
 #------------------------------
 # Alias
 #------------------------------
@@ -244,8 +243,10 @@ alias 'dir=dir --color=auto'
 
 # Play safe!
 alias 'rm=safe-rm'
-# alias 'mv=amv -g'
-# alias 'cp=acp -g'
+
+# advcpmv
+alias 'mv=amv -g'
+alias 'cp=acp -g'
 
 # For convenience
 alias 'mkdir=mkdir -p'
