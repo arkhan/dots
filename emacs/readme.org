@@ -227,16 +227,16 @@
     (validate-setq flyspell-use-meta-tab nil
                    flyspell-issue-welcome-flag nil
                    flyspell-issue-message-flag nil)
-    (setq-default ispell-program-name "hunspell"
+    (setq-default ispell-program-name "aspell"
                   ispell-really-hunspell t
                   ispell-check-comments t
-                  ispell-extra-args '("-i" "utf-8")
-                  ispell-dictionary "en_US")
+                  ispell-extra-args '("-a" "--sug-mode=ultra")
+                  ispell-dictionary "en")
 
     (defun switch-dictionary ()
       (interactive)
       (let* ((dic ispell-current-dictionary)
-             (change (if (string= dic "en_US") "es_EC" "en_US")))
+             (change (if (string= dic "en") "es" "en")))
         (ispell-change-dictionary change)
         (message "Dictionary switched from %s to %s" dic change)))
 
@@ -270,10 +270,10 @@
     :bind (:map flyspell-mode-map
                 ("C-'" . #'flyspell-popup-correct)))
 
-  (use-package flyspell-lazy
-    :ensure t
-    :after flyspell
-    :init (flyspell-lazy-mode 1))
+  ;; (use-package flyspell-lazy
+  ;;   :ensure t
+  ;;   :after flyspell
+  ;;   :init (flyspell-lazy-mode 1))
 #+END_SRC
 * Prescient
 #+BEGIN_SRC emacs-lisp
@@ -930,7 +930,11 @@
     :ensure t
     :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
 #+END_SRC
-
+**** Dcoker Tramp
+#+BEGIN_SRC emacs-lisp
+  (use-package docker-tramp
+    :ensure t)
+#+END_SRC
 *** dumb-jump
 #+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
@@ -1579,9 +1583,13 @@
     :interpreter ("python" . python-mode)
     :init (setq python-shell-interpreter "python"))
 
-  (use-package pyvenv
+  (use-package pyenv-mode
     :ensure t
-    :config (defalias 'workon 'pyvenv-workon))
+    :config (pyenv-mode 1))
+
+  ;; (use-package pyvenv
+  ;;   :ensure t
+  ;;   :config (defalias 'workon 'pyvenv-workon))
 
   (use-package py-isort
     :ensure t
@@ -1589,21 +1597,21 @@
     (setq py-isort-options '("--lines=100"))
     (add-hook 'before-save-hook 'py-isort-before-save))
 
-  (use-package auto-virtualenv
-    :ensure t
-    :config
-    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+  ;; (use-package auto-virtualenv
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
-  (use-package virtualenvwrapper
-    :ensure t
-    :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
-    :init
-    (venv-initialize-interactive-shells)
-    (venv-initialize-eshell)
-    (setq venv-location "~/.virtualenvs")
-    :config
-    (add-hook 'venv-postmkvirtualenv-hook
-              (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
+  ;; (use-package virtualenvwrapper
+  ;;   :ensure t
+  ;;   :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
+  ;;   :init
+  ;;   (venv-initialize-interactive-shells)
+  ;;   (venv-initialize-eshell)
+  ;;   (setq venv-location "~/.virtualenvs")
+  ;;   :config
+  ;;   (add-hook 'venv-postmkvirtualenv-hook
+  ;;             (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
 
   (use-package pyimport :ensure t)
 
