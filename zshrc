@@ -12,6 +12,8 @@ fi
 
 source <(antibody init)
 
+WORKON_HOME="${HOME}/.virtualenvs/"
+# PYENV_ROOT="${HOME}/.pyenv/"
 ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
 
 antibody bundle robbyrussell/oh-my-zsh
@@ -27,9 +29,10 @@ antibody bundle robbyrussell/oh-my-zsh path:plugins/git-prompt
 antibody bundle robbyrussell/oh-my-zsh path:plugins/history
 antibody bundle robbyrussell/oh-my-zsh path:plugins/pass
 antibody bundle robbyrussell/oh-my-zsh path:plugins/python
-antibody bundle robbyrussell/oh-my-zsh path:plugins/pyenv
+# antibody bundle robbyrussell/oh-my-zsh path:plugins/pyenv
 antibody bundle robbyrussell/oh-my-zsh path:plugins/shrink-path
 antibody bundle robbyrussell/oh-my-zsh path:plugins/sudo
+antibody bundle robbyrussell/oh-my-zsh path:plugins/virtualenvwrapper
 
 [[ $INSIDE_EMACS != *"term"* ]] && antibody bundle zsh-users/zsh-autosuggestions
 antibody bundle zsh-users/zsh-syntax-highlighting

@@ -1,4 +1,4 @@
-#clip -*- mode: i3wm-config -*-
+#-*- mode: i3wm-config -*-
 # Terminal
 set $term urxvtcd --geometry 100x30
 
@@ -130,38 +130,18 @@ set $ws6 6
 set $ws7 7
 set $ws8 8
 set $ws9 9
-set $wsa 10
-set $wsb 11
-set $wsc 12
 
-workspace $ws0 output $hdmi1
-workspace $ws0 output $hdmi2
+workspace $ws0 output $hdmi1 $hdmi2
 
-workspace $ws1 output $edp1
-workspace $ws2 output $edp1
-workspace $ws3 output $edp1
-workspace $ws4 output $edp1
-workspace $ws5 output $edp1
-workspace $ws6 output $edp1
-workspace $ws7 output $edp1
-workspace $ws8 output $epd1
-workspace $ws9 output $epd1
-workspace $wsa output $epd1
-workspace $wsb output $epd1
-workspace $wsc output $epd1
-
-workspace $ws1 output $vga0
-workspace $ws2 output $vga0
-workspace $ws3 output $vga0
-workspace $ws4 output $vga0
-workspace $ws5 output $vga0
-workspace $ws6 output $vga0
-workspace $ws7 output $vga0
-workspace $ws8 output $vga0
-workspace $ws9 output $vga0
-workspace $wsa output $vga0
-workspace $wsb output $vga0
-workspace $wsc output $vga0
+workspace $ws1 output $edp1 $vga0
+workspace $ws2 output $edp1 $vga0
+workspace $ws3 output $edp1 $vga0
+workspace $ws4 output $edp1 $vga0
+workspace $ws5 output $edp1 $vga0
+workspace $ws6 output $edp1 $vga0
+workspace $ws7 output $edp1 $vga0
+workspace $ws8 output $epd1 $vga0
+workspace $ws9 output $epd1 $vga0
 
 # switch to workspace
 bindsym $mod4+1 workspace $ws1
@@ -289,9 +269,9 @@ assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
 assign [class="(?i)lyx"] $ws8
 assign [title="(?i)LibreOffice*"] $ws8
 assign [class="(?i)emacs"] $ws9
-assign [title="zathura"] $wsa
-assign [title="nomacs"] $wsb
-assign [class="Wine"] $wsc
+assign [title="zathura"] $ws8
+assign [title="nomacs"] $ws7
+assign [class="Wine"] $ws6
 
 # Floating
 for_window [class="(?i)lxappearance"] floating enable
@@ -313,7 +293,7 @@ for_window [class="(?i)mpv"] floating disable layout tabbed focus
 for_window [class="(?i)smplayer"] floating disable layout tabbed focus
 
 # Stuff
-workspace_auto_back_and_forth yes
+# workspace_auto_back_and_forth yes
 force_display_urgency_hint 0 ms
 focus_on_window_activation urgent
 floating_minimum_size -1 x -1
@@ -322,4 +302,3 @@ floating_maximum_size -1 x -1
 # i3-gaps
 gaps inner 2
 gaps outer 2
-smart_borders on

@@ -903,11 +903,12 @@
 
   (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
 
-  (use-package company-childframe
+  (use-package company-quickhelp
     :ensure t
-    :diminish ((company-childframe-mode . "")
-               (company-posframe-mode . ""))
-    :init (company-posframe-mode 1))
+    :after company
+    :bind (:map company-active-map
+                ("C-c h" . #'company-quickhelp-manual-begin))
+    :init (company-quickhelp-mode))
 
 #+END_SRC
 *** Csv
@@ -1556,6 +1557,7 @@
     (add-hook 'TeX-mode-hook 'cfg:TeX-mode-hook))
 #+END_SRC
 *** Python
+**** lsp-python
 #+BEGIN_SRC emacs-lisp
   (setq ansi-color-for-comint-mode t)
   (defun python-template ()
@@ -1574,23 +1576,69 @@
                              '("pyls"))
     (add-hook 'python-mode-hook #'lsp-python-enable))
 
-  (use-package blacken
-    :ensure t
-    :diminish blacken-mode
-    :config (add-hook 'python-mode-hook 'blacken-mode))
-
   (use-package python
     :if (executable-find "python")
     :interpreter ("python" . python-mode)
     :init (setq python-shell-interpreter "python"))
-
+#+END_SRC
+**** Pyenv
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package pyenv-mode
     :ensure t
-    :config (pyenv-mode 1))
+    :config
+    (defun conf:pyenv-mode-set (version)
+      "Set python shell VERSION."
+      (interactive (list (pyenv-mode-read-version)))
+      (pythonic-activate (pyenv-mode-full-path version))
+      (setenv "PYENV_VERSION" version)
+      (setenv "VIRTUAL_ENV" (pyenv-mode-full-path version))
+      (force-mode-line-update))
+
+    (advice-add 'pyenv-mode-set :override #'conf:pyenv-mode-set)
+
+    (defun conf:pyenv-mode-unset ()
+      "Unset python shell version."
+      (interactive)
+      (pythonic-deactivate)
+      (setenv "PYENV_VERSION")
+      (setenv "VIRTUAL_ENV")
+      (force-mode-line-update))
+
+    (advice-add 'pyenv-mode-unset :override #'conf:pyenv-mode-unset)
+
+    (pyenv-mode 1))
 
   (use-package pyenv-mode-auto
+    :ensure t)
+#+END_SRC
+**** VirtualEnv
+#+BEGIN_SRC emacs-lisp
+  (use-package pyvenv
     :ensure t
-    :after pyenv-mode)
+    :config (defalias 'workon 'pyvenv-workon))
+
+  (use-package auto-virtualenv
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+
+  (use-package virtualenvwrapper
+    :ensure t
+    :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
+    :init
+    (venv-initialize-interactive-shells)
+    (venv-initialize-eshell)
+    (setq venv-location "~/.virtualenvs")
+    :config
+    (add-hook 'venv-postmkvirtualenv-hook
+              (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
+#+END_SRC
+**** Stuff
+#+BEGIN_SRC emacs-lisp
+  (use-package blacken
+    :ensure t
+    :diminish blacken-mode
+    :config (add-hook 'python-mode-hook 'blacken-mode))
 
   (use-package py-isort
     :ensure t
@@ -2030,19 +2078,19 @@
            (if (not (= C 0))
                (propertize
                 (format "✖%d" C)
-                'face '(:foreground "firebrick")
+                'face '(:inherit font-lock-warning-face)
                 'help-echo C-files))
 
            (if (not (= S 0))
                (propertize
                 (format "●%d" S)
-                'face '(:foreground "firebrick")
+                'face '(:inherit font-lock-warning-face)
                 'help-echo S-files))
 
            (if (> M 0)
                (propertize
                 (format "+%d" M)
-                'face '(:foreground "RoyalBlue")
+                'face '(:inherit font-lock-variable-name-face)
                 'help-echo M-files))
 
            (if (> U 0)
@@ -2052,7 +2100,7 @@
            " ")
         (propertize
          "✔ "
-         'face '(:foreground "LimeGreen")))))
+         'face '(:inherit font-lock-string-face)))))
 
   (defun git-remote-status ()
     (interactive)
@@ -2078,11 +2126,16 @@
       (concat
        (propertize
         (format "%s" branch)
-        'face (list :foreground "MediumPurple3"))
+        'face (list :inherit font-lock-comment-face))
        (if (> (string-to-number local) 0)
            (format "↑%s" local))
        (if (> (string-to-number remotes) 0)
            (format "↓%s" remotes)))))
+
+  (add-to-list 'mode-line-misc-info
+               '(:eval (when (not (tramp-tramp-file-p default-directory))
+                         (if (in-git-p)
+                             (concat (git-remote-status) " " (git-parse-status))))))
 
   (validate-setq line-number-mode t
                  column-number-mode t)
@@ -2094,11 +2147,6 @@
           sml/theme 'dark
           sml/show-client t
           sml/show-encoding t)
-
-    (add-to-list 'mode-line-misc-info
-                 '(:eval (when (not (tramp-tramp-file-p default-directory))
-                           (if (in-git-p)
-                               (concat (git-remote-status) " " (git-parse-status))))))
     (sml/setup))
 
  #+END_SRC
