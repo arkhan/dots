@@ -1576,6 +1576,7 @@
 
   (use-package blacken
     :ensure t
+    :diminish blacken-mode
     :config (add-hook 'python-mode-hook 'blacken-mode))
 
   (use-package python
@@ -1587,9 +1588,9 @@
     :ensure t
     :config (pyenv-mode 1))
 
-  ;; (use-package pyvenv
-  ;;   :ensure t
-  ;;   :config (defalias 'workon 'pyvenv-workon))
+  (use-package pyenv-mode-auto
+    :ensure t
+    :after pyenv-mode)
 
   (use-package py-isort
     :ensure t
@@ -1597,25 +1598,7 @@
     (setq py-isort-options '("--lines=100"))
     (add-hook 'before-save-hook 'py-isort-before-save))
 
-  ;; (use-package auto-virtualenv
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
-
-  ;; (use-package virtualenvwrapper
-  ;;   :ensure t
-  ;;   :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
-  ;;   :init
-  ;;   (venv-initialize-interactive-shells)
-  ;;   (venv-initialize-eshell)
-  ;;   (setq venv-location "~/.virtualenvs")
-  ;;   :config
-  ;;   (add-hook 'venv-postmkvirtualenv-hook
-  ;;             (lambda () (shell-command "pip install jedi rope isort importmagic autopep8 yapf flake8 virtualenvwrapper"))))
-
   (use-package pyimport :ensure t)
-
-  (use-package pippel :ensure t)
 
   (use-package pip-requirements :ensure t)
 #+END_SRC
