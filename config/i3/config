@@ -284,6 +284,7 @@ for_window [class="(?i)pinentry"] floating enable
 for_window [class="(?i)GtkLP"] floating enable
 
 # Tabbed
+for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
 for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
 for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
