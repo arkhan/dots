@@ -227,16 +227,16 @@
     (validate-setq flyspell-use-meta-tab nil
                    flyspell-issue-welcome-flag nil
                    flyspell-issue-message-flag nil)
-    (setq-default ispell-program-name "aspell"
+
+    (setq-default ispell-program-name "hunspell"
                   ispell-really-hunspell t
                   ispell-check-comments t
-                  ispell-extra-args '("-a" "--sug-mode=ultra")
-                  ispell-dictionary "en")
+                  ispell-dictionary "en_US")
 
     (defun switch-dictionary ()
       (interactive)
       (let* ((dic ispell-current-dictionary)
-             (change (if (string= dic "en") "es" "en")))
+             (change (if (string= dic "en_US") "es_EC" "en_US")))
         (ispell-change-dictionary change)
         (message "Dictionary switched from %s to %s" dic change)))
 
@@ -270,10 +270,10 @@
     :bind (:map flyspell-mode-map
                 ("C-'" . #'flyspell-popup-correct)))
 
-  ;; (use-package flyspell-lazy
-  ;;   :ensure t
-  ;;   :after flyspell
-  ;;   :init (flyspell-lazy-mode 1))
+  (use-package flyspell-lazy
+    :ensure t
+    :after flyspell
+    :init (flyspell-lazy-mode 1))
 #+END_SRC
 * Prescient
 #+BEGIN_SRC emacs-lisp
@@ -2388,6 +2388,12 @@
                                                  (presentation-mode 0)
                                                (presentation-mode 1))
                                              (toggle-frame-fullscreen))))
+#+END_SRC
+** Proced
+#+BEGIN_SRC emacs-lisp
+  (use-package proced
+    :ensure t
+    :if (or (string-equal system-type "gnu/linux") (string-equal system-type "gnu/kfreebsd")))
 #+END_SRC
 ** Sudo
 #+BEGIN_SRC emacs-lisp
