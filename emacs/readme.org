@@ -2002,6 +2002,7 @@
             ("*Help*" :select t :inhibit-window-quit t :other t)
             ("*Messages*" :select nil :inhibit-window-quit t :other t)
             ("*Process List*" :select t :size 0.3 :align below)
+            ("*Proced*" :select t :size 0.3 :align below)
             ("*Python*" :select t :size 0.3 :align bellow)
             ("*Shell Command Output*" :select nil)
             ("*Warnings*" :ignore t)
@@ -2393,7 +2394,11 @@
 #+BEGIN_SRC emacs-lisp
   (use-package proced
     :ensure t
-    :if (or (string-equal system-type "gnu/linux") (string-equal system-type "gnu/kfreebsd")))
+    :bind ("C-x p" . proced)
+    :if (or (string-equal system-type "gnu/linux")
+            (string-equal system-type "gnu/kfreebsd"))
+    :config
+    (add-hook 'proced-mode-hook (lambda () (setq proced-tree-flag t))))
 #+END_SRC
 ** Sudo
 #+BEGIN_SRC emacs-lisp
