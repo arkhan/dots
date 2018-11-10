@@ -555,13 +555,6 @@
     :ensure org-plus-contrib
     :commands (org-babel-execute:plantuml))
 
-  (use-package secretaria
-    :ensure t
-    :config
-    ;; use this for getting a reminder every 30 minutes of those tasks scheduled
-    ;; for today and which have no time of day defined.
-    (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
-
   (use-package org-timeline
     :ensure t
     :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
@@ -1186,29 +1179,28 @@
           imenu-list-focus-after-activation t
           imenu-list-after-jump-hook nil))
 #+END_SRC
-*** Iedit
+*** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
-  (use-package iedit
+  (use-package multiple-cursors
     :ensure t)
 #+END_SRC
 *** LSP
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :diminish lsp-mode
-    :init
+    :config
     (setq lsp-eldoc-render-all nil
           lsp-inhibit-message t
           lsp-message-project-root-warning t)
-    :config
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
     (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
 
   (use-package lsp-ui
     :ensure t
-    :after (lsp-mode)
     :init
-    (setf lsp-ui-sideline-enable t
+    (setq lsp-ui-sideline-enable t
+          lsp-ui-sideline-ignore-duplicate t
+          lsp-ui-sideline-show-hover nil
           lsp-ui-doc-enable t)
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
@@ -1569,11 +1561,16 @@
 
   (use-package lsp-python
     :ensure t
-    :after (lsp-mode)
     :config
     (lsp-define-stdio-client lsp-python "python"
                              #'projectile-project-root
                              '("pyls"))
+
+    (defun lsp-set-cfg ()
+      (let ((lsp-cfg '(:pyls (:configurationSources ("flake8")))))
+        (lsp--set-configuration lsp-cfg)))
+
+    (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
     (add-hook 'python-mode-hook #'lsp-python-enable))
 
   (use-package python
@@ -1614,8 +1611,7 @@
 **** VirtualEnv
 #+BEGIN_SRC emacs-lisp
   (use-package pyvenv
-    :ensure t
-    :config (defalias 'workon 'pyvenv-workon))
+    :ensure t)
 
   (use-package auto-virtualenv
     :ensure t
@@ -1844,6 +1840,13 @@
   (global-set-key "\M-p" 'backward-paragraph)
   (global-set-key "\M-n" 'forward-paragraph)
   (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
+#+END_SRC
+** easy-kill
+#+BEGIN_SRC emacs-lisp
+  (use-package easy-kill
+    :ensure t
+    :bind (([remap kill-ring-save] . #'easy-kill)
+           ([remap mark-sexp] . #'easy-mark)))
 #+END_SRC
 ** Cursor
 #+BEGIN_SRC emacs-lisp
@@ -2213,6 +2216,15 @@
     (which-key-mode))
 #+END_SRC
 * Utils
+** alert
+#+BEGIN_SRC emacs-lisp
+  (use-package alert
+    :ensure t
+    :config
+    (if (eq system-type 'windows-nt)
+        (setq alert-default-style 'message)
+      (setq alert-default-style 'libnotify)))
+#+END_SRC
 ** auth-password-store
 #+BEGIN_SRC emacs-lisp
   (use-package password-store
