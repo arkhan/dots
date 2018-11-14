@@ -12,8 +12,9 @@ fi
 
 source <(antibody init)
 
-WORKON_HOME="${HOME}/.virtualenvs/"
-# PYENV_ROOT="${HOME}/.pyenv/"
+export WORKON_HOME="${HOME}/.venv/"
+# export PYENV_ROOT="${HOME}/.pyenv/"
+
 ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
 
 antibody bundle robbyrussell/oh-my-zsh
