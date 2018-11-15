@@ -12,10 +12,10 @@ fi
 
 source <(antibody init)
 
-export WORKON_HOME="${HOME}/.venv/"
+export WORKON_HOME="${HOME}/.virtualenvs/"
 # export PYENV_ROOT="${HOME}/.pyenv/"
 
-ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
+export ZSH="${HOME}/.cache/antibody/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh/"
 
 antibody bundle robbyrussell/oh-my-zsh
 antibody bundle robbyrussell/oh-my-zsh path:plugins/command-not-found

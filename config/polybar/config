@@ -22,7 +22,6 @@ clickareas = 16
 
 tray-position = right
 tray-padding = 1
-tray-maxsize = 10
 tray-transparent = false
 tray-background = ${colors.bg_normal}
 
