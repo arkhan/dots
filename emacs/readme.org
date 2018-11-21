@@ -57,6 +57,9 @@
       (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\"")))
 
   (add-hook 'after-save-hook 'tangle-init)
+
+  (setq max-specpdl-size 650
+        max-lisp-eval-depth 400)
 #+END_SRC
 * Configuración de Paquetes
 ** Directorio Temporal
@@ -231,7 +234,10 @@
     (setq-default ispell-program-name "hunspell"
                   ispell-really-hunspell t
                   ispell-check-comments t
-                  ispell-dictionary "en_US")
+                  ispell-local-dictionary "en_US"
+                  ispell-local-dictionary-alist
+                  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+                    ("es_EC" "[[:alpha:]]" "[^[:alpha:]]" "[ñ]" nil ("-d" "es_EC") nil utf-8)))
 
     (defun switch-dictionary ()
       (interactive)
@@ -454,7 +460,7 @@
       (setq org-latex-pdf-process '("~/.bin/ctex %f"))
 
       ;; tasks management
-      (setq org-refile-targets '((org-agenda-files :maxlevel . 5)))
+      (setq org-refile-targets '((org-agenda-files :maxlevel . 1)))
       (setq org-log-done t
             org-clock-idle-time nil
             org-todo-keywords (quote
@@ -1206,6 +1212,7 @@
     :defer t
     :config
     (setq lsp-eldoc-render-all nil
+          lsp-print-io nil
           lsp-inhibit-message t
           lsp-message-project-root-warning t)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
