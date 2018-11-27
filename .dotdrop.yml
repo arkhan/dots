@@ -5,14 +5,21 @@ config:
   banner: true
   create: true
   dotpath: .dots
+  ignoreempty: false
   keepdot: false
   link_by_default: true
   longkey: false
+  showdiff: false
+  workdir: ~/.config/dotdrop
 dotfiles:
   d_bin:
     dst: ~/.bin
     link: true
     src: bin
+  d_bspwm:
+    dst: ~/.config/bspwm
+    link: true
+    src: config/bspwm
   d_dunst:
     dst: ~/.config/dunst
     link: true
@@ -35,6 +42,10 @@ dotfiles:
     dst: ~/.config/polybar
     link: true
     src: config/polybar
+  d_qutebrowser:
+    dst: ~/.config/qutebrowser
+    link: true
+    src: config/qutebrowser
   d_ranger:
     dst: ~/.config/ranger
     link: true
@@ -43,6 +54,10 @@ dotfiles:
     dst: ~/.config/rofi-pass
     link: true
     src: config/rofi-pass
+  d_sxhkd:
+    dst: ~/.config/sxhkd
+    link: true
+    src: config/sxhkd
   d_teiler:
     dst: ~/.config/teiler
     link: true
@@ -55,10 +70,6 @@ dotfiles:
     dst: ~/.compton.conf
     link: true
     src: compton.conf
-  d_qutebrowser:
-    dst: ~/.config/qutebrowser
-    link: true
-    src: config/qutebrowser
   f_editorconfig:
     dst: ~/.editorconfig
     link: true

@@ -899,11 +899,6 @@
               '(:with company-yasnippet))))
   (add-hook 'company-mode-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
-  (defun add-pcomplete-to-capf ()
-    (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-
-  (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
-
   (use-package company-quickhelp
     :ensure t
     :after company
@@ -1202,8 +1197,9 @@
 *** Multiple Cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
+    :ensure t
     :defer t
-    :ensure t)
+    :init   (add-hook 'multiple-cursors-mode-hook #'conf:lsp-on-change-modify-hook))
 #+END_SRC
 *** LSP Mode
 #+BEGIN_SRC emacs-lisp
@@ -1217,6 +1213,22 @@
           lsp-message-project-root-warning t)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
     (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
+
+  ;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
+  (defvar-local conf:lsp-on-change-exist nil
+    "indica si la función `lsp-on-change' estaba insertada en `after-change-functions'")
+
+  (defun conf:lsp-on-change-modify-hook ()
+    "Remueve o agrega `lsp-on-change' de `after-change-functions'"
+    (if (not conf:lsp-on-change-exist)
+        ;; quita la función, solamente si estaba insertada desde un principio
+        (when (memq 'lsp-on-change after-change-functions)
+          (setq conf:lsp-on-change-exist t)
+          (remove-hook 'after-change-functions 'lsp-on-change t))
+      ;; agrega la función
+      (add-hook 'after-change-functions #'lsp-on-change nil t)
+      (setq conf:lsp-on-change-exist nil)))
+
 
   (use-package lsp-ui
     :ensure t
@@ -1919,7 +1931,7 @@
     :straight (font-lock+ :type git :host github :repo "emacsmirror/font-lock-plus"))
 
   (use-package sidebar
-    :ensure (sidebar.el :type git :host github :repo "samangh/sidebar.el")
+    :straight (sidebar.el :type git :host github :repo "samangh/sidebar.el")
     :bind ("M-1" . sidebar-open))
 #+END_SRC
 ** Neotree
@@ -1986,9 +1998,9 @@
         scroll-conservatively 10000)
 
   (setq scroll-margin 80
-        scroll-conservatively 3000
-        scroll-up-aggressively 0.02
-        scroll-down-aggressively 0.02)
+        scroll-conservatively 3000)
+        ;;scroll-up-aggressively 0.02
+        ;;scroll-down-aggressively 0.02)
 
   (use-package smooth-scrolling
     :ensure t

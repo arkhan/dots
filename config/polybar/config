@@ -42,15 +42,16 @@ font-0 = Misc Tamsyn:size=12;0
 font-1 = Wuncon Siji:size=12;1
 font-2 = DejaVuSansMono NF:size=12;1
 
+wm-restack = bspwm
+
 modules-left = ws
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root battery date
 
 [module/ws]
-type = internal/i3
-index-sort = true
-
+type = internal/bspwm
 pin-workspaces = true
+
 ws-icon-default = 
 ws-icon-0 = 0;
 ws-icon-1 = 1;
@@ -63,11 +64,21 @@ ws-icon-7 = 7;
 ws-icon-8 = 8;
 ws-icon-9 = 9;
 
+format = <label-state> <label-mode>
+
+label-dimmed = %icon%
+label-dimmed-padding = 1
+label-dimmed-foreground = ${colors.fg_normal}
+label-dimmed-underline = ${colors.fg_normal}
+
 label-focused = %icon%
 label-focused-foreground = ${colors.fg_focus}
 label-focused-background = ${colors.bg_normal}
 label-focused-underline = ${colors.fg_underline}
 label-focused-padding = 1
+
+label-occupied = %icon%
+label-occupied-padding = 1
 
 label-unfocused = %icon%
 label-unfocused-padding = 1
@@ -83,6 +94,13 @@ label-urgent-foreground = ${colors.fg_urgent}
 label-urgent-background = ${colors.bg_normal}
 label-urgent-underline = ${colors.fg_urgent}
 label-urgent-padding = 1
+
+label-empty =
+
+label-monocle = [M]
+label-locked = [L]
+label-sticky = [S]
+label-private = [P]
 
 [module/battery]
 type = internal/battery
