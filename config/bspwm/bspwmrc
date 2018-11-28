@@ -52,6 +52,7 @@ bspc rule -a Wine follow=off desktop=^12 state=tiled
 
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
+bspc rule -a URxvt:Fuzzy sticky=on follow=off state=floating center=on
 bspc rule -a URxvt:terminal sticky=on follow=off state=floating
 bspc rule -a 'Firefox:firefox' follow=off state=floating manage=off
 bspc rule -a 'Firefox:Browser' follow=off state=floating manage=off
