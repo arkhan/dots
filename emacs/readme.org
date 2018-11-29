@@ -1436,20 +1436,27 @@
 #+END_SRC
 *** Undo Tree
 #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :ensure t
+    (use-package undo-tree
+    :demand t
     :diminish undo-tree-mode
+    :bind ("C-x u" . undo-tree-visualizer)
     :init
-    (progn
-      (global-undo-tree-mode)
-      (setq undo-tree-dir (concat conf:cache-dir "undo/"))
-      (make-directory undo-tree-dir :parents)
-      (validate-setq undo-tree-history-directory-alist `(("." . ,undo-tree-dir))
-                     undo-tree-auto-save-history t
-                     undo-tree-visualizer-timestamps t
-                     undo-tree-visualizer-diff t))
-    (add-hook 'write-file-functions #'undo-tree-save-history-hook)
-    (add-hook 'find-file-hook #'undo-tree-load-history-hook))
+    (defadvice undo-tree-make-history-save-file-name
+        (after undo-tree activate)
+      (setq ad-return-value (concat ad-return-value ".7z")))
+    (defadvice undo-tree-visualize (around undo-tree-split-side-by-side activate)
+      "Divide la ventana de lado a lado al visualizar undo-tree-visualize"
+      (let ((split-height-threshold nil)
+            (split-width-threshold 0))
+        ad-do-it))
+    (setq undo-tree-dir (concat conf:cache-dir "undo/"))
+    (make-directory undo-tree-dir :parents)
+    (setq undo-tree-visualizer-timestamps t
+          undo-tree-visualizer-diff t
+          undo-tree-auto-save-history nil)
+    :config
+    (defalias 'redo 'undo-tree-redo)
+    (global-undo-tree-mode 1))
 #+END_SRC
 *** Yassnippet
 #+BEGIN_SRC emacs-lisp
@@ -1618,16 +1625,23 @@
     :init (setq python-shell-interpreter "python"))
 #+END_SRC
 **** Pyenv
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package pyenv-mode
     :ensure t
-    :init (pyenv-mode))
+    :init (pyenv-mode)
+    :config
+    (defun pyenv-venv-wrapper-act (&optional ARG PRED)
+      (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
+    (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
+    (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
+      (setenv "VIRTUAL_ENV"))
+    (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact))
 
   (use-package pyenv-mode-auto
     :ensure t)
 #+END_SRC
 **** VirtualEnv
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package pyvenv
     :ensure t)
 
