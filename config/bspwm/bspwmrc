@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 DISPLAY1="$(bspc query -M --names | awk -F: '{print $1}' | grep 'eDP1\|VGA-0')"
-[[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 10 11 12 && bspc config -m "$DISPLAY1" top_padding 18
+[[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 && bspc config -m "$DISPLAY1" top_padding 18
 
 [[ -z `pgrep enforce` ]] && ~/.bin/enforce "$DISPLAY1" '^1' &
 
@@ -21,8 +21,6 @@ bspc config click_to_focus any
 bspc config honor_size_hints false
 bspc config ignore_ewmh_focus true
 
-bspc config external_rules_command "$XDG_CONFIG_HOME/bspwm/rules"
-
 # Workspaces
 bspc rule -a 'Firefox:Navigator' follow=on desktop=^1
 bspc rule -a 'Firefox Developer Edition:Navigator' follow=on desktop=^1
@@ -30,10 +28,8 @@ bspc rule -a Qutebrowser follow=on desktop=^1
 bspc rule -a Iceweasel follow=on desktop=^1
 bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
 bspc rule -a URxvt:chat follow=on desktop=^2 state=tiled
-bspc rule -a URxvt:URxvtQuake sticky=on state=floating
 bspc rule -a Thunderbird follow=on desktop=^3
 bspc rule -a Icedove follow=on desktop=^3
-bspc rule -a Doublecmd follow=on desktop=^4
 bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
 bspc rule -a JDownloader follow=off  desktop=^5
 bspc rule -a Lxappearance follow=on desktop=^6 state=floating
@@ -47,13 +43,12 @@ bspc rule -a Easytag follow=on desktop=^7 state=tiled
 bspc rule -a *:libreoffice follow=off desktop=^8
 bspc rule -a Soffice follow=off desktop=^8
 bspc rule -a Zathura follow=on desktop=^8 state=tiled
-bspc rule -a Emacs follow=on desktop=^9
-bspc rule -a Wine follow=off desktop=^12 state=tiled
+bspc rule -a Emacs follow=on desktop=^9 state=tiled
+bspc rule -a Wine follow=off desktop=^6 state=tiled
 
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
-bspc rule -a URxvt:Fuzzy sticky=on follow=off state=floating center=on
-bspc rule -a URxvt:terminal sticky=on follow=off state=floating
+bspc rule -a URxvt:terminal sticky=on follow=off state=floating center=on
 bspc rule -a 'Firefox:firefox' follow=off state=floating manage=off
 bspc rule -a 'Firefox:Browser' follow=off state=floating manage=off
 bspc rule -a 'Firefox Developer Edition:firefox-developer-edition' follow=off state=floating manage=off
