@@ -883,11 +883,9 @@
     (setq company-auto-complete nil
           company-echo-delay 0
           company-idle-delay 0.2
-          company-minimum-prefix-length 1
-          company-tooltip-align-annotations t
-          company-tooltip-limit 20
-          company-transformers '(company-sort-by-occurrence))
-    (add-hook 'after-init-hook 'global-company-mode))
+          company-minimum-prefix-length 2
+          company-dabbrev-downcase 0)
+    (add-hook 'after-init-hook #'global-company-mode))
 
   (use-package company-prescient
     :ensure t
