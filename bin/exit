@@ -1,21 +1,67 @@
 #!/bin/sh
+OPTIONS="Yes\nNo"
+LAUNCHER="rofi -width 10 -dmenu -i"
 
 case $1 in
   lock)
     loginctl lock-session
     ;;
   logout)
-    session=`loginctl session-status | awk 'NR==1{print $1}'`
-    loginctl terminate-session $session
+    LAUNCHER+=" -p Logout"
+    option=$(echo -e $OPTIONS | $LAUNCHER | awk '{print $1}' | tr -d '\r\n')
+    echo $option
+    if [ ${#option} -gt 0 ]; then
+      case $option in
+        Yes)
+          session=`loginctl session-status | awk 'NR==1{print $1}'`
+          loginctl terminate-session $session
+          ;;
+        No)
+          ;;
+        esac
+    fi
     ;;
   suspend)
-    systemctl suspend
+    LAUNCHER+=" -p Suspend"
+    option=$(echo -e $OPTIONS | $LAUNCHER | awk '{print $1}' | tr -d '\r\n')
+    echo $option
+    if [ ${#option} -gt 0 ]; then
+      case $option in
+        Yes)
+          systemctl suspend
+          ;;
+          *)
+          ;;
+      esac
+    fi
     ;;
   reboot)
-    systemctl reboot
+    LAUNCHER+=" -p Reboot"
+    option=$(echo -e $OPTIONS | $LAUNCHER | awk '{print $1}' | tr -d '\r\n')
+    echo $option
+    if [ ${#option} -gt 0 ]; then
+      case $option in
+        Yes)
+          systemctl reboot
+          ;;
+          *)
+          ;;
+      esac
+    fi
     ;;
   poweroff)
-    systemctl poweroff
+    LAUNCHER+=" -p Poweroff"
+    option=$(echo -e $OPTIONS | $LAUNCHER | awk '{print $1}' | tr -d '\r\n')
+    echo $option
+    if [ ${#option} -gt 0 ]; then
+      case $option in
+        Yes)
+          systemctl poweroff
+          ;;
+          *)
+          ;;
+      esac
+    fi
     ;;
 esac
 

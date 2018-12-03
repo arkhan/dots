@@ -1570,7 +1570,7 @@
                        :help "Compilation with custom script") TeX-command-list)
                 (add-to-list 'TeX-expand-list
                              '("%(ctex_bin)" (lambda ()
-                                               (concat bin-dir "ctex" ))))
+                                               "ctex" )))
                 (setq TeX-command-default "cTeX"
                       TeX-save-query nil
                       TeX-show-compilation t))))
