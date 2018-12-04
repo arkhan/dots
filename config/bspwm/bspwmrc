@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
 
 DISPLAY1="$(bspc query -M --names | awk -F: '{print $1}' | grep 'eDP1\|VGA-0')"
-[[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 && bspc config -m "$DISPLAY1" top_padding 18
+[[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 && bspc config -m "$DISPLAY1" top_padding 17
 
 [[ -z `pgrep enforce` ]] && ~/.bin/enforce "$DISPLAY1" '^1' &
 
 bspc config border_width 1
 bspc config window_gap 3
-
 bspc config split_ratio 0.5
 bspc config borderless_monocle false
 bspc config single_monocle true
@@ -40,7 +39,7 @@ bspc rule -a mpv follow=on desktop=^7 state=tiled
 bspc rule -a obs follow=on desktop=^7 state=tiled
 bspc rule -a cantata follow=on desktop=^7 state=tiled
 bspc rule -a Easytag follow=on desktop=^7 state=tiled
-bspc rule -a *:libreoffice follow=off desktop=^8
+bspc rule -a *:libreoffice follow=off desktop=^8 state=tiled
 bspc rule -a Soffice follow=off desktop=^8
 bspc rule -a Zathura follow=on desktop=^8 state=tiled
 bspc rule -a Emacs follow=on desktop=^9 state=tiled
@@ -48,7 +47,7 @@ bspc rule -a Wine follow=off desktop=^6 state=tiled
 
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
-bspc rule -a URxvt:terminal sticky=on follow=off state=floating center=on
+bspc rule -a URxvt:terminal follow=off state=floating center=on
 bspc rule -a 'Firefox:firefox' follow=off state=floating manage=off
 bspc rule -a 'Firefox:Browser' follow=off state=floating manage=off
 bspc rule -a 'Firefox Developer Edition:firefox-developer-edition' follow=off state=floating manage=off
