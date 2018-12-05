@@ -1626,14 +1626,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package pyenv-mode
     :ensure t
-    :init (pyenv-mode)
-    :config
-    (defun pyenv-venv-wrapper-act (&optional ARG PRED)
-      (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
-    (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
-    (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
-      (setenv "VIRTUAL_ENV"))
-    (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact))
+    :init (pyenv-mode))
 
   (use-package pyenv-mode-auto
     :ensure t)
