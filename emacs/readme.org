@@ -897,15 +897,20 @@
         backend
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
-  (add-hook 'company-mode-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
+  (add-hook 'after-init-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
-  (use-package company-quickhelp
+  (use-package company-posframe
+    :ensure t
+    :diminish company-posframe-mode
+    :config
+    (company-posframe-mode 1))
+
+  (use-package company-statistics
     :ensure t
     :after company
-    :bind (:map company-active-map
-                ("C-c h" . #'company-quickhelp-manual-begin))
-    :init (company-quickhelp-mode))
-
+    :init
+    (setq company-statistics-file (concat conf:cache-dir "company-statistics.el"))
+    (add-hook 'after-init-hook 'company-statistics-mode))
 #+END_SRC
 *** Csv
 #+BEGIN_SRC emacs-lisp
@@ -1208,16 +1213,17 @@
 #+END_SRC
 *** LSP Mode
 #+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
+  (use-package lsp
+    :ensure lsp-mode
     :defer t
     :config
+    (require 'lsp-clients)
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    :init
     (setq lsp-eldoc-render-all nil
           lsp-print-io nil
           lsp-inhibit-message t
-          lsp-message-project-root-warning t)
-    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-    (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
+          lsp-message-project-root-warning t))
 
   ;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
   (defvar-local conf:lsp-on-change-exist nil
@@ -1237,11 +1243,13 @@
 
   (use-package lsp-ui
     :ensure t
+    :after lsp
     :init
     (setq lsp-ui-sideline-enable t
           lsp-ui-sideline-ignore-duplicate t
           lsp-ui-sideline-show-hover nil
-          lsp-ui-doc-enable t)
+          lsp-ui-doc-enable t
+          lsp-prefer-flymake nil)
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
@@ -1250,7 +1258,10 @@
   (use-package company-lsp
     :ensure t
     :defer t
-    :config (push 'company-lsp company-backends))
+    :config
+    (setq company-lsp-enable-snippet t
+          company-lsp-async t)
+    (push '(company-lsp :with company-yasnippet) company-backends))
 #+END_SRC
 *** move-dup
 #+BEGIN_SRC emacs-lisp
@@ -1434,8 +1445,9 @@
 #+END_SRC
 *** Undo Tree
 #+BEGIN_SRC emacs-lisp
-    (use-package undo-tree
-    :demand t
+  (use-package undo-tree
+    :ensure t
+    :defer t
     :diminish undo-tree-mode
     :bind ("C-x u" . undo-tree-visualizer)
     :init
@@ -1608,19 +1620,10 @@
   (add-hook 'python-mode-hook
             '(lambda () (when (empty-buffer?) (python-template))))
 
-  (use-package lsp-python
-    :ensure t
-    :config
-    (lsp-define-stdio-client lsp-python "python"
-                             #'projectile-project-root
-                             '("pyls"))
-
-    (add-hook 'python-mode-hook #'lsp-python-enable))
-
   (use-package python
-    :if (executable-find "python")
-    :interpreter ("python" . python-mode)
-    :init (setq python-shell-interpreter "python"))
+    :init
+    (setq python-shell-interpreter "python")
+    (add-hook 'python-mode-hook #'lsp))
 #+END_SRC
 **** Pyenv
 #+BEGIN_SRC emacs-lisp
