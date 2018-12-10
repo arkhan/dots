@@ -1223,7 +1223,10 @@
     (setq lsp-eldoc-render-all nil
           lsp-print-io nil
           lsp-inhibit-message t
-          lsp-message-project-root-warning t))
+          lsp-message-project-root-warning t
+          lsp-prefer-flymake nil
+          lsp-auto-guess-root t
+          lsp-session-file (concat conf:cache-dir "lsp-session")))
 
   ;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
   (defvar-local conf:lsp-on-change-exist nil
@@ -1248,8 +1251,7 @@
     (setq lsp-ui-sideline-enable t
           lsp-ui-sideline-ignore-duplicate t
           lsp-ui-sideline-show-hover nil
-          lsp-ui-doc-enable t
-          lsp-prefer-flymake nil)
+          lsp-ui-doc-enable t)
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
