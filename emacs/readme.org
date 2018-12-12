@@ -899,11 +899,11 @@
               '(:with company-yasnippet))))
   (add-hook 'after-init-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
-  (use-package company-posframe
-    :ensure t
-    :diminish company-posframe-mode
-    :config
-    (company-posframe-mode 1))
+  ;; (use-package company-posframe
+  ;;   :ensure t
+  ;;   :diminish company-posframe-mode
+  ;;   :config
+  ;;   (company-posframe-mode 1))
 
   (use-package company-statistics
     :ensure t
@@ -1709,6 +1709,7 @@
     :config (add-hook 'sql-mode-hook 'sqlformat-mode))
 #+END_SRC
 *** Web
+**** PHP
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package php-mode
     :ensure t)
@@ -1894,7 +1895,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "MonacoB2" :height 90)
+  (set-face-attribute 'default nil :family "MonacoBSemi" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 ** Frame Title

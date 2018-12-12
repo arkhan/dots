@@ -27,14 +27,17 @@ bindsym $mod4+Return exec $term
 #start terminal with tmux session
 bindsym $mod4+Shift+Return exec $term -e $bin/tmx
 
-# kill focused window
-bindsym $mod4+Shift+q kill
-
 # launch rofi -show run (a program launcher)
 bindsym $mod4+d exec $bin/rofi-run
 
 # rofi clipboard
-bindsym $mod4+c exec $bin/rofi-clip
+bindsym $mod4+$mod1+c exec $bin/rofi-clip
+
+# Password Store
+bindsym $mod4+$mod1+p exec rofi-pass
+
+# Systemd
+bindsym $mod4+$mod1+s exec $bin/rofi-systemd
 
 # rofi xrandr
 bindsym Control+F8 exec $bin/rofi-xrandr
@@ -42,25 +45,11 @@ bindsym Control+F8 exec $bin/rofi-xrandr
 # Launch rofi -show window (a window shitcher)
 bindsym $mod4+Tab exec rofi -show window -width 32
 
-# Make the currently focused window a scratchpad
-bindsym $mod4+m move scratchpad
-# Show the first scratchpad window
-bindsym $mod4+n scratchpad show
-
 # Programs
-## Firefox
-bindsym $mod4+b exec firefox
 ## Ranger
 bindsym $mod4+Control+t exec $term -name Ranger -e ranger /media/data
 ## Weechat
 bindsym $mod4+Control+i exec $term -name Weechat -e weechat
-
-# Password Store
-## Copy Password
-bindsym $mod4+period exec rofi-pass
-
-# Systemd
-bindsym $mod4+comma exec $bin/rofi-systemd
 
 # Pamixer Control
 ## Toggle Mute
@@ -69,6 +58,14 @@ bindsym $mod1+m exec pamixer -t
 bindsym $mod1+Up exec pamixer -i 1
 ## Decrease
 bindsym $mod1+Down exec pamixer -d 1
+
+# kill focused window
+bindsym $mod4+Shift+q kill
+
+# Make the currently focused window a scratchpad
+bindsym $mod4+m move scratchpad
+# Show the first scratchpad window
+bindsym $mod4+n scratchpad show
 
 # change focus
 bindsym $mod4+j focus left
