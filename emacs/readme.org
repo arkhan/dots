@@ -537,13 +537,13 @@
       (setq org-confirm-babel-evaluate 'conf:org-confirm-babel-evaluate)
 
       ;; refresh images after execution
-      (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+      (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)))
 
-      ;; Disable flycheck when edit org-src-block
-      (defun disable-fylcheck-in-org-src-block ()
-        (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+      ;; ;; Disable flycheck when edit org-src-block
+      ;; (defun disable-fylcheck-in-org-src-block ()
+      ;;   (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
-      (add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)))
+      ;; (add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)))
 
   (use-package ob-python
     :defer t
@@ -1002,7 +1002,7 @@
                 fci-rule-column 79))
 #+END_SRC
 *** Flycheck
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package flycheck
     :ensure t
     :defer 1
@@ -1018,6 +1018,15 @@
     (setq-default flycheck-disabled-checkers
                   (append flycheck-disabled-checkers
                           '(json-jsonlist))))
+#+END_SRC
+*** Flymake
+#+BEGIN_SRC emacs-lisp
+  (use-package flymake-diagnostic-at-point
+    :straight (flymake-diagnostic-at-point :type git :host github :repo "waymondo/flymake-diagnostic-at-point" :branch "posframe-support")
+    :after flymake
+    :config
+    (setq flymake-diagnostic-at-point-display-diagnostic-function 'flymake-diagnostic-at-point-display-posframe)
+    (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 #+END_SRC
 *** Format-all
 #+BEGIN_SRC emacs-lisp
@@ -1224,7 +1233,6 @@
           lsp-print-io nil
           lsp-inhibit-message t
           lsp-message-project-root-warning t
-          lsp-prefer-flymake nil
           lsp-auto-guess-root t
           lsp-session-file (concat conf:cache-dir "lsp-session")))
 
@@ -2413,7 +2421,7 @@
     :mode "PKGBUILD\\'")
 #+END_SRC
 ** Plantuml
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package plantuml-mode
     :ensure t
     :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
