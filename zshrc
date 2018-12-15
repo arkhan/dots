@@ -42,6 +42,8 @@ antibody bundle zsh-users/zsh-completions
 antibody bundle zsh-users/zsh-history-substring-search
 
 antibody bundle zimfw/zimfw path:modules/history
+antibody bundle mafredri/zsh-async
+
 
 # Enable highlighters
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
@@ -78,15 +80,68 @@ ZSH_THEME_GIT_PROMPT_PREFIX=""
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
 ZSH_THEME_GIT_PROMPT_SEPARATOR=" "
 
-PROMPT='$(virtualenv_status) %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) '
-RPROMPT='%B%F{black}$(shrink_path -f)%f%b$(git_status)'
+async_init
+
+# cache variable
+typeset -Ag prompt_data
+
+# section for dir
+function prompt_dir() {
+  echo '%B%F{black}$(shrink_path -f)%f%b'
+}
+
+# section for git branch
+function prompt_git() {
+  echo '$(git_status)'
+}
+
+# section for git branch
+function prompt_venv() {
+  echo '$(virtualenv_status)'
+}
+
+# refresh prompt with new data
+prompt_refresh() {
+  PROMPT="$prompt_data[prompt_venv] %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) "
+  RPROMPT="$prompt_data[prompt_dir]$prompt_data[prompt_git]"
+  # Redraw the prompt.
+  zle && zle .reset-prompt
+}
+
+prompt_callback() {
+  local job=$1 code=$2 output=$3 exec_time=$4
+  prompt_data[$job]=$output
+  prompt_refresh
+}
+
+# Start async worker
+async_start_worker 'prompt' -n
+# Register callback function for the workers completed jobs
+async_register_callback 'prompt' prompt_callback
+
+# start async jobs before cmd
+prompt_precmd() {
+  async_job 'prompt' prompt_dir
+  async_job 'prompt' prompt_venv $PWD # required
+  async_job 'prompt' prompt_git $PWD # required
+}
+
+# Setup
+zmodload zsh/zle
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd prompt_precmd
+
+PROMPT=' %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) '
+
+# PROMPT='$(virtualenv_status) %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) '
+# RPROMPT='%B%F{black}$(shrink_path -f)%f%b$(git_status)'
 # Color command correction prompt
-export SPROMPT="$fg[cyan]Correct $fg[red]%R$reset_color $fg[magenta]to $fg[green]%r?$reset_color ($fg[white]Si :: No :: Abortar :: Editar$fg[white])"
+SPROMPT="$fg[cyan]Correct $fg[red]%R$reset_color $fg[magenta]to $fg[green]%r?$reset_color ($fg[white]Si :: No :: Abortar :: Editar$fg[white])"
 
 #-----------------------------
 # colors
 #-----------------------------
-export LS_COLORS='rs=0:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:';
+LS_COLORS='rs=0:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:';
 
 #------------------------------
 # Keybindings
