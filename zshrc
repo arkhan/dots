@@ -356,6 +356,7 @@ zstyle ':completion:*' max-errors 1 numeric
 zstyle ':completion:*' menu select=2
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
 zstyle ':completion:*' substitute 0
+zstyle ":completion:*:commands" rehash 1
 zstyle ':completion:*:(all-|)files' ignored-patterns '(|*/)CVS'
 zstyle ':completion:*:(rm|kill|diff):*' ignore-line yes
 zstyle ':completion:*:*:kill:*' menu yes select

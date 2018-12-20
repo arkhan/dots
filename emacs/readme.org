@@ -372,33 +372,34 @@
   (use-package ivy-rich
     :ensure t
     :config
-    '(ivy-switch-buffer
-      (:columns
-       ((ivy-rich-candidate (:width 30))  ; return the candidate itself
-        (ivy-rich-switch-buffer-size (:width 7))  ; return the buffer size
-        (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right)); return the buffer indicators
-        (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))          ; return the major mode info
-        (ivy-rich-switch-buffer-project (:width 15 :face success))             ; return project name using `projectile'
-        (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))  ; return file path relative to project root or `default-directory' if project is nil
-       :predicate
-       (lambda (cand) (get-buffer cand)))
-      counsel-M-x
-      (:columns
-       ((counsel-M-x-transformer (:width 40))  ; thr original transfomer
-        (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))  ; return the docstring of the command
-      counsel-describe-function
-      (:columns
-       ((counsel-describe-function-transformer (:width 40))  ; the original transformer
-        (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))  ; return the docstring of the function
-      counsel-describe-variable
-      (:columns
-       ((counsel-describe-variable-transformer (:width 40))  ; the original transformer
-        (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))  ; return the docstring of the variable
-      counsel-recentf
-      (:columns
-       ((ivy-rich-candidate (:width 0.8)) ; return the candidate itself
-        (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))) ; return the last modified time of the file
-    (setq ivy-virtual-abbreviate 'full
+    (setq ivy-rich--display-transformers-list
+          '(ivy-switch-buffer
+            (:columns
+             ((ivy-rich-candidate (:width 30))  ; return the candidate itself
+              (ivy-rich-switch-buffer-size (:width 7))  ; return the buffer size
+              (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right)); return the buffer indicators
+              (ivy-rich-switch-buffer-major-mode (:width 12 :face warning))          ; return the major mode info
+              (ivy-rich-switch-buffer-project (:width 15 :face success))             ; return project name using `projectile'
+              (ivy-rich-switch-buffer-path (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path x (ivy-rich-minibuffer-width 0.3))))))  ; return file path relative to project root or `default-directory' if project is nil
+             :predicate
+             (lambda (cand) (get-buffer cand)))
+            counsel-M-x
+            (:columns
+             ((counsel-M-x-transformer (:width 40))  ; thr original transfomer
+              (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))  ; return the docstring of the command
+            counsel-describe-function
+            (:columns
+             ((counsel-describe-function-transformer (:width 40))  ; the original transformer
+              (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))  ; return the docstring of the function
+            counsel-describe-variable
+            (:columns
+             ((counsel-describe-variable-transformer (:width 40))  ; the original transformer
+              (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))  ; return the docstring of the variable
+            counsel-recentf
+            (:columns
+             ((ivy-rich-candidate (:width 0.8)) ; return the candidate itself
+              (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))) ; return the last modified time of the file
+          ivy-virtual-abbreviate 'full
           ivy-rich-path-style 'abbrev
           ivy-rich-switch-buffer-align-virtual-buffer t)
     (ivy-rich-mode 1))
@@ -1002,7 +1003,7 @@
                 fci-rule-column 79))
 #+END_SRC
 *** Flycheck
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
     :defer 1
@@ -1020,7 +1021,7 @@
                           '(json-jsonlist))))
 #+END_SRC
 *** Flymake
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package flymake-diagnostic-at-point
     :straight (flymake-diagnostic-at-point :type git :host github :repo "waymondo/flymake-diagnostic-at-point" :branch "posframe-support")
     :after flymake
@@ -1234,6 +1235,7 @@
           lsp-inhibit-message t
           lsp-message-project-root-warning t
           lsp-auto-guess-root t
+          lsp-prefer-flymake nil
           lsp-session-file (concat conf:cache-dir "lsp-session")))
 
   ;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
@@ -1974,7 +1976,9 @@
                 ("+" . neotree-create-node)
                 ("d" . neotree-delete-node)
                 ("r" . neotree-rename-node))
-    :config (setq neo-theme 'ascii
+    :config (setq neo-theme (if (display-graphic-p)
+                                'arrow
+                              'ascii)
                   neo-vc-integration nil
                   neo-window-width 36
                   neo-create-file-auto-open t
@@ -2089,10 +2093,12 @@
     (interactive)
     (let ((U 0)   ; untracked files
           (M 0)   ; modified files
+          (D 0)   ; deleted files
           (S 0)   ; other files
           (C 0)   ; conflict files
           (U-files "")
           (M-files "")
+          (D-files "")
           (S-files "")
           (C-files ""))
       (dolist (line (split-string
@@ -2107,21 +2113,24 @@
           (setq U (+ 1 U))
           (setq U-files (concat U-files "\n" line)))
 
+         ((string-match "^ D" line)
+          (setq D (+ 1 D))
+          (setq D-files (concat D-files "\n" line)))
+
+
          ((string-match "^ M" line)
           (setq M (+ 1 M))
-          (setq M-files (concat M-files "\n" line))
-          )
+          (setq M-files (concat M-files "\n" line)))
 
          ((string-match "^ U" line)
           (setq C (+ 1 C))
-          (setq C-files (concat C-files "\n" line))
-          )
+          (setq C-files (concat C-files "\n" line)))
 
          (t
           (setq S (+ 1 S))
           (setq S-files (concat S-files "\n" line)))))
 
-      (if (or (> M 0) (> U 0) (> S 0) (> C 0))
+      (if (or (> M 0) (> D 0) (> U 0) (> S 0) (> C 0))
           ;; construct propertized string
           (concat
            (if (not (= C 0))
@@ -2135,6 +2144,12 @@
                 (format "●%d" S)
                 'face '(:inherit font-lock-warning-face)
                 'help-echo S-files))
+
+           (if (> D 0)
+               (propertize
+                (format "-%d" D)
+                'face '(:inherit font-lock-warning-face)
+                'help-echo D-files))
 
            (if (> M 0)
                (propertize
@@ -2379,6 +2394,11 @@
           clipmon-transform-prefix ""
           clipmon-transform-suffix "\n\n"
           clipmon-transform-function nil))
+#+END_SRC
+** Equake
+#+BEGIN_SRC emacs-lisp
+  (use-package equake
+    :straight (equake :type git :host gitlab :repo "emacsomancer/equake"))
 #+END_SRC
 ** GraphViz
 #+BEGIN_SRC emacs-lisp :tangle no
