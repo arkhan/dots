@@ -1320,7 +1320,6 @@
 *** PO
 #+BEGIN_SRC emacs-lisp
   (use-package po-mode
-    :ensure t
     :config
     ;; Fuente: https://www.emacswiki.org/emacs/PoMode
     (defun po-wrap ()
@@ -1976,9 +1975,7 @@
                 ("+" . neotree-create-node)
                 ("d" . neotree-delete-node)
                 ("r" . neotree-rename-node))
-    :config (setq neo-theme (if (display-graphic-p)
-                                'arrow
-                              'ascii)
+    :config (setq neo-theme 'ascii
                   neo-vc-integration nil
                   neo-window-width 36
                   neo-create-file-auto-open t
