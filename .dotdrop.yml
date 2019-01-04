@@ -1,5 +1,3 @@
-actions:
-  tangle: /usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'
 config:
   backup: true
   banner: true
@@ -25,8 +23,6 @@ dotfiles:
     link: true
     src: config/dunst
   d_emacs.d:
-    actions:
-    - tangle
     dst: ~/.emacs.d
     link: true
     src: emacs
