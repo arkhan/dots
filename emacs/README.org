@@ -598,7 +598,7 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC elisp
-  (set-face-attribute 'default nil :family "Fantasque Sans Mono" :height 100)
+  (set-face-attribute 'default nil :family "MonacoBSemi" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -1790,7 +1790,7 @@
                                              (toggle-frame-fullscreen))))
 #+END_SRC
 * Pretty Symbols
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC elisp
   (use-package prog-mode ; Contains pretty-symbols-mode
     :config
     (setq prettify-symbols-unprettify-at-point 'right-edge)
@@ -1821,6 +1821,7 @@
                         ;; ("Any" .      ?\u2754)
                         ;; ("Union" .    ?\u222a)
                         ;; Condition
+                        ("==" . ?\u2261)
                         ("!=" . ?\u2260)
                         (">=" . ?\u2265)
                         ("<=" . ?\u2264))))))
