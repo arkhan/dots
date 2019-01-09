@@ -9,7 +9,8 @@ Xft.lcdfilter: lcddefault
 *.charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48,35:48,58:48,63:48,61:48,44:48,38:48,59:48
 *.saveLines: 4096
 *.scrollBar: false
-xterm*faceName: xft:MonacoBSemi:style=Regular:size=9
+! XTerm
+xterm*faceName: xft:Hack:style=Regular:size=9
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -21,12 +22,13 @@ xterm*rightScrollBar: flase
 xterm*jumpScroll: true
 xterm*multiScroll: true
 xterm*toolBar: false
+! URxvt
 URxvt.iso14755: false
 URxvt.iso14755_52: false
-URxvt*font: xft:MonacoBSemi:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldFont: xft:MonacoBSemi:bold:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*italicFont: xft:MonacoBSemi:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldItalicFont: xft:MonacoBSemi:bold:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*font: xft:Hack:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldFont: xft:Hack:bold:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*italicFont: xft:Hack:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldItalicFont: xft:Hack:bold:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
