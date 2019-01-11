@@ -1779,23 +1779,6 @@
 
   (use-package pyenv-mode-auto)
 #+END_SRC
-**** VirtualEnv
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package pyvenv)
-
-  (use-package auto-virtualenv
-    :config
-    (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
-
-  (use-package virtualenvwrapper
-    :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
-    :init
-    (venv-initialize-interactive-shells)
-    (venv-initialize-eshell)
-    :config
-    (add-hook 'venv-postmkvirtualenv-hook
-              (lambda () (shell-command "pip install jedi isort 'python-language-server[all]' flake8 virtualenvwrapper"))))
-#+END_SRC
 **** Stuff
 #+BEGIN_SRC emacs-lisp
   (use-package blacken
