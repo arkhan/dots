@@ -3,7 +3,7 @@
 #+EMAIL:     arkhan@disroot.org
 #+BABEL: :cache yes
 #+LANGUAGE: es
-#+PROPERTY: header-args
+#+PROPERTY: header-args :tangle init.el
 #+OPTIONS: author:nil date:nil toc:nil title:nil e:nil
 #+LaTeX_HEADER: \pagenumbering{gobble}
 #+LaTeX_HEADER: \usepackage[T1]{fontenc}
@@ -17,15 +17,15 @@
 #+LaTeX_HEADER: \setminted{breaklines}
 
 * init.el
-#+BEGIN_SRC emacs-lisp :tangle init.el
+#+BEGIN_SRC emacs-lisp
   ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
   ;;; Commentary:
   ;; This config start here
 
   (defvar cfg--file-name-handler-alist file-name-handler-alist)
   (setq gc-cons-threshold 402653184
-        gc-cons-percentage 0.6
-        file-name-handler-alist nil)
+    gc-cons-percentage 0.6
+    file-name-handler-alist nil)
 
   (defvar conf:cache-dir (concat user-emacs-directory "cache/"))
   (unless (file-exists-p conf:cache-dir)
@@ -33,13 +33,6 @@
 
   (setq nsm-settings-file (concat conf:cache-dir "network-security.data"))
   (setq network-security-level 'high)
-
-  (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                           ("melpa" . "https://melpa.org/packages/")
-                           ("org" . "https://orgmode.org/elpa/"))
-        package-archive-priorities '(("melpa" . 10)
-                                     ("gnu" . 5)
-                                     ("org" . 0)))
 
   (defvar bootstrap-version)
   (let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -55,46 +48,24 @@
 
   (setq straight-check-for-modifications 'live)
 
-  (setq straight-enable-use-package-integration nil)
+  (straight-use-package 'use-package)
+  (setq straight-enable-use-package-integration t
+        straight-use-package-by-default t)
 
   (straight-use-package 'el-patch)
   (setq el-patch-enable-use-package-integration t)
-  ;; avoid problems with files newer than their byte-compiled counterparts
-  ;; it's better a lower startup than load an outdated and maybe bugged package
-  (setq load-prefer-newer t)
-  ;; initialize the packages and create the packages list if not exists
-
-  (setq package-enable-at-startup nil
-        package--init-file-ensured t)
-
-  (package-initialize)
-  (when (not package-archive-contents)
-    (package-refresh-contents))
-
-  ;; install use-package if not exists
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
 
   (eval-when-compile
     (require 'use-package))
 
   (require 'use-package)
 
-  (use-package bind-key :ensure t)
-  (use-package diminish :ensure t)
-
-  (use-package package-utils
-    :ensure t)
+  (use-package bind-key)
+  (use-package diminish)
 
   (use-package async
     :defer t
-    :ensure t
     :config (setq async-bytecomp-package-mode t))
-
-  (use-package literate-elisp
-    :ensure t
-    :config
-    (literate-elisp-load (concat user-emacs-directory "readme.org")))
 #+END_SRC
 * async-tangle
 #+begin_src emacs-lisp
@@ -110,8 +81,9 @@
   (add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 * abbrev
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package abbrev
+    :straight nil
     :diminish abbrev-mode
     :config
     (abbrev-mode t)
@@ -123,18 +95,16 @@
       (quietly-read-abbrev-file)))
 #+END_SRC
 * alert
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package alert
-    :ensure t
     :config
     (if (eq system-type 'windows-nt)
         (setq alert-default-style 'message)
       (setq alert-default-style 'libnotify)))
 #+END_SRC
 * Anzu
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
     (use-package anzu
-      :ensure t
       :defer t
       :bind (("M-%" . anzu-query-replace)
 	     ("C-M-%" . anzu-query-replace-regexp))
@@ -163,15 +133,13 @@
       (global-anzu-mode +1))
 #+END_SRC
 * auth-password-store
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package password-store
-    :ensure t
     :config
     (progn
       (setq password-store-password-length 30)))
 
   (use-package pass
-    :ensure t
     :commands pass
     :init
     (progn
@@ -191,34 +159,29 @@
                      entry))
             (password-store-edit entry)
             (pass-update-buffer)))))
-    :config
-    (progn
-      (advice-add #'pass-insert-generated :override #'my/pass-insert-generated)))
+    :config (advice-add #'pass-insert-generated :override #'my/pass-insert-generated))
 
   (use-package auth-source
-    :init
-    (progn
-      (setq auth-source-debug t)
-      (setq auth-source-do-cache nil)))
+    :straight nil
+    :init (setq auth-source-debug t
+                auth-source-do-cache nil))
 
   (use-package auth-source-pass
-    :ensure t
     :demand t
     :after auth-source
-    :init
-    (progn
-      (setq auth-sources '(password-store))))
+    :init (setq auth-sources '(password-store)))
 #+END_SRC
 * autorevert
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package autorevert
+    :straight nil
     :diminish auto-revert-mode
     :config (setq auto-revert-remote-files t
                   auto-revert-interval 1))
 
 #+END_SRC
 * Básico
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-screen t
                  use-dialog-box nil
                  use-file-dialog nil
@@ -253,31 +216,29 @@
   (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
 #+END_SRC
 * benchmark-init
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package benchmark-init
-    :ensure t
     :config
     ;; To disable collection of benchmark data after init is done.
     (add-hook 'after-init-hook 'benchmark-init/deactivate))
 #+END_SRC
 * Bookmarks
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package bookmark
+    :straight nil
     :config
     (setq bookmark-default-file  (concat conf:cache-dir "bookmarks"))
     (when (file-exists-p bookmark-default-file)
       (bookmark-load bookmark-default-file t)))
 #+END_SRC
 * Bughunter
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package bug-hunter
-    :ensure t
     :commands (bug-hunter-file bug-hunter-init-file))
 #+END_SRC
 * Caldav
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package org-caldav
-    :ensure t
     :bind ("<f6>" . org-caldav-sync)
     :config
     (setq org-icalendar-alarm-time 30
@@ -304,19 +265,17 @@
 
 
   (use-package calfw
-    :ensure t
     :bind ("C-c f" . cfw:open-org-calendar)
     :config
     (setq cfw:org-overwrite-default-keybinding t
           cfw:display-calendar-holidays nil
           calendar-week-start-day 1))
 
-  (use-package calfw-org :ensure t)
+  (use-package calfw-org)
 #+END_SRC
 * Clipboard
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package clipmon
-    :ensure t
     :config
     (add-to-list 'after-init-hook 'clipmon-mode-start)
     (setq kill-ring-max 500
@@ -330,16 +289,14 @@
           clipmon-transform-function nil))
 #+END_SRC
 * Comment-dwim-2
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package comment-dwim-2
-    :ensure t
     :defer t
     :bind* ("M-;" . comment-dwim-2))
 #+END_SRC
 * Company
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package company
-    :ensure t
     :diminish company-mode
     :config
     (setf company-backends '((company-files
@@ -355,7 +312,6 @@
     (add-hook 'after-init-hook #'global-company-mode))
 
   (use-package company-prescient
-    :ensure t
     :after company
     :init (company-prescient-mode))
 
@@ -367,32 +323,31 @@
   (add-hook 'after-init-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
   ;; (use-package company-posframe
-  ;;   :ensure t
+  ;;
   ;;   :diminish company-posframe-mode
   ;;   :config
   ;;   (company-posframe-mode 1))
 
   (use-package company-statistics
-    :ensure t
     :after company
     :init
     (setq company-statistics-file (concat conf:cache-dir "company-statistics.el"))
     (add-hook 'after-init-hook 'company-statistics-mode))
 #+END_SRC
 * Csv
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package csv-mode
-    :ensure t
     :defer t
     :mode ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
     :config (setq csv-separators '("," ";" "|" " ")))
 #+END_SRC
 * Cursor
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq-default cursor-type '(hbar . 2))
   (setq x-stretch-cursor t)
 
   (use-package frame
+    :straight nil
     :config
     (defun set-cursor-hook (frame)
       (modify-frame-parameters
@@ -401,7 +356,7 @@
     (add-hook 'after-make-frame-functions 'set-cursor-hook))
 #+END_SRC
 * custom.el
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq custom-file (concat conf:cache-dir "custom.el"))
   (unless (file-exists-p custom-file)
     (with-temp-buffer
@@ -409,41 +364,37 @@
   (load custom-file)
 #+END_SRC
 * Datos Personales
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq user-full-name "arkhan"
                  user-mail-address "arkhan@disroot.org")
 #+END_SRC
 * Directorios
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq-default semanticdb-default-save-directory (concat conf:cache-dir "semanticdb")
                 url-configuration-directory (concat conf:cache-dir "url")
                 eshell-directory-name (concat conf:cache-dir "eshell" ))
 #+END_SRC
 * Docker
 **** Dockerfile
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
     :mode "Dockerfile\\'"
-    :defer t
-    :ensure t)
+    :defer t)
 #+END_SRC
 **** Docker Compose
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package docker-compose-mode
-    :ensure t
     :defer t
     :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
 #+END_SRC
 **** Dcoker Tramp
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package docker-tramp
-    :defer t
-    :ensure t)
+    :defer t)
 #+END_SRC
 * dumb-jump
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
-    :ensure t
     :bind (("M-g o" . dumb-jump-go-other-window)
            ("M-g j" . dumb-jump-go)
            ("M-g i" . dumb-jump-go-prompt)
@@ -452,15 +403,15 @@
     :config (setq dumb-jump-selector 'ivy))
 #+END_SRC
 * easy-kill
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package easy-kill
-    :ensure t
     :bind (([remap kill-ring-save] . #'easy-kill)
            ([remap mark-sexp] . #'easy-mark)))
 #+END_SRC
 * Ediff
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package ediff-wind
+    :straight nil
     :defer t
     :config
     ;; Split windows horizontally in ediff (instead of vertically)
@@ -482,35 +433,33 @@
     (defalias 'ediff-buffer-with-file 'ediff-current-file))
 #+END_SRC
 * EditorConfig
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package editorconfig
-    :ensure t
     :defer 1
     :diminish ""
     :config (editorconfig-mode))
 #+END_SRC
 * Eldoc
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package eldoc
     :diminish eldoc-mode)
 #+END_SRC
 * Empty Buffer
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (defun empty-buffer? ()
     (= (buffer-end 1) (buffer-end -1)))
 #+END_SRC
 * Fill Column Indicator
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package fill-column-indicator
-    :ensure t
     :commands (fci-mode)
     :init (setq fci-rule-width 5
                 fci-rule-column 79))
 #+END_SRC
 * Flycheck
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :ensure t
+
     :defer 1
     :bind (("C-c e n" . flycheck-next-error)
            ("C-c e p" . flycheck-previous-error))
@@ -535,7 +484,7 @@
     (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 #+END_SRC
 * Flyspell
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package flyspell
     :diminish ""
     :bind (("C-c t s" . flyspell-mode)
@@ -593,42 +542,42 @@
     (define-key flyspell-mode-map [(control ?\")] 'flyspell-add-word-to-dict))
 
   (use-package flyspell-popup
-    :ensure t
+
     :after flyspell
     :bind (:map flyspell-mode-map
                 ("C-'" . #'flyspell-popup-correct)))
 
   (use-package flyspell-lazy
-    :ensure t
+
     :after flyspell
     :init (flyspell-lazy-mode 1))
 #+END_SRC
 * Font
-#+BEGIN_SRC elisp :tangle no
-  (set-face-attribute 'default nil :family "Hack" :height 90)
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :family "MonacoBSemi" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package format-all
-    :ensure t
+
     :defer t
     :bind (:map prog-mode-map
                 ("<M-f8>" . format-all-buffer)))
 #+END_SRC
 * Frame Title
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq-default frame-title-format
                 (list (user-login-name) "@" (system-name) " %b [%m]"))
 #+END_SRC
 * Git
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq vc-follows-symlinks t
         find-file-visit-truename t
         vc-handled-backends nil)
 
   (use-package magit
-    :ensure t
+
     :bind (("C-x g c" . magit-commit-create)
            ("C-x g e" . magit-ediff-resolve)
            ("C-x g g" . magit-grep)
@@ -681,12 +630,12 @@
             magit-log-buffer-file-locket t)))
 
   (use-package magit-gitflow
-    :ensure t
+
     :config
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 
   (use-package git-gutter
-    :ensure t
+
     :defer 1
     :bind (("C-x C-g" . git-gutter)
            ("C-x v =" . git-gutter:popup-hunk)
@@ -698,7 +647,7 @@
     :config
     (if (display-graphic-p)
         (use-package git-gutter-fringe
-          :ensure t))
+          ))
     (global-git-gutter-mode t)
     (setq-default fringes-outside-margins t)
     (setq indicate-empty-lines nil)
@@ -709,25 +658,25 @@
     (set-face-foreground 'git-gutter:deleted "red"))
 
   (use-package gitconfig-mode
-    :ensure t
+
     :defer t
     :mode ("/\\.?git/?config$"
            "/\\.gitmodules$")
     :init (add-hook 'gitconfig-mode-hook 'flyspell-mode))
 
   (use-package gitignore-mode
-    :ensure t
+
     :defer t
     :mode ("/\\.gitignore$"
            "/\\.git/info/exclude$"
            "/git/ignore$"))
 
   (use-package gitattributes-mode
-    :ensure t
+
     :defer t)
 
   (use-package git-timemachine
-    :ensure t
+
     :defer t
     :commands git-timemachine
     :bind (:map git-timemachine-mode
@@ -735,7 +684,7 @@
                 ("b" . git-timemachine-switch-branch)))
 
   (use-package smerge-mode
-    :ensure t
+
     :defer t
     :config
     (defun enable-smerge-maybe ()
@@ -748,12 +697,12 @@
     (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
 #+END_SRC
 * GraphViz
-#+BEGIN_SRC elisp :tangle no :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package graphviz-dot-mode
-    :ensure t)
+    )
 #+END_SRC
 * Historial
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq-default history-length 1000)
   (setq savehist-file (concat conf:cache-dir "history")
         history-delete-duplicates t
@@ -765,12 +714,12 @@
   (savehist-mode t)
 #+END_SRC
 * i3wm
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
    (use-package i3wm-config-mode
      :straight (i3wm-config-mode :type git :host github :repo "Alexander-Miller/i3wm-Config-Mode"))
 #+END_SRC
 * IBuffer
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package ibuffer
     :bind ("C-x C-b" . ibuffer)
     :config
@@ -806,9 +755,9 @@
 
 #+END_SRC
 * Imenu
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package imenu-list
-    :ensure t
+
     :defer t
     :bind ("M-2" . imenu-list-smart-toggle)
     :config
@@ -817,12 +766,19 @@
           imenu-list-focus-after-activation t
           imenu-list-after-jump-hook nil))
 #+END_SRC
+* avy
+#+begin_src emacs-lisp
+  (use-package avy
+
+    :config
+    (setq avy-all-windows t))
+#+end_src
 * Ivy, Counsel, Swiper
-#+BEGIN_SRC elisp :tangle no
-  (use-package flx :ensure t)
+#+BEGIN_SRC emacs-lisp
+  (use-package flx )
 
   (use-package ivy
-    :ensure t
+
     :diminish ivy-mode
     :bind (:map ivy-mode-map
                 ("C-'" . ivy-avy))
@@ -865,14 +821,14 @@
     (ivy-mode 1))
 
   (use-package ivy-prescient
-    :ensure t
+
     :after ivy
     :init (ivy-prescient-mode))
 
   (setq confirm-nonexistent-file-or-buffer t)
 
   (use-package swiper
-    :ensure t
+
     :bind* (("C-s" . swiper)
             ("C-r" . swiper)
             ("C-M-s" . swiper-all))
@@ -881,10 +837,10 @@
           ("C-r" . counsel-minibuffer-history)))
 
   (use-package counsel
-    :ensure t
+
     :bind (("M-x" . counsel-M-x)
            ("C-c b" . counsel-imenu)
-           ("C-x C-f" . counsel-find-file)
+           ;; ("C-x C-f" . counsel-find-file)
            ("C-x C-r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
@@ -895,8 +851,13 @@
     (setq counsel-find-file-at-point t
                    counsel-rg-base-command "rg -uuu -S --no-heading --line-number --color never %s ."))
 
+  (use-package ivy-explorer
+
+    :diminish ivy-explorer-mode
+    :config (ivy-explorer-mode 1))
+
   (use-package ivy-rich
-    :ensure t
+
     :config
     (setq ivy-rich--display-transformers-list
           '(ivy-switch-buffer
@@ -930,26 +891,26 @@
     (ivy-rich-mode 1))
 #+END_SRC
 * Jinja
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package jinja2-mode
-    :ensure t)
+    )
 #+END_SRC
 * JS
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package js2-mode
-    :ensure t
+
     :config
     (add-hook 'js-mode-hook 'tern-mode))
 
   (use-package js-format
-    :ensure t
+
     :after js2-mode
     :config (add-hook 'js2-mode-hook
                       (lambda()
                         (js-format-setup "standard"))))
 
   (use-package tern
-    :ensure t
+
     :config
     ;; Force restart of tern in new projects
     ;; $ M-x delete-tern-process
@@ -960,7 +921,7 @@
       (delete-process "Tern")))
 
   (use-package company-tern
-    :ensure t
+
     :init
     (defun cfg:js-mode-hook ()
       (add-to-list 'company-backends 'company-tern))
@@ -971,7 +932,7 @@
 #+BEGIN_SRC emacs-lisp :tangle no
   (use-package tex
     :defer t
-    :ensure auctex
+    :straight auctex
     :bind
     ("C-c c" . TeX-clean)
     :init
@@ -999,7 +960,7 @@
     (add-hook 'TeX-mode-hook 'turn-on-auto-fill)
     (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
     (use-package cdlatex
-      :ensure t)
+      )
     (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)
 
     ;; Use pdf-tools to open PDF files
@@ -1040,7 +1001,7 @@
                   (set-fill-column 120)))))
 
   (use-package company-auctex
-    :ensure t
+
     :config
     (defun cfg:TeX-mode-hook ()
       (company-auctex-init))
@@ -1048,15 +1009,15 @@
     (add-hook 'TeX-mode-hook 'cfg:TeX-mode-hook))
 #+END_SRC
 * Logview
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package logview
-    :ensure t
+
     :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+END_SRC
 * LSP Mode
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package lsp
-    :ensure lsp-mode
+    :straight lsp-mode
     :defer t
     :config
     (require 'lsp-clients)
@@ -1087,7 +1048,7 @@
 
 
   (use-package lsp-ui
-    :ensure t
+
     :after lsp
     :init
     (setq lsp-ui-sideline-enable t
@@ -1100,7 +1061,7 @@
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
   (use-package company-lsp
-    :ensure t
+
     :defer t
     :config
     (setq company-lsp-enable-snippet t
@@ -1108,20 +1069,20 @@
     (push '(company-lsp :with company-yasnippet) company-backends))
 #+END_SRC
 * Makefile
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package makefile-runner
     :straight (makefile-runner :type git :host github :repo "danamlund/emacs-makefile-runner")
     :bind ("<C-f11>" . makefile-runner))
 #+END_SRC
 * Modo Mayor por defecto
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq major-mode 'text-mode
                  current-language-environment "Spanish")
 #+END_SRC
 * move-dup
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package move-dup
-    :ensure t
+
     :defer t
     :diminish move-dup-mode
     :bind (("S-M-<up>" . md/move-lines-up)
@@ -1131,19 +1092,19 @@
     :init (global-move-dup-mode))
 #+END_SRC
 * Multiple Cursors
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
-    :ensure t
+
     :defer t
     :init   (add-hook 'multiple-cursors-mode-hook #'conf:lsp-on-change-modify-hook))
 #+END_SRC
 * Neotree
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package shrink-path
-    :ensure t)
+    )
 
   (use-package neotree
-    :ensure t
+
     :bind (:map neotree-mode-map
                 ("<C-return>" . neotree-change-root)
                 ("C" . neotree-change-root)
@@ -1196,19 +1157,50 @@
   (global-set-key (kbd "M-1") 'neotree-project-dir-toggle)
 #+END_SRC
 * Nginx
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package nginx-mode
-    :ensure t
+
     :mode
     ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 #+END_SRC
 * Orgmode
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
+  (use-package git )
+
   (use-package org
-    :ensure org-plus-contrib
+    :straight org-plus-contrib
     :defer 1
     :bind (("C-x a" . org-agenda-list)
            ("C-x c" . org-capture))
+    :init
+    (require 'subr-x)
+    (defun org-git-version ()
+      "The Git version of org-mode.
+  Inserted by installing org-mode or when a release is made."
+      (require 'git)
+      (let ((git-repo (expand-file-name
+                       "straight/repos/org/" user-emacs-directory)))
+        (string-trim
+         (git-run "describe"
+                  "--match=release\*"
+                  "--abbrev=6"
+                  "HEAD"))))
+
+    (defun org-release ()
+      "The release version of org-mode.
+  Inserted by installing org-mode or when a release is made."
+      (require 'git)
+      (let ((git-repo (expand-file-name
+                       "straight/repos/org/" user-emacs-directory)))
+        (string-trim
+         (string-remove-prefix
+          "release_"
+          (git-run "describe"
+                   "--match=release\*"
+                   "--abbrev=0"
+                   "HEAD")))))
+
+    (provide 'org-version)
     :config
     (progn
       (add-hook 'org-mode-hook
@@ -1244,7 +1236,7 @@
 
       ;; highlight code blocks syntax in PDF export
       ;; Include the latex-exporter
-      (use-package ox-latex)
+      (use-package ox-latex :straight nil)
       (setq org-latex-packages-alist nil
             org-latex-default-packages-alist nil
             org-latex-hyperref-template nil)
@@ -1284,7 +1276,7 @@
               ("d" "Agenda + Next Actions" ((agenda) (todo "NEXT")))))
 
       ;; date insertion configuration
-      (use-package org-expiry)
+      (use-package org-expiry :straight nil)
       (setq org-expiry-created-property-name "CREATED"
             org-expiry-inactive-timestamps t
             org-todo-state-tags-triggers (quote
@@ -1345,12 +1337,12 @@
 
   (use-package ob-python
     :defer t
-    :ensure org-plus-contrib
+    :straight org-plus-contrib
     :commands (org-babel-execute:python))
 
   (use-package ob-shell
     :defer t
-    :ensure org-plus-contrib
+    :straight org-plus-contrib
     :commands (org-babel-execute:sh
                org-babel-expand-body:sh
                org-babel-execute:bash
@@ -1358,24 +1350,24 @@
 
   (use-package ob-plantuml
     :defer t
-    :ensure org-plus-contrib
+    :straight org-plus-contrib
     :commands (org-babel-execute:plantuml))
 
   (use-package org-timeline
-    :ensure t
     :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
-  (use-package secretaria
-    :ensure t
-    :init
-    (setf secretaria-clocked-task-save-file "~/.secretaria-tarea")
-    (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
+  ;; (use-package secretaria
+  ;;
+  ;;   :init
+  ;;   (setf secretaria-clocked-task-save-file "~/.secretaria-tarea")
+  ;;   (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
 
   (use-package org-bullets
-    :ensure t
-    :hook (org-mode . org-bullets-mode))
+    :hook (org-mode . org-bullets-mode)
+    :config (setq org-bullets-bullet-list '("*")))
 
   (use-package org-inlinetask
+    :straight nil
     :config
     (defun org-power-return (&optional ignore)
       "Add new list item, heading or table row with RET.
@@ -1443,109 +1435,104 @@
           (org-return)))))
     (define-key org-mode-map (kbd "RET") 'org-power-return))
 
-  (use-package ob-async
-    :ensure t)
+  (use-package ob-async)
 
-  (use-package ob-translate
-    :ensure t)
+  (use-package ob-translate)
 
-  (use-package ox-reveal
-    :ensure t)
+  (use-package ox-reveal)
 
-  (use-package htmlize
-    :ensure t)
+  (use-package htmlize)
 
-  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
-  (use-package org-tree-slide
-    :ensure t
-    :config
-    (progn
-      (setq org-tree-slide--lighter " Slide")
+  ;; ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
+  ;; (use-package org-tree-slide
+  ;;
+  ;;   :config
+  ;;   (progn
+  ;;     (setq org-tree-slide--lighter " Slide")
 
-      (defvar conf:org-tree-slide-text-scale 4
-        "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
+  ;;     (defvar conf:org-tree-slide-text-scale 4
+  ;;       "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
 
-      (defun conf:org-tree-slide-set-profile ()
-        "Customize org-tree-slide variables."
-        (interactive)
-        (setq org-tree-slide-header t)
-        (setq org-tree-slide-slide-in-effect nil)
-        (setq org-tree-slide-heading-emphasis t)
-        (setq org-tree-slide-cursor-init t) ;Move cursor to the head of buffer
-        (setq org-tree-slide-modeline-display 'lighter)
-        (setq org-tree-slide-skip-done nil)
-        (setq org-tree-slide-skip-comments t)
-        (setq org-tree-slide-activate-message
-              (concat "Starting Org presentation. "
-                      "Use arrow keys to navigate the slides."))
-        (setq org-tree-slide-deactivate-message "Ended presentation.")
-        (message "Custom `org-tree-slide' profile: ON"))
+  ;;     (defun conf:org-tree-slide-set-profile ()
+  ;;       "Customize org-tree-slide variables."
+  ;;       (interactive)
+  ;;       (setq org-tree-slide-header t)
+  ;;       (setq org-tree-slide-slide-in-effect nil)
+  ;;       (setq org-tree-slide-heading-emphasis t)
+  ;;       (setq org-tree-slide-cursor-init t) ;Move cursor to the head of buffer
+  ;;       (setq org-tree-slide-modeline-display 'lighter)
+  ;;       (setq org-tree-slide-skip-done nil)
+  ;;       (setq org-tree-slide-skip-comments t)
+  ;;       (setq org-tree-slide-activate-message
+  ;;             (concat "Starting Org presentation. "
+  ;;                     "Use arrow keys to navigate the slides."))
+  ;;       (setq org-tree-slide-deactivate-message "Ended presentation.")
+  ;;       (message "Custom `org-tree-slide' profile: ON"))
 
-      (defvar conf:writegood-mode-state nil
-        "Variable to store the state of `writegood-mode'.")
+  ;;     (defvar conf:writegood-mode-state nil
+  ;;       "Variable to store the state of `writegood-mode'.")
 
-      (defun conf:org-tree-slide-start ()
-        "Set up the frame for the slideshow."
-        (interactive)
-        (when (fboundp 'writegood-mode)
-          (setq conf:writegood-mode-state writegood-mode)
-          (writegood-mode -1))
-        (flyspell-mode -1)
-        (text-scale-set conf:org-tree-slide-text-scale))
-      (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
+  ;;     (defun conf:org-tree-slide-start ()
+  ;;       "Set up the frame for the slideshow."
+  ;;       (interactive)
+  ;;       (when (fboundp 'writegood-mode)
+  ;;         (setq conf:writegood-mode-state writegood-mode)
+  ;;         (writegood-mode -1))
+  ;;       (flyspell-mode -1)
+  ;;       (text-scale-set conf:org-tree-slide-text-scale))
+  ;;     (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
 
-      (defun conf:org-tree-slide-stop()
-        "Undo the frame setup for the slideshow."
-        (interactive)
-        (when (and (fboundp 'writegood-mode)
-                   conf:writegood-mode-state)
-          (writegood-mode 1)
-          (setq conf:writegood-mode-state nil))
-        (flyspell-mode 1)
-        (text-scale-set 0))
-      (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
+  ;;     (defun conf:org-tree-slide-stop()
+  ;;       "Undo the frame setup for the slideshow."
+  ;;       (interactive)
+  ;;       (when (and (fboundp 'writegood-mode)
+  ;;                  conf:writegood-mode-state)
+  ;;         (writegood-mode 1)
+  ;;         (setq conf:writegood-mode-state nil))
+  ;;       (flyspell-mode 1)
+  ;;       (text-scale-set 0))
+  ;;     (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
 
-      (defun conf:org-tree-slide-text-scale-reset ()
-        "Reset time scale to `modi/org-tree-slide-text-scale'."
-        (interactive)
-        (text-scale-set conf:org-tree-slide-text-scale))
+  ;;     (defun conf:org-tree-slide-text-scale-reset ()
+  ;;       "Reset time scale to `modi/org-tree-slide-text-scale'."
+  ;;       (interactive)
+  ;;       (text-scale-set conf:org-tree-slide-text-scale))
 
-      (defun conf:org-tree-slide-text-scale-inc1 ()
-        "Increase text scale by 1."
-        (interactive)
-        (text-scale-increase 1))
+  ;;     (defun conf:org-tree-slide-text-scale-inc1 ()
+  ;;       "Increase text scale by 1."
+  ;;       (interactive)
+  ;;       (text-scale-increase 1))
 
-      (defun conf:org-tree-slide-text-scale-dec1 ()
-        "Decrease text scale by 1."
-        (interactive)
-        (text-scale-decrease 1))
+  ;;     (defun conf:org-tree-slide-text-scale-dec1 ()
+  ;;       "Decrease text scale by 1."
+  ;;       (interactive)
+  ;;       (text-scale-decrease 1))
 
-      (bind-keys
-       :map org-tree-slide-mode-map
-       ("C-b" . org-tree-slide-move-previous-tree)
-       ("C-f" . org-tree-slide-move-next-tree)
-       ("C-0" . conf:org-tree-slide-text-scale-reset)
-       ("C-+" . conf:org-tree-slide-text-scale-inc1)
-       ("C--" . conf:org-tree-slide-text-scale-dec1)
-       ("C-1" . org-tree-slide-content)
-       ("C-2" . conf:org-tree-slide-set-profile)
-       ("C-3" . org-tree-slide-simple-profile)
-       ("C-4" . org-tree-slide-presentation-profile))))
+  ;;     (bind-keys
+  ;;      :map org-tree-slide-mode-map
+  ;;      ("C-b" . org-tree-slide-move-previous-tree)
+  ;;      ("C-f" . org-tree-slide-move-next-tree)
+  ;;      ("C-0" . conf:org-tree-slide-text-scale-reset)
+  ;;      ("C-+" . conf:org-tree-slide-text-scale-inc1)
+  ;;      ("C--" . conf:org-tree-slide-text-scale-dec1)
+  ;;      ("C-1" . org-tree-slide-content)
+  ;;      ("C-2" . conf:org-tree-slide-set-profile)
+  ;;      ("C-3" . org-tree-slide-simple-profile)
+  ;;      ("C-4" . org-tree-slide-presentation-profile))))
 
   ;; (when (file-exists-p "~/.sync.el")
   ;;    (use-package org-sync
-  ;;      :ensure t
+  ;;
   ;;      :config
   ;;      (mapc 'load '("org-sync" "org-sync-gitlab" "org-sync-github"))
   ;;      (load-file "~/.sync.el")))
 #+END_SRC
 * Pacfiles
-#+BEGIN_SRC elisp :tangle no
-  (use-package pacfiles-mode
-    :ensure t)
+#+BEGIN_SRC emacs-lisp
+  (use-package pacfiles-mode)
 #+END_SRC
 * Parents
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (electric-pair-mode 1)
 
   (use-package paren
@@ -1556,7 +1543,6 @@
     (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
 
   (use-package smartparens
-    :ensure t
     :commands
     (smartparens-mode
      smartparens-strict-mode)
@@ -1570,22 +1556,19 @@
     (require 'smartparens-config))
 
   (use-package rainbow-delimiters
-    :ensure t
     :config
     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
 * PATH
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
-    :ensure t
     :init
     (setq exec-path-from-shell-check-startup-files nil)
     (exec-path-from-shell-initialize))
 #+END_SRC
 * Pdf Tools
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
-    :ensure t
     :bind (:map pdf-view-mode-map
                 ("<s-spc>" .  pdf-view-scroll-down-or-next-page)
                 ("g"  . pdf-view-first-page)
@@ -1616,30 +1599,27 @@
           pdf-view-midnight-colors '("white smoke" . "gray5")))
 
   (use-package org-pdfview
-    :after org
-    :ensure t)
+    :after org)
 #+END_SRC
 * Pkgbuil
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
-    :ensure t
     :mode "PKGBUILD\\'")
 #+END_SRC
 * Plantuml
-#+BEGIN_SRC elisp :tangle no :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no :tangle no
   (use-package plantuml-mode
-    :ensure t
     :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
                   org-plantuml-jar-path "/opt/plantuml/plantuml.jar"))
 
   (use-package flycheck-plantuml
-    :ensure t
     :after flycheck
     :config (flycheck-plantuml-setup))
 #+END_SRC
 * PO
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package po-mode
+    :straight nil
     :mode ("\\.po\\'" . po-mode)
     :config
     ;; Fuente: https://www.emacswiki.org/emacs/PoMode
@@ -1687,17 +1667,15 @@
               (flyspell-buffer))))))
 #+END_SRC
 * Prescient
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package prescient
-    :ensure t
     :config
     (setq prescient-save-file (concat conf:cache-dir "prescient.el"))
     (prescient-persist-mode))
 #+END_SRC
 * Presentación
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package presentation
-    :ensure t
     :config (global-set-key (kbd "<M-f5>") (lambda ()
                                              (interactive)
                                              (if presentation-mode
@@ -1706,8 +1684,9 @@
                                              (toggle-frame-fullscreen))))
 #+END_SRC
 * Pretty Symbols
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package prog-mode ; Contains pretty-symbols-mode
+    :straight nil
     :config
     (setq prettify-symbols-unprettify-at-point 'right-edge)
     (global-prettify-symbols-mode t)
@@ -1744,9 +1723,8 @@
                         ("<=" . ?\u2264))))))
 #+END_SRC
 * Proced
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package proced
-    :ensure t
     :bind ("C-x p" . proced)
     :if (or (string-equal system-type "gnu/linux")
             (string-equal system-type "gnu/kfreebsd"))
@@ -1754,9 +1732,8 @@
     (add-hook 'proced-mode-hook (lambda () (setq proced-tree-flag t))))
 #+END_SRC
 * Projectile
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :ensure t
     :diminish projectile-mode
     :config
     (setq projectile-known-projects-file (concat conf:cache-dir "projectile-bookmarks.eld")
@@ -1768,23 +1745,20 @@
     (projectile-mode))
 
   (use-package counsel-projectile
-    :ensure t
     :bind ("C-x r R" . counsel-projectile-rg)
     :config
     (setq counsel-projectile-rg-options-history (list "-uuu"))
     (add-hook 'text-mode-hook 'counsel-projectile-mode)
     (add-hook 'prog-mode-hook 'counsel-projectile-mode))
 
-  (use-package term-projectile
-    :ensure t)
+  (use-package term-projectile)
 
   (use-package rg
-    :ensure t
     :config (setq rg-command-line-flags (list "-uuu")))
 #+END_SRC
 * Python
 **** lsp-python
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq ansi-color-for-comint-mode t)
   (defun python-template ()
     (interactive)
@@ -1799,26 +1773,21 @@
     (add-hook 'python-mode-hook #'lsp))
 #+END_SRC
 **** Pyenv
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package pyenv-mode
-    :ensure t
     :init (pyenv-mode))
 
-  (use-package pyenv-mode-auto
-    :ensure t)
+  (use-package pyenv-mode-auto)
 #+END_SRC
 **** VirtualEnv
 #+BEGIN_SRC emacs-lisp :tangle no
-  (use-package pyvenv
-    :ensure t)
+  (use-package pyvenv)
 
   (use-package auto-virtualenv
-    :ensure t
     :config
     (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
   (use-package virtualenvwrapper
-    :ensure t
     :commands (venv-workon venv-deactivate venv-initialize-interactive-shells venv-initialize-eshell)
     :init
     (venv-initialize-interactive-shells)
@@ -1828,34 +1797,32 @@
               (lambda () (shell-command "pip install jedi isort 'python-language-server[all]' flake8 virtualenvwrapper"))))
 #+END_SRC
 **** Stuff
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package blacken
-    :ensure t
     :diminish blacken-mode
     :config (add-hook 'python-mode-hook 'blacken-mode))
 
   (use-package py-isort
-    :ensure t
     :config
     (setq py-isort-options '("--lines=100"))
     (add-hook 'before-save-hook 'py-isort-before-save))
 
-  (use-package pyimport :ensure t)
+  (use-package pyimport)
 
-  (use-package pip-requirements :ensure t)
+  (use-package pip-requirements)
 #+END_SRC
 * Rainbow
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
-    :ensure t
     :diminish rainbow-mode
     :config
     (add-hook 'prog-mode-hook 'rainbow-mode)
     (add-hook 'conf-mode-hook 'rainbow-mode))
 #+END_SRC
 * recentf
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package recentf
+    :straight nil
     :config
     (setq recentf-save-file (concat conf:cache-dir "recentf")
           recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/" "conf:cache-dir")
@@ -1866,18 +1833,16 @@
     (recentf-mode +1))
 #+END_SRC
 * Saveplace
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package saveplace
-    :ensure t
-    :init
-    (save-place-mode)
+    :init (save-place-mode)
     :config
     (progn
       (setq save-place-file (concat conf:cache-dir "saveplace.el"))
       (setq-default save-place t)))
 #+END_SRC
 * Scroll
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (setq scroll-step 1
         scroll-conservatively 10000)
 
@@ -1887,26 +1852,19 @@
         ;;scroll-down-aggressively 0.02)
 
   (use-package smooth-scrolling
-    :ensure t
-    :config
-    (setq smooth-scroll-margin 5))
+    :config (setq smooth-scroll-margin 5))
 #+END_SRC
-
 * Semantic
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package semantic
-    :ensure t
-    :init
-    (semantic-mode 1))
+    :init (semantic-mode 1))
 #+END_SRC
 * Shackle
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package shackle
-    :ensure t
     :init (shackle-mode)
     :config
     (setq shackle-default-size 0.4)
-
     (setq shackle-rules
           '(("*Calendar*" :select t :size 0.3 :align below)
             ("*Compile-Log*" :ignore t)
@@ -1933,32 +1891,27 @@
             (compilation-mode :select nil))))
 #+END_SRC
 * Shell
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package terminal-here
-    :ensure t
     :bind (("C-<f5>" . terminal-here-launch)
            ("C-<f6>" . terminal-here-project-launch))
     :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+END_SRC
 * SQL
-#+BEGIN_SRC elisp :tangle no
-  (use-package edbi-database-url
-    :ensure t)
+#+BEGIN_SRC emacs-lisp
+  (use-package edbi-database-url)
 
   (use-package edbi-minor-mode
-    :ensure t
     :config
     (add-hook 'sql-mode-hook 'edbi-minor-mode))
 
   (use-package company-edbi
-    :ensure t
     :init
     (defun cfg:edbi-mode-hook()
       (add-to-list 'company-backends 'company-edbi))
     (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
 
   (use-package sqlup-mode
-    :ensure t
     :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
     :init
     (add-hook 'sql-mode-hook 'sqlup-mode)
@@ -1966,18 +1919,15 @@
     (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 
   (use-package sql-indent
-    :ensure t
     :after sql
     :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer))))
 
   (use-package sqlformat
-    :ensure t
     :config (add-hook 'sql-mode-hook 'sqlformat-mode))
 #+END_SRC
 * SSH
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package ssh
-    :ensure t
     :init
     (add-hook 'ssh-mode-hook
               (lambda ()
@@ -1986,7 +1936,7 @@
                 (setq dirtrackp nil))))
 #+END_SRC
 * Status Line
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   ;; Original http://kitchingroup.cheme.cmu.edu/blog/2014/09/19/A-git-status-Emacs-modeline/
 
   (defun in-git-p ()
@@ -2108,7 +2058,6 @@
                  column-number-mode t)
 
   (use-package smart-mode-line
-    :ensure t
     :config
     (setq sml/no-confirm-load-theme t
           sml/theme 'dark
@@ -2118,14 +2067,12 @@
 
 #+END_SRC
 * Sudo
-#+BEGIN_SRC elisp :tangle no
-  (use-package sudo-edit
-    :ensure t)
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit)
 #+END_SRC
 * Switch Windows
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package switch-window
-    :ensure t
     :bind (("C-x o" . switch-window)
            ("C-x 1" . switch-window-then-maximize)
            ("C-x 2" . switch-window-then-split-below)
@@ -2133,26 +2080,23 @@
            ("C-x 0" . switch-window-then-delete)))
 #+END_SRC
 * Tablero
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package page-break-lines
-    :ensure t
     :diminish page-break-lines-mode
     :config (page-break-lines-mode))
 
   (use-package dashboard
-    :ensure t
     :config
     (dashboard-setup-startup-hook)
     (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version " kernel " (car (split-string (shell-command-to-string "uname -r") "-")) " x86_64 ArchLinux GTK+ " gtk-version-string)
           dashboard-page-separator "\n\f\f\n"
           show-week-agenda-p t
           dashboard-items '((recents  . 5)
-                            (projects . 5)
-                            (agenda . 5))
+                            (projects . 5))
           initial-buffer-choice (lambda () (switch-to-buffer "*dashboard*"))))
 #+END_SRC
 * Theme
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package vibrant-ink-theme
     :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
     :init (add-hook 'after-init-hook
@@ -2160,7 +2104,7 @@
                       (load-theme 'vibrant-ink t))))
 #+END_SRC
 * Tramp
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package tramp
     :config
     (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
@@ -2174,7 +2118,6 @@
                                            (tramp-parse-sconfig "~/.ssh/config"))))
 
   (use-package counsel-tramp
-    :ensure t
     :bind ("C-c s" . counsel-tramp)
     :config
     (add-hook 'counsel-tramp-pre-command-hook '(lambda () (projectile-mode 0)
@@ -2183,9 +2126,8 @@
                                           (editorconfig-mode 1))))
 #+END_SRC
 * Undo Tree
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :ensure t
     :defer t
     :diminish undo-tree-mode
     :bind ("C-x u" . undo-tree-visualizer)
@@ -2208,7 +2150,7 @@
     (global-undo-tree-mode 1))
 #+END_SRC
 * UTF-8
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (prefer-coding-system       'utf-8)
   (set-default-coding-systems 'utf-8)
   (set-terminal-coding-system 'utf-8)
@@ -2217,51 +2159,21 @@
                 x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 #+END_SRC
 * VLF
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package vlf-setup
-    :ensure vlf
+    :straight vlf
     :init (setq vlf-application 'dont-ask))
 #+END_SRC
-* Web
-**** PHP
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package php-mode
-    :ensure t)
-
-  (use-package company-php
-    :ensure t
-    :config
-    (defun cfg:php-mode-hook ()
-      (interactive)
-      (require 'company-php)
-      (company-mode t)
-      (add-to-list 'company-backends 'company-ac-php-backend))
-
-    (add-hook 'php-mode-hook 'cfg:php-mode-hook))
-
-  (use-package web-mode
-    :ensure t
-    :mode
-    (("\\.phtml\\'" . web-mode)
-     ("\\.tpl\\'" . web-mode)
-     ("\\.[agj]sp\\'" . web-mode)
-     ("\\.as[cp]x\\'" . web-mode)
-     ("\\.erb\\'" . web-mode)
-     ("\\.mustache\\'" . web-mode)
-     ("\\.djhtml\\'" . web-mode)
-     ("\\.html?\\'" . web-mode)))
-#+END_SRC
 * Which-key
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :ensure t
     :diminish which-key-mode
     :config
     (setq which-key-sort-order 'which-key-key-order-alpha)
     (which-key-mode))
 #+END_SRC
 * XML
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (defun nxml-template ()
     (interactive)
     (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
@@ -2270,6 +2182,7 @@
             '(lambda () (when (empty-buffer?) (nxml-template))))
 
   (use-package nxml-mode
+    :straight nil
     :mode (("\\.plist\\'" . nxml-mode)
            ("\\.rss\\'"   . nxml-mode)
            ("\\.svg\\'"   . nxml-mode)
@@ -2325,7 +2238,7 @@
 
 #+END_SRC
 * xrdb
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package xrdb-mode
     :straight (xrdb-mode :type git :host github :repo "emacsattic/xrdb-mode")
     :mode (("\\.Xdefaults$" . xrdb-mode)
@@ -2336,36 +2249,31 @@
     :config
     (add-hook 'xrdb-mode-hook (lambda () (setq comment-start "! "))))
 #+END_SRC
-
 * Yaml
-#+BEGIN_SRC elisp :tangle no
-  (use-package yaml-mode
-    :ensure t)
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode)
 #+END_SRC
 * Yassnippet
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :ensure t
     :defer 2
     :diminish yas-minor-mode
     :config
     (yas-global-mode)
     (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
-  (use-package yasnippet-snippets
-    :ensure t)
+  (use-package yasnippet-snippets)
 #+END_SRC
 * Ztree
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package ztree
-    :ensure t
     :bind (("C-c z" . ztree-diff))
     :config
     (setq ztree-draw-unicode-lines t
           ztree-dir-move-focus t))
 #+END_SRC
 * Startup
-#+BEGIN_SRC elisp :tangle no
+#+BEGIN_SRC emacs-lisp
   ;; Use a hook so the message doesn't get clobbered by other messages.
   (add-hook 'emacs-startup-hook
             (lambda ()

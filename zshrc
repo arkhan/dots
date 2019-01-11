@@ -61,8 +61,8 @@ autoload -U complist
 #-----------------------------
 # Prompt
 #-----------------------------
-autoload -U colors
-colors
+autoload -U promptinit; promptinit
+autoload -U colors; colors
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
