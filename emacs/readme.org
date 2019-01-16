@@ -1165,7 +1165,7 @@
 #+END_SRC
 * Orgmode
 #+BEGIN_SRC emacs-lisp
-  (use-package git )
+  (use-package git)
 
   (use-package org
     :straight org-plus-contrib
@@ -1223,8 +1223,9 @@
       (setq org-archive-location (concat org-directory "/archive.org::datetree/** Archived"))
 
       ;; highlight code blocks syntax
-      (setq org-src-fontify-natively  t
-            org-src-tab-acts-natively t)
+      (setq org-src-fontify-natively t
+            org-src-tab-acts-natively t
+            org-src-window-setup 'current-window)
 
       ;; more sane emphasis regex to export to HTML as substitute of Markdown
       (org-set-emph-re 'org-emphasis-regexp-components
@@ -1370,8 +1371,8 @@
     :config
     (defun org-power-return (&optional ignore)
       "Add new list item, heading or table row with RET.
-            A double return on an empty element deletes it.
-            Use a prefix arg to get regular RET. "
+       A double return on an empty element deletes it.
+       Use a prefix arg to get regular RET. "
       (interactive "P")
       (if ignore
           (org-return)
