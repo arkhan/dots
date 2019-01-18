@@ -752,7 +752,6 @@
 
     ;; Don't ask for confirmation to delete marked buffers
     (setq ibuffer-expert t))
-
 #+END_SRC
 * Imenu
 #+BEGIN_SRC emacs-lisp
@@ -1061,7 +1060,6 @@
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
   (use-package company-lsp
-
     :defer t
     :config
     (setq company-lsp-enable-snippet t
