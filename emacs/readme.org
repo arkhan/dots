@@ -275,18 +275,8 @@
 #+END_SRC
 * Clipboard
 #+BEGIN_SRC emacs-lisp
-  (use-package clipmon
-    :config
-    (add-to-list 'after-init-hook 'clipmon-mode-start)
-    (setq kill-ring-max 500
-          clipmon-timer-interval 2
-          clipmon-autoinsert-sound nil
-          clipmon-autoinsert-color "red"
-          clipmon-autoinsert-timeout 5
-          clipmon-transform-trim t
-          clipmon-transform-prefix ""
-          clipmon-transform-suffix "\n\n"
-          clipmon-transform-function nil))
+  (use-package gpastel
+    :config (gpastel-mode))
 #+END_SRC
 * Comment-dwim-2
 #+BEGIN_SRC emacs-lisp
