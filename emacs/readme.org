@@ -273,11 +273,6 @@
 
   (use-package calfw-org)
 #+END_SRC
-* Clipboard
-#+BEGIN_SRC emacs-lisp
-  (use-package gpastel
-    :config (gpastel-mode))
-#+END_SRC
 * Comment-dwim-2
 #+BEGIN_SRC emacs-lisp
   (use-package comment-dwim-2
@@ -544,7 +539,7 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "MonacoBSemi" :height 90)
+  (set-face-attribute 'default nil :family "Mononoki" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -2025,16 +2020,20 @@
                              (concat (git-remote-status) " " (git-parse-status))))))
 
   (setq line-number-mode t
-                 column-number-mode t)
+        column-number-mode t)
 
-  (use-package smart-mode-line
-    :config
-    (setq sml/no-confirm-load-theme t
-          sml/theme 'dark
-          sml/show-client t
-          sml/show-encoding t)
-    (sml/setup))
+  ;; (use-package smart-mode-line
+  ;;   :config
+  ;;   (setq sml/no-confirm-load-theme t
+  ;;         sml/theme 'dark
+  ;;         sml/show-client t
+  ;;         sml/show-encoding t)
+  ;;   (sml/setup))
 
+  (use-package doom-modeline
+    :config (setq doom-modeline-icon nil
+                  doom-modeline-height 12)
+    :hook (after-init . doom-modeline-mode))
 #+END_SRC
 * Sudo
 #+BEGIN_SRC emacs-lisp

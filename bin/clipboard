@@ -1,8 +1,7 @@
 #!/usr/bin/sh
 
-killall -q gpaste-daemon
-killall -q gpaste-client
+killall -q clipster
 
-while pgrep -x gpaste-client >/dev/null; do sleep 1; done
+while pgrep -x clipster >/dev/null; do sleep 1; done
 
-gpaste-client d &
+clipster -d &
