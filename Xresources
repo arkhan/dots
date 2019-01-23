@@ -71,6 +71,13 @@ URxvt*colorULMode: on
 URxvt*underLine: on
 URxvt.borderColor: 0
 
+! ST
+st.termname: st-256color
+st.font: Mononoki:size=9:antialias=true:autohint=true
+st.borderpx: 1
+st.cursorshape: 4
+st.bold_font: 1
+
 ! black
 *.color0: #000000
 *.color8: #31363b
