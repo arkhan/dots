@@ -1,6 +1,6 @@
 #-*- mode: i3wm-config -*-
 # Terminal
-set $term xst -g 100x30
+set $term urxvtcd --geometry 100x30
 
 # Bin dir
 set $bin $HOME/.bin
@@ -22,7 +22,7 @@ font pango:Misc Tamsyn 10
 floating_modifier $mod4
 
 # start a terminal
-bindsym $mod4+Return exec $term -n Terminal
+bindsym $mod4+Return exec $term
 
 #start terminal with tmux session
 bindsym $mod4+Shift+Return exec $term -e $bin/tmx
@@ -47,9 +47,9 @@ bindsym $mod4+Tab exec rofi -show window -width 32
 
 # Programs
 ## Ranger
-bindsym $mod4+Control+t exec $term -n Ranger -e ranger /media/data
+bindsym $mod4+Control+t exec $term -name Ranger -e ranger /media/data
 ## Weechat
-bindsym $mod4+Control+i exec $term -n Weechat -e weechat
+bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 
 # Pamixer Control
 ## Toggle Mute
@@ -259,7 +259,6 @@ assign [title="Telegram"] $ws2
 assign [class="URxvt" instance="Weechat"] $ws2
 assign [class="(?i)tuxcmd|Spacefm|doublecmd"] $ws4
 assign [class="URxvt" instance="Ranger"] $ws4
-assign [class="(?st)" instance="Ranger"] $ws4
 assign [class="(?i)thunderbird|(?i)icedove"] $ws3
 assign [class="JDownloader|Syncthing GTK"] $ws5
 assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
@@ -276,7 +275,6 @@ for_window [class="(?i)lxappearance"] floating enable
 for_window [title="(?i)systemsettings"] floating enable
 for_window [class="(?i)qt5ct"] floating enable
 for_window [class="(?i)urxvt"] floating enable
-for_window [class="(?i)st"] floating enable
 for_window [title="Redac(?i)"] floating enable
 for_window [title="Cop(?i)"] floating enable
 for_window [class="(?i)pinentry"] floating enable
@@ -285,7 +283,6 @@ for_window [class="(?i)GtkLP"] floating enable
 # Tabbed
 for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
 for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
-for_window [class="(?)st" instance="Ranger"] floating disable layout tabbed
 for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
 for_window [class="(?i)emacs"] floating disable layout tabbed focus
