@@ -46,6 +46,8 @@
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
+  (setq load-prefer-newer t)
+
   (setq straight-check-for-modifications 'live)
 
   (straight-use-package 'use-package)
@@ -77,7 +79,7 @@
            (equal (buffer-file-name)
                   (expand-file-name "~/.dots/emacs/readme.org")))
       (let ((prog-mode-hook nil))
-        (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+        (async-shell-command "sh -c \"/usr/bin/remacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
   (add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 * abbrev
@@ -434,13 +436,6 @@
   (defun empty-buffer? ()
     (= (buffer-end 1) (buffer-end -1)))
 #+END_SRC
-* Fill Column Indicator
-#+BEGIN_SRC emacs-lisp
-  (use-package fill-column-indicator
-    :commands (fci-mode)
-    :init (setq fci-rule-width 5
-                fci-rule-column 79))
-#+END_SRC
 * Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -484,8 +479,8 @@
     (add-hook 'prog-mode-hook 'flyspell-prog-mode)
     :config
     (setq flyspell-use-meta-tab nil
-                   flyspell-issue-welcome-flag nil
-                   flyspell-issue-message-flag nil)
+          flyspell-issue-welcome-flag nil
+          flyspell-issue-message-flag nil)
 
     (setq-default ispell-program-name "hunspell"
                   ispell-really-hunspell t
@@ -526,16 +521,11 @@
 
     (define-key flyspell-mode-map [(control ?\")] 'flyspell-add-word-to-dict))
 
-  (use-package flyspell-popup
-
-    :after flyspell
-    :bind (:map flyspell-mode-map
-                ("C-'" . #'flyspell-popup-correct)))
-
-  (use-package flyspell-lazy
-
-    :after flyspell
-    :init (flyspell-lazy-mode 1))
+  (use-package flyspell-correct-popup
+    :bind ("C-M-'" . flyspell-correct-wrapper)
+    :init
+    (setq flyspell-correct-interface #'flyspell-correct-popup
+          flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
@@ -545,7 +535,6 @@
 * Format-all
 #+BEGIN_SRC emacs-lisp
   (use-package format-all
-
     :defer t
     :bind (:map prog-mode-map
                 ("<M-f8>" . format-all-buffer)))
@@ -686,6 +675,13 @@
   (use-package graphviz-dot-mode
     )
 #+END_SRC
+* highlight-indent-guides
+  #+begin_src emacs-lisp
+    (use-package highlight-indent-guides
+      :config
+      (setq highlight-indent-guides-method 'character)
+      (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+  #+end_src
 * Historial
 #+BEGIN_SRC emacs-lisp
   (setq-default history-length 1000)
@@ -1050,6 +1046,8 @@
     (setq company-lsp-enable-snippet t
           company-lsp-async t)
     (push '(company-lsp :with company-yasnippet) company-backends))
+
+  (use-package dap-mode)
 #+END_SRC
 * Makefile
 #+BEGIN_SRC emacs-lisp
