@@ -79,7 +79,7 @@
            (equal (buffer-file-name)
                   (expand-file-name "~/.dots/emacs/readme.org")))
       (let ((prog-mode-hook nil))
-        (async-shell-command "sh -c \"/usr/bin/remacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+        (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
   (add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 * abbrev
@@ -2030,7 +2030,8 @@
 
   (use-package doom-modeline
     :config (setq doom-modeline-icon nil
-                  doom-modeline-height 12)
+                  doom-modeline-height 12
+                  doom-modeline-mu4e nil)
     :hook (after-init . doom-modeline-mode))
 #+END_SRC
 * Sudo
