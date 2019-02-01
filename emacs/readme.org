@@ -1795,6 +1795,10 @@
           recentf-auto-cleanup 'never)
     (recentf-mode +1))
 #+END_SRC
+* restart emacs
+  #+begin_src emacs-lisp
+    (use-package restart-emacs)
+  #+end_src
 * Saveplace
 #+BEGIN_SRC emacs-lisp
   (use-package saveplace
