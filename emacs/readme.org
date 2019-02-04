@@ -998,6 +998,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package lsp
     :straight lsp-mode
+    :commands lsp
     :defer t
     :config
     (require 'lsp-clients)
@@ -1028,8 +1029,8 @@
 
 
   (use-package lsp-ui
-
     :after lsp
+    :commands lsp-ui-mode
     :init
     (setq lsp-ui-sideline-enable t
           lsp-ui-sideline-ignore-duplicate t
@@ -1042,6 +1043,7 @@
 
   (use-package company-lsp
     :defer t
+    :commands company-lsp
     :config
     (setq company-lsp-enable-snippet t
           company-lsp-async t)
