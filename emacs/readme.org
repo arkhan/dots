@@ -362,22 +362,14 @@
                 eshell-directory-name (concat conf:cache-dir "eshell" ))
 #+END_SRC
 * Docker
-**** Dockerfile
 #+BEGIN_SRC emacs-lisp
+  (use-package docker)
+
   (use-package dockerfile-mode
-    :mode "Dockerfile\\'"
-    :defer t)
-#+END_SRC
-**** Docker Compose
-#+BEGIN_SRC emacs-lisp
+    :mode "Dockerfile\\'")
+
   (use-package docker-compose-mode
-    :defer t
     :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
-#+END_SRC
-**** Dcoker Tramp
-#+BEGIN_SRC emacs-lisp
-  (use-package docker-tramp
-    :defer t)
 #+END_SRC
 * dumb-jump
 #+BEGIN_SRC emacs-lisp
@@ -792,7 +784,7 @@
       "Transform CAND-PAIRS into a string for minibuffer."
       (ivy--format-function-generic
        (lambda (str)
-         (concat ">> " (ivy--add-face str 'ivy-current-match)))
+         (concat "-> " (ivy--add-face str 'ivy-current-match)))
        (lambda (str)
          (concat "   " str))
        cands
