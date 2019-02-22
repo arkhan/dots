@@ -1,3 +1,4 @@
 #!/bin/bash
 
-torify /usr/bin/git "$@"
+# torify /usr/bin/git "$@"
+/usr/bin/git "$@"

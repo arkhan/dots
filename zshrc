@@ -65,8 +65,8 @@ autoload -U colors; colors
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 function virtualenv_status() {
-  [[ -z "$VIRTUAL_ENV" ]] && return ""
-  basename " %{${fg_bold[white]}%}`basename \"$VIRTUAL_ENV\"`%{${reset_color}%}"
+  [[ "$(pyenv version-name)"  == "system"  ]] && return ""
+  echo -e " $(pyenv version-name)"
 }
 
 function git_status(){

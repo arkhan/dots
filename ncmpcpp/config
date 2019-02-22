@@ -51,7 +51,6 @@ autocenter_mode = "yes"
 centered_cursor = "no"
 
 progressbar_look = "━━─"
-progressbar_boldness = "yes"
 default_place_to_search_in = "database" (database/playlist)
 
 user_interface = "alternative" (classic/alternative)
@@ -94,10 +93,13 @@ state_flags_color = "blue"
 main_window_color = "white"
 color1 = "blue"
 color2 = "white"
-main_window_highlight_color = "white"
+current_item_prefix = "$(cyan)$r"
+current_item_suffix = "$/r$(end)"
 progressbar_color = "cyan"
+progressbar_elapsed_color = "white"
 statusbar_color = "white"
 alternative_ui_separator_color = "black"
-active_column_color = "cyan"
+current_item_inactive_column_prefix = "$(white)$r"
+current_item_inactive_column_suffix = "$/r$(end)"
 active_window_border = "blue"
 window_border_color = "blue"

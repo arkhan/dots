@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: PostgreSQL
-# key: pgsql_
-# --
-:PROPERTIES:
-:engine:   postgresql
-:cmdline:  ${1:database} -U ${1:user}
-:exports:  both
-:END:
