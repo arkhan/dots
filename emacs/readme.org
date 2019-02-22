@@ -79,7 +79,7 @@
            (equal (buffer-file-name)
                   (expand-file-name "~/.dots/emacs/readme.org")))
       (let ((prog-mode-hook nil))
-        (async-shell-command "sh -c \"/usr/bin/remacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+        (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
   (add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 * abbrev
@@ -309,9 +309,11 @@
               '(:with company-yasnippet))))
   (add-hook 'after-init-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
-  (use-package company-posframe
-    :diminish company-posframe-mode
-    :config (company-posframe-mode 1))
+  ;; (use-package company-posframe
+  ;;
+  ;;   :diminish company-posframe-mode
+  ;;   :config
+  ;;   (company-posframe-mode 1))
 
   (use-package company-statistics
     :after company
@@ -519,7 +521,7 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Mononoki" :height 90)
+  (set-face-attribute 'default nil :family "MonacoB2" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -1573,6 +1575,7 @@
   (use-package org-pdfview
     :after org)
 #+END_SRC
+* Persp
 * Pkgbuil
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
@@ -2015,14 +2018,6 @@
 
   (setq line-number-mode t
         column-number-mode t)
-
-  ;; (use-package smart-mode-line
-  ;;   :config
-  ;;   (setq sml/no-confirm-load-theme t
-  ;;         sml/theme 'dark
-  ;;         sml/show-client t
-  ;;         sml/show-encoding t)
-  ;;   (sml/setup))
 
   (use-package doom-modeline
     :config (setq doom-modeline-icon nil
