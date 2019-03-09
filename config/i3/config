@@ -21,19 +21,22 @@ font pango:Misc Tamsyn 10
 # Use Mouse+$mod4 to drag floating windows to their wanted position
 floating_modifier $mod4
 
-# start a terminal
+# %%hotkey: Lanuch rofi as hotkey helper %%
+bindsym $mod4+F1 exec $bin/hotkeys i3
+
+# %%hotkey: Launch a terminal %%
 bindsym $mod4+Return exec $term
 
-#start terminal with tmux session
+# %%hotkey: Launch terminal with tmux session %%
 bindsym $mod4+Shift+Return exec $term -e $bin/tmx
 
-# launch rofi -show run (a program launcher)
+# %%hotkey: Launch rofi as program launcher) %%
 bindsym $mod4+d exec $bin/rofi-run
 
-# rofi clipboard
+# %%hotkey: Launch rofi as clipboard manager %%
 bindsym $mod4+$mod1+c exec $bin/rofi-clip
 
-# Password Store
+# %%hotkey: Launch rofi as password manager %%
 bindsym $mod4+$mod1+p exec rofi-pass
 
 # Systemd
@@ -50,6 +53,8 @@ bindsym $mod4+Tab exec rofi -show window -width 32
 bindsym $mod4+Control+t exec $term -name Ranger -e ranger /media/data
 ## Weechat
 bindsym $mod4+Control+i exec $term -name Weechat -e weechat
+## Ncmpcpp
+bindsym $mod4+Control+p exec $term -name Ncmpcpp -e ncmpcpp
 
 # Pamixer Control
 ## Toggle Mute
@@ -262,6 +267,7 @@ assign [class="URxvt" instance="Ranger"] $ws4
 assign [class="(?i)thunderbird|(?i)icedove"] $ws3
 assign [class="JDownloader|Syncthing GTK"] $ws5
 assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
+assign [class="URxvt" instance="Ncmpcpp"] $ws7
 assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
 assign [class="(?i)lyx"] $ws8
 assign [title="(?i)LibreOffice*"] $ws8

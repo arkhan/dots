@@ -238,6 +238,22 @@
   (use-package bug-hunter
     :commands (bug-hunter-file bug-hunter-init-file))
 #+END_SRC
+* Buffer-expose
+#+begin_src emacs-lisp
+  (use-package buffer-expose
+    :straight (buffer-expose :type git :host github :repo "clemera/buffer-expose")
+    :init (buffer-expose-mode 1)
+    :config (defvar buffer-expose-mode-map
+              (let ((map (make-sparse-keymap)))
+                (define-key map (kbd "<s-tab>") 'buffer-expose)
+                (define-key map (kbd "<C-tab>") 'buffer-expose-no-stars)
+                (define-key map (kbd "C-c <C-tab>") 'buffer-expose-current-mode)
+                (define-key map (kbd "C-c C-d") 'buffer-expose-dired-buffers)
+                (define-key map (kbd "C-c C-*") 'buffer-expose-stars)
+                map)
+              "Mode map for command `buffer-expose-mode'."))
+
+#+end_src
 * Caldav
 #+BEGIN_SRC emacs-lisp
   (use-package org-caldav
@@ -309,11 +325,9 @@
               '(:with company-yasnippet))))
   (add-hook 'after-init-hook (lambda () (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 
-  ;; (use-package company-posframe
-  ;;
-  ;;   :diminish company-posframe-mode
-  ;;   :config
-  ;;   (company-posframe-mode 1))
+  (use-package company-posframe
+    :diminish company-posframe-mode
+    :config (company-posframe-mode 1))
 
   (use-package company-statistics
     :after company
@@ -542,6 +556,9 @@
         find-file-visit-truename t
         vc-handled-backends nil)
 
+  (use-package transient
+    :config (setq transient-history-file (concat conf:cache-dir "transient.el")))
+
   (use-package magit
 
     :bind (("C-x g c" . magit-commit-create)
@@ -596,12 +613,10 @@
             magit-log-buffer-file-locket t)))
 
   (use-package magit-gitflow
-
     :config
     (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 
   (use-package git-gutter
-
     :defer 1
     :bind (("C-x C-g" . git-gutter)
            ("C-x v =" . git-gutter:popup-hunk)
@@ -624,25 +639,20 @@
     (set-face-foreground 'git-gutter:deleted "red"))
 
   (use-package gitconfig-mode
-
     :defer t
     :mode ("/\\.?git/?config$"
            "/\\.gitmodules$")
     :init (add-hook 'gitconfig-mode-hook 'flyspell-mode))
 
   (use-package gitignore-mode
-
     :defer t
     :mode ("/\\.gitignore$"
            "/\\.git/info/exclude$"
            "/git/ignore$"))
 
-  (use-package gitattributes-mode
-
-    :defer t)
+  (use-package gitattributes-mode :defer t)
 
   (use-package git-timemachine
-
     :defer t
     :commands git-timemachine
     :bind (:map git-timemachine-mode
@@ -650,7 +660,6 @@
                 ("b" . git-timemachine-switch-branch)))
 
   (use-package smerge-mode
-
     :defer t
     :config
     (defun enable-smerge-maybe ()
@@ -664,8 +673,7 @@
 #+END_SRC
 * GraphViz
 #+BEGIN_SRC emacs-lisp :tangle no
-  (use-package graphviz-dot-mode
-    )
+  (use-package graphviz-dot-mode)
 #+END_SRC
 * highlight-indent-guides
   #+begin_src emacs-lisp
@@ -729,7 +737,6 @@
 * Imenu
 #+BEGIN_SRC emacs-lisp
   (use-package imenu-list
-
     :defer t
     :bind ("M-2" . imenu-list-smart-toggle)
     :config
@@ -741,16 +748,14 @@
 * avy
 #+begin_src emacs-lisp
   (use-package avy
-
     :config
     (setq avy-all-windows t))
 #+end_src
 * Ivy, Counsel, Swiper
 #+BEGIN_SRC emacs-lisp
-  (use-package flx )
+  (use-package flx)
 
   (use-package ivy
-
     :diminish ivy-mode
     :bind (:map ivy-mode-map
                 ("C-'" . ivy-avy))
@@ -793,14 +798,12 @@
     (ivy-mode 1))
 
   (use-package ivy-prescient
-
     :after ivy
     :init (ivy-prescient-mode))
 
   (setq confirm-nonexistent-file-or-buffer t)
 
   (use-package swiper
-
     :bind* (("C-s" . swiper)
             ("C-r" . swiper)
             ("C-M-s" . swiper-all))
@@ -809,10 +812,8 @@
           ("C-r" . counsel-minibuffer-history)))
 
   (use-package counsel
-
     :bind (("M-x" . counsel-M-x)
            ("C-c b" . counsel-imenu)
-           ;; ("C-x C-f" . counsel-find-file)
            ("C-x C-r" . counsel-rg)
            ("C-h f" . counsel-describe-function)
            ("C-h v" . counsel-describe-variable)
@@ -821,15 +822,32 @@
            ("M-SPC" . counsel-shell-history))
     :config
     (setq counsel-find-file-at-point t
-                   counsel-rg-base-command "rg -uuu -S --no-heading --line-number --color never %s ."))
+          counsel-rg-base-command "rg -uuu -S --no-heading --line-number --color never %s ."))
+
+  (use-package ivy-posframe
+    :config
+    (setq ivy-posframe-width (window-width)
+          ivy-posframe-border-width 1
+          ivy-posframe-hide-minibuffer t
+          ivy-posframe-parameters '((left-fringe . 10)
+                                    (right-fringe . 10))
+          ivy-display-function #'ivy-posframe-display-at-frame-bottom-left)
+    (ivy-posframe-enable))
 
   (use-package ivy-explorer
-
     :diminish ivy-explorer-mode
-    :config (ivy-explorer-mode 1))
+    :config
+    (setq ivy-explorer-message-function #'ivy-explorer--posframe)
+
+    ;;(defun ivy-explorer-posframe (msg)
+    ;;  (ivy-posframe-display-at-frame-bottom-left
+    ;;   (concat "\n" msg)))
+
+    ;;(push '(ivy-explorer--display-function :cleanup ivy-posframe-cleanup)
+    ;;      ivy-display-functions-props)
+    (ivy-explorer-mode 1))
 
   (use-package ivy-rich
-
     :config
     (setq ivy-rich--display-transformers-list
           '(ivy-switch-buffer
@@ -864,126 +882,11 @@
 #+END_SRC
 * Jinja
 #+BEGIN_SRC emacs-lisp
-  (use-package jinja2-mode
-    )
-#+END_SRC
-* JS
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package js2-mode
-
-    :config
-    (add-hook 'js-mode-hook 'tern-mode))
-
-  (use-package js-format
-
-    :after js2-mode
-    :config (add-hook 'js2-mode-hook
-                      (lambda()
-                        (js-format-setup "standard"))))
-
-  (use-package tern
-
-    :config
-    ;; Force restart of tern in new projects
-    ;; $ M-x delete-tern-process
-    (setq tern-command '("/usr/bin/tern" "--no-port-file"))
-    (defun delete-tern-process ()
-      "Force restart of tern in new project."
-      (interactive)
-      (delete-process "Tern")))
-
-  (use-package company-tern
-
-    :init
-    (defun cfg:js-mode-hook ()
-      (add-to-list 'company-backends 'company-tern))
-
-    (add-hook 'js-mode-hook 'cfg:js-mode-hook))
-#+END_SRC
-* LaTex
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package tex
-    :defer t
-    :straight auctex
-    :bind
-    ("C-c c" . TeX-clean)
-    :init
-    (progn
-      (require 'smartparens-latex)
-      (add-hook 'TeX-mode-hook
-                (lambda ()
-                  (outline-minor-mode t)
-                  (flyspell-mode t)
-                  (TeX-PDF-mode t)
-                  (TeX-fold-mode t)
-                  (switch-dictionary)))
-      (add-hook 'LaTeX-mode-hook
-                (lambda ()
-                  (LaTeX-math-mode t)
-                  (reftex-mode t)))
-      (setq TeX-auto-save t
-            TeX-parse-self t
-            LaTeX-syntactic-comment t
-            TeX-save-query nil
-            TeX-PDF-mode t
-            TeX-auto-untabify t)
-      (setq-default TeX-engine 'xetex))
-    :config
-    (add-hook 'TeX-mode-hook 'turn-on-auto-fill)
-    (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
-    (use-package cdlatex
-      )
-    (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)
-
-    ;; Use pdf-tools to open PDF files
-    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-          TeX-source-correlate-start-server t)
-
-    ;; Update PDF buffers after successful LaTeX runs
-    (add-hook 'TeX-after-TeX-LaTeX-command-finished-hook
-              #'TeX-revert-document-buffer)
-
-    ;(setq TeX-view-program-list '(("zathura" "zathura %o"))
-    ;      TeX-view-program-selection '((output-pdf "zathura")))
-
-    ;; set XeTeX mode in TeX/LaTeX
-    (add-hook 'LaTeX-mode-hook
-              (lambda () (push
-                     '("cTeX" "%(ctex_bin) %t " TeX-run-TeX nil t
-                       :help "Compilation with custom script") TeX-command-list)
-                (add-to-list 'TeX-expand-list
-                             '("%(ctex_bin)" (lambda ()
-                                               "ctex" )))
-                (setq TeX-command-default "cTeX"
-                      TeX-save-query nil
-                      TeX-show-compilation t))))
-
-  (use-package reftex
-    :commands turn-on-reftex
-    :init
-    (progn
-      (setq reftex-plug-into-AUCTeX t)))
-
-  (use-package bibtex
-    :init
-    (progn
-      (setq bibtex-align-at-equal-sign t)
-      (add-hook 'bibtex-mode-hook
-                (lambda ()
-                  (set-fill-column 120)))))
-
-  (use-package company-auctex
-
-    :config
-    (defun cfg:TeX-mode-hook ()
-      (company-auctex-init))
-    (add-hook 'LaTeX-mode-hook 'cfg:TeX-mode-hook)
-    (add-hook 'TeX-mode-hook 'cfg:TeX-mode-hook))
+  (use-package jinja2-mode)
 #+END_SRC
 * Logview
 #+BEGIN_SRC emacs-lisp
   (use-package logview
-
     :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+END_SRC
 * LSP Mode
@@ -1041,7 +944,10 @@
           company-lsp-async t)
     (push '(company-lsp :with company-yasnippet) company-backends))
 
-  (use-package dap-mode)
+  (use-package dap-mode
+    :config
+    (dap-mode 1)
+    (dap-ui-mode 1))
 #+END_SRC
 * Makefile
 #+BEGIN_SRC emacs-lisp
@@ -1052,12 +958,11 @@
 * Modo Mayor por defecto
 #+BEGIN_SRC emacs-lisp
   (setq major-mode 'text-mode
-                 current-language-environment "Spanish")
+        current-language-environment "Spanish")
 #+END_SRC
 * move-dup
 #+BEGIN_SRC emacs-lisp
   (use-package move-dup
-
     :defer t
     :diminish move-dup-mode
     :bind (("S-M-<up>" . md/move-lines-up)
@@ -1069,17 +974,14 @@
 * Multiple Cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
-
     :defer t
-    :init   (add-hook 'multiple-cursors-mode-hook #'conf:lsp-on-change-modify-hook))
+    :init (add-hook 'multiple-cursors-mode-hook #'conf:lsp-on-change-modify-hook))
 #+END_SRC
 * Neotree
 #+BEGIN_SRC emacs-lisp
-  (use-package shrink-path
-    )
+  (use-package shrink-path)
 
   (use-package neotree
-
     :bind (:map neotree-mode-map
                 ("<C-return>" . neotree-change-root)
                 ("C" . neotree-change-root)
@@ -1134,9 +1036,7 @@
 * Nginx
 #+BEGIN_SRC emacs-lisp
   (use-package nginx-mode
-
-    :mode
-    ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
+    :mode ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 #+END_SRC
 * Orgmode
 #+BEGIN_SRC emacs-lisp
@@ -1352,7 +1252,6 @@
       (if ignore
           (org-return)
         (cond
-
          ((eq 'line-break (car (org-element-context)))
           (org-return-indent))
 
@@ -1493,13 +1392,6 @@
        ("C-2" . conf:org-tree-slide-set-profile)
        ("C-3" . org-tree-slide-simple-profile)
        ("C-4" . org-tree-slide-presentation-profile))))
-
-  ;; (when (file-exists-p "~/.sync.el")
-  ;;    (use-package org-sync
-  ;;
-  ;;      :config
-  ;;      (mapc 'load '("org-sync" "org-sync-gitlab" "org-sync-github"))
-  ;;      (load-file "~/.sync.el")))
 #+END_SRC
 * Pacfiles
 #+BEGIN_SRC emacs-lisp
@@ -1575,14 +1467,13 @@
   (use-package org-pdfview
     :after org)
 #+END_SRC
-* Persp
 * Pkgbuil
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode
     :mode "PKGBUILD\\'")
 #+END_SRC
 * Plantuml
-#+BEGIN_SRC emacs-lisp :tangle no :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package plantuml-mode
     :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
                   org-plantuml-jar-path "/opt/plantuml/plantuml.jar"))
@@ -1732,7 +1623,7 @@
     :config (setq rg-command-line-flags (list "-uuu")))
 #+END_SRC
 * Python
-**** lsp-python
+** lsp-python
 #+BEGIN_SRC emacs-lisp
   (setq ansi-color-for-comint-mode t)
   (defun python-template ()
@@ -1744,31 +1635,34 @@
 
   (use-package python
     :init
+    (require 'dap-python)
     (setq python-shell-interpreter "python")
     (add-hook 'python-mode-hook #'lsp))
 #+END_SRC
-**** Pyenv
+** Pyenv
 #+BEGIN_SRC emacs-lisp
   (use-package pyenv-mode
     :init (pyenv-mode))
 
   (use-package pyenv-mode-auto)
 #+END_SRC
-**** Stuff
+** PEP8
 #+BEGIN_SRC emacs-lisp
   (use-package blacken
     :diminish blacken-mode
     :config (add-hook 'python-mode-hook 'blacken-mode))
 
-  (use-package py-isort
-    :config
-    (setq py-isort-options '("--lines=100"))
-    (add-hook 'before-save-hook 'py-isort-before-save))
-
+  (use-package isortify
+    :diminish isortify-mode
+    :config (add-hook 'python-mode-hook 'isortify-mode))
+#+END_SRC
+** Stuff
+#+BEGIN_SRC emacs-lisp
   (use-package pyimport)
 
   (use-package pip-requirements)
 #+END_SRC
+
 * Rainbow
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
@@ -1810,16 +1704,20 @@
 
   (setq scroll-margin 80
         scroll-conservatively 3000)
-        ;;scroll-up-aggressively 0.02
-        ;;scroll-down-aggressively 0.02)
 
   (use-package smooth-scrolling
     :config (setq smooth-scroll-margin 5))
 #+END_SRC
 * Semantic
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp
   (use-package semantic
-    :init (semantic-mode 1))
+    :straight nil
+    :config
+    (defun cfg:inhibit-semantic-p ()
+      (not (equal major-mode 'nxml-mode)))
+
+    (with-eval-after-load 'semantic
+      (add-to-list 'semantic-inhibit-functions #'cfg:inhibit-semantic-p)))
 #+END_SRC
 * Shackle
 #+BEGIN_SRC emacs-lisp
