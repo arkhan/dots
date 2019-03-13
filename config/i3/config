@@ -30,7 +30,7 @@ bindsym $mod4+Return exec $term
 # %%hotkey: Launch terminal with tmux session %%
 bindsym $mod4+Shift+Return exec $term -e $bin/tmx
 
-# %%hotkey: Launch rofi as program launcher) %%
+# %%hotkey: Launch rofi as program launcher %%
 bindsym $mod4+d exec $bin/rofi-run
 
 # %%hotkey: Launch rofi as clipboard manager %%
@@ -39,14 +39,17 @@ bindsym $mod4+$mod1+c exec $bin/rofi-clip
 # %%hotkey: Launch rofi as password manager %%
 bindsym $mod4+$mod1+p exec rofi-pass
 
-# Systemd
+# %%hotkey: Launch rofi as systemd manager %%
 bindsym $mod4+$mod1+s exec $bin/rofi-systemd
 
-# rofi xrandr
+# %%hotkey: Launch rofi as display manager(xrandr) %%
 bindsym Control+F8 exec $bin/rofi-xrandr
 
-# Launch rofi -show window (a window shitcher)
+# %%hotkey: Launch rofi as window switcher %%
 bindsym $mod4+Tab exec rofi -show window -width 32
+
+# %%hotkey: Launch rofi as Calc %%
+bindsym $mod4+c exec rofi -show calc -modi calc -no-show-match -no-sort
 
 # Programs
 ## Ranger

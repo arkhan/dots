@@ -535,7 +535,7 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "MonacoB2" :height 90)
+  (set-face-attribute 'default nil :family "Mononoki" :height 90)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -827,8 +827,7 @@
   (use-package ivy-posframe
     :config
     (setq ivy-posframe-width (window-width)
-          ivy-posframe-border-width 1
-          ivy-posframe-hide-minibuffer t
+          ivy-posframe-hide-minibuffer nil
           ivy-posframe-parameters '((left-fringe . 10)
                                     (right-fringe . 10))
           ivy-display-function #'ivy-posframe-display-at-frame-bottom-left)
@@ -943,11 +942,6 @@
     (setq company-lsp-enable-snippet t
           company-lsp-async t)
     (push '(company-lsp :with company-yasnippet) company-backends))
-
-  (use-package dap-mode
-    :config
-    (dap-mode 1)
-    (dap-ui-mode 1))
 #+END_SRC
 * Makefile
 #+BEGIN_SRC emacs-lisp
@@ -1635,7 +1629,6 @@
 
   (use-package python
     :init
-    (require 'dap-python)
     (setq python-shell-interpreter "python")
     (add-hook 'python-mode-hook #'lsp))
 #+END_SRC
@@ -2123,6 +2116,10 @@
     (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
 
   (use-package yasnippet-snippets)
+
+  (use-package org-sync-snippets
+    :init (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets))
+
 #+END_SRC
 * Ztree
 #+BEGIN_SRC emacs-lisp :tangle no
