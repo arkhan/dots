@@ -37,7 +37,7 @@ URxvt.termName: rxvt-unicode-256color
 URxvt.internalBorder: 0
 URxvt*cutchars: '\"'()*<>[]{|}
 ! Perl Extentions
-URxvt.perl-ext-common: default,clipboard,tabbedex,resize-font,fullscreen,url-select
+URxvt.perl-ext-common: default,clipboard,tabbedex,resize-font,url-select
 ! Url select
 URxvt.keysym.M-u: perl:url-select:select_next
 URxvt.url-launcher: /usr/bin/xdg-open
