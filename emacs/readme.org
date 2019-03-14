@@ -535,7 +535,7 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Mononoki" :height 90)
+  (set-face-attribute 'default nil :family "Mononoki" :height 120)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -627,8 +627,7 @@
            ("C-x v SPC" . git-gutter:mark-hunk))
     :config
     (if (display-graphic-p)
-        (use-package git-gutter-fringe
-          ))
+        (use-package git-gutter-fringe))
     (global-git-gutter-mode t)
     (setq-default fringes-outside-margins t)
     (setq indicate-empty-lines nil)
@@ -836,14 +835,8 @@
   (use-package ivy-explorer
     :diminish ivy-explorer-mode
     :config
-    (setq ivy-explorer-message-function #'ivy-explorer--posframe)
-
-    ;;(defun ivy-explorer-posframe (msg)
-    ;;  (ivy-posframe-display-at-frame-bottom-left
-    ;;   (concat "\n" msg)))
-
-    ;;(push '(ivy-explorer--display-function :cleanup ivy-posframe-cleanup)
-    ;;      ivy-display-functions-props)
+    (if (display-graphic-p)
+        (setq ivy-explorer-message-function #'ivy-explorer--posframe))
     (ivy-explorer-mode 1))
 
   (use-package ivy-rich
@@ -1911,9 +1904,9 @@
         column-number-mode t)
 
   (use-package doom-modeline
-    :config (setq doom-modeline-icon nil
-                  doom-modeline-height 12
-                  doom-modeline-mu4e nil)
+    :init (setq doom-modeline-icon nil
+                doom-modeline-height 12
+                doom-modeline-mu4e nil)
     :hook (after-init . doom-modeline-mode))
 #+END_SRC
 * Sudo

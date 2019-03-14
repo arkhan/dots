@@ -16,7 +16,7 @@ set $mod4 Mod4
 set $mod1 Mod1
 
 # Font for window titles.
-font pango:Misc Tamsyn 10
+font pango:xos4 Terminus 12
 
 # Use Mouse+$mod4 to drag floating windows to their wanted position
 floating_modifier $mod4
@@ -53,7 +53,7 @@ bindsym $mod4+c exec rofi -show calc -modi calc -no-show-match -no-sort
 
 # Programs
 ## Ranger
-bindsym $mod4+Control+t exec $term -name Ranger -e ranger /media/data
+bindsym $mod4+Control+t exec $term -name Ranger -e ranger
 ## Weechat
 bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 ## Ncmpcpp

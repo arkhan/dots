@@ -42,7 +42,6 @@ antibody bundle zsh-users/zsh-history-substring-search
 antibody bundle zimfw/zimfw path:modules/history
 antibody bundle mafredri/zsh-async
 
-
 # Enable highlighters
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root line)
 
@@ -65,8 +64,8 @@ autoload -U colors; colors
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 function virtualenv_status() {
-  [[ "$(pyenv version-name)"  == "system"  ]] && return ""
-  echo -e " $(pyenv version-name)"
+  [[ -z "$VIRTUAL_ENV" ]] && return ""
+  basename " %{${fg_bold[white]}%}`basename \"$VIRTUAL_ENV\"`%{${reset_color}%}"
 }
 
 function git_status(){

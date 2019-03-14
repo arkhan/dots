@@ -10,7 +10,7 @@ Xft.lcdfilter: lcddefault
 *.saveLines: 4096
 *.scrollBar: false
 ! XTerm
-xterm*faceName: xft:Mononoki:style=Regular:size=9
+xterm*faceName: xft:Mononoki:style=Regular:size=12
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -25,10 +25,10 @@ xterm*toolBar: false
 ! URxvt
 URxvt.iso14755: false
 URxvt.iso14755_52: false
-URxvt*font: xft:Mononoki:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldFont: xft:Mononoki:bold:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*italicFont: xft:Mononoki:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldItalicFont: xft:Mononoki:bold:italic:autohint=true:size=9,xft:DejaVuSansMono NF:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*font: xft:Mononoki:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldFont: xft:Mononoki:bold:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*italicFont: xft:Mononoki:italic:autohint=true:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldItalicFont: xft:Mononoki:bold:italic:autohint=true:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
@@ -117,20 +117,3 @@ st.bold_font: 1
 *colorBD: #004DA6
 *colorUL: #008C8C
 *colorIT: #87af5f
-
-rofi.font: Misc Tamsyn 10
-rofi.dpi: 96
-rofi.height: 30
-rofi.hide-scrollbar: true
-rofi.location: 0
-rofi.line-margin: 5
-rofi.lines: 5
-rofi.separator-style: dash
-rofi.width: 30
-rofi.fixed-num-lines: false
-rofi.terminal: urxvtcd
-rofi.color-enabled: true
-rofi.color-active: #000000, #747474, #000000, #000000, #dddcff
-rofi.color-normal: #000000, #747474, #000000, #000000, #dddcff
-rofi.color-urgent: #000000, #cc9393, #000000, #000000, #e62424
-rofi.color-window: #000000, #292929, #747474

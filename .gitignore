@@ -1,6 +1,8 @@
 *.el
 *.elc
+*.log
 *.pyc
+
 
 emacs/elpa/
 emacs/cache/

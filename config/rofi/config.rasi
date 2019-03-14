@@ -1,0 +1,17 @@
+Configuration {
+	width: 30;
+	lines: 5;
+	font: "xos4 Terminus 12";
+	location: 0;
+	fixed-num-lines: false;
+	terminal: "urxvtcd";
+	line-margin: 5;
+	separator-style: "dash";
+	hide-scrollbar: true;
+	dpi: 96;
+	color-normal: "#000000, #747474, #000000, #000000, #dddcff";
+	color-urgent: "#000000, #cc9393, #000000, #000000, #e62424";
+	color-active: "#000000, #747474, #000000, #000000, #dddcff";
+	color-window: "#000000, #292929, #747474";
+  eh: 1;
+}

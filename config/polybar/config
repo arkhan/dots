@@ -18,8 +18,8 @@ margin-bottom = 2
 monitor = ${env:MONITOR}
 monitor-strict = true
 width = 100%
-height = 16
-clickareas = 16
+height = 18
+clickareas = 18
 
 tray-position = right
 tray-padding = 1
@@ -40,13 +40,13 @@ underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
-font-0 = Misc Tamsyn:size=12;0
-font-1 = Wuncon Siji:size=12;1
-font-2 = DejaVuSansMono NF:size=12;1
+font-0 = Tamzen:size=14;0
+font-1 = Wuncon Siji:size=14;1
+font-2 = DejaVuSansMono Nerd Font:size=10;1
 
 modules-left = ws
-modules-center =
-modules-right = wireless wired volume cpu memory fs-data fs-root battery date
+modules-center = datetime
+modules-right = wireless wired volume cpu memory fs-data fs-root battery
 
 [module/ws]
 type = internal/i3
@@ -97,8 +97,11 @@ label-empty =
 
 [module/battery]
 type = internal/battery
-full-at = 100
+full-at = 99
 time-format = %H:%M
+
+battery = BAT1
+adapter = ACAD
 
 label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
 label-discharging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
@@ -207,7 +210,7 @@ type = internal/cpu
 interval = 0.5
 label =  %{F#fff}%percentage%%%{F-}
 
-[module/date]
+[module/datetime]
 type = internal/date
 format = <label>
 date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}

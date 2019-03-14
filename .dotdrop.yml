@@ -46,6 +46,10 @@ dotfiles:
     dst: ~/.config/ranger
     link: true
     src: config/ranger
+  d_rofi:
+    dst: ~/.config/rofi
+    link: true
+    src: config/rofi
   d_rofi-pass:
     dst: ~/.config/rofi-pass
     link: true
@@ -71,9 +75,9 @@ dotfiles:
     link: true
     src: editorconfig
   f_ncmpcpp:
-    dst: ~/.ncmpcpp/config
+    dst: ~/.config/ncmpcpp
     link: true
-    src: ncmpcpp/config
+    src: config/ncmpcpp
   f_rtorrent.rc:
     dst: ~/.rtorrent.rc
     link: true
