@@ -1,10 +1,10 @@
-ncmpcpp_directory = "~/.ncmpcpp"
+ncmpcpp_directory = "~/.config/ncmpcpp"
 lyrics_directory = "~/.lyrics"
 execute_on_song_change = "~/.bin/mnuc"
 
 mpd_host = "localhost"
 mpd_port = "6600"
-mpd_music_dir = "/home/arkhan/data/Metal"
+mpd_music_dir = "/media/data/Metal"
 mpd_connection_timeout = "5"
 #mpd_crossfade_time = "5"
 

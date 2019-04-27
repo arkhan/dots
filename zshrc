@@ -112,16 +112,15 @@ prompt_callback() {
 }
 
 # Start async worker
-async_start_worker 'prompt' -n
+async_start_worker prompt_async -n
 # Register callback function for the workers completed jobs
-async_register_callback 'prompt' prompt_callback
+async_register_callback prompt_async prompt_callback
 
 # start async jobs before cmd
 prompt_precmd() {
-  autoload -U promptinit; promptinit
-  async_job 'prompt' prompt_dir
-  async_job 'prompt' prompt_venv $PWD # required
-  async_job 'prompt' prompt_git $PWD # required
+  async_job prompt_async prompt_dir
+  async_job prompt_async prompt_venv $PWD # required
+  async_job prompt_async prompt_git $PWD # required
 }
 
 # Setup

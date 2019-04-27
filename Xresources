@@ -10,7 +10,7 @@ Xft.lcdfilter: lcddefault
 *.saveLines: 4096
 *.scrollBar: false
 ! XTerm
-xterm*faceName: xft:Mononoki:style=Regular:size=12
+xterm*faceName: xft:MonacoB:style=Regular:size=11
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -25,10 +25,10 @@ xterm*toolBar: false
 ! URxvt
 URxvt.iso14755: false
 URxvt.iso14755_52: false
-URxvt*font: xft:Mononoki:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldFont: xft:Mononoki:bold:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*italicFont: xft:Mononoki:italic:autohint=true:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
-URxvt*boldItalicFont: xft:Mononoki:bold:italic:autohint=true:size=12,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*font: xft:MonacoB:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldFont: xft:MonacoB:bold:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*italicFont: xft:MonacoB:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
+URxvt*boldItalicFont: xft:MonacoB:bold:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:size=10
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
@@ -73,7 +73,7 @@ URxvt.borderColor: 0
 
 ! ST
 st.termname: st-256color
-st.font: Mononoki:size=9:antialias=true:autohint=true
+st.font: MonacoB:size=9:antialias=true:autohint=true
 st.borderpx: 1
 st.cursorshape: 4
 st.bold_font: 1

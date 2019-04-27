@@ -4,7 +4,7 @@ Configuration {
 	font: "xos4 Terminus 12";
 	location: 0;
 	fixed-num-lines: false;
-	terminal: "urxvtcd";
+	terminal: "urxvtcd -e";
 	line-margin: 5;
 	separator-style: "dash";
 	hide-scrollbar: true;

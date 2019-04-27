@@ -48,7 +48,7 @@
 
   (setq load-prefer-newer t)
 
-  (setq straight-check-for-modifications 'live)
+  (setq straight-check-for-modifications '(check-on-save-find-when-checking))
 
   (straight-use-package 'use-package)
   (setq straight-enable-use-package-integration t
@@ -239,7 +239,7 @@
     :commands (bug-hunter-file bug-hunter-init-file))
 #+END_SRC
 * Buffer-expose
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package buffer-expose
     :straight (buffer-expose :type git :host github :repo "clemera/buffer-expose")
     :init (buffer-expose-mode 1)
@@ -302,12 +302,11 @@
   (use-package company
     :diminish company-mode
     :config
-    (setf company-backends '((company-files
+    (setq company-backends '((company-files
                               company-keywords
-                              company-capf
                               company-yasnippet)
-                             (company-abbrev company-dabbrev)))
-    (setq company-auto-complete nil
+                             (company-abbrev company-dabbrev))
+          company-auto-complete nil
           company-echo-delay 0
           company-idle-delay 0.2
           company-minimum-prefix-length 1
@@ -364,11 +363,6 @@
       (write-file custom-file)))
   (load custom-file)
 #+END_SRC
-* Datos Personales
-#+BEGIN_SRC emacs-lisp
-  (setq user-full-name "arkhan"
-                 user-mail-address "arkhan@disroot.org")
-#+END_SRC
 * Directorios
 #+BEGIN_SRC emacs-lisp
   (setq-default semanticdb-default-save-directory (concat conf:cache-dir "semanticdb")
@@ -377,7 +371,7 @@
 #+END_SRC
 * Docker
 #+BEGIN_SRC emacs-lisp
-  (use-package docker)
+  ;;(use-package docker)
 
   (use-package dockerfile-mode
     :mode "Dockerfile\\'")
@@ -472,7 +466,6 @@
 * Flyspell
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
-    :diminish ""
     :bind (("C-c t s" . flyspell-mode)
            ("C-c l b" . flyspell-buffer)
            :map flyspell-mode-map
@@ -535,7 +528,9 @@
 #+END_SRC
 * Font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :family "Mononoki" :height 120)
+  (global-font-lock-mode 1)
+
+  (set-face-attribute 'default nil :family "MonacoB" :height 110)
   (set-fontset-font t 'unicode (font-spec :size 20 :name "Symbola") nil 'prepend)
 #+END_SRC
 * Format-all
@@ -556,88 +551,88 @@
         find-file-visit-truename t
         vc-handled-backends nil)
 
-  (use-package transient
-    :config (setq transient-history-file (concat conf:cache-dir "transient.el")))
+    (use-package transient
+      :config (setq transient-history-file (concat conf:cache-dir "transient.el")))
 
-  (use-package magit
+    (use-package magit
 
-    :bind (("C-x g c" . magit-commit-create)
-           ("C-x g e" . magit-ediff-resolve)
-           ("C-x g g" . magit-grep)
-           ("C-x g l" . magit-file-log)
-           ("C-x g p" . magit-push-other)
-           ("C-x g r" . magit-rebase-interactive)
-           ("C-x g s" . magit-status)
-           ("C-x g u" . magit-pull-other)
-           ("C-x g x" . magit-checkout))
-    :init
-    (progn
-      (setq magit-git-executable "tg")
-      (delete 'Git vc-handled-backends)
-      (defadvice magit-status (around magit-fullscreen activate)
-        (window-configuration-to-register :magit-fullscreen)
-        ad-do-it
-        (delete-other-windows))
-      (defadvice git-commit-commit (after delete-window activate)
-        (delete-window))
-      (defadvice git-commit-abort (after delete-window activate)
-        (delete-window))
-      (defun magit-commit-mode-init ()
-        (when (looking-at "\n")
-          (open-line 1))))
-    :config
-    (progn
-      (defadvice magit-quit-window (around magit-restore-screen activate)
-        (let ((current-mode major-mode))
+      :bind (("C-x g c" . magit-commit-create)
+             ("C-x g e" . magit-ediff-resolve)
+             ("C-x g g" . magit-grep)
+             ("C-x g l" . magit-file-log)
+             ("C-x g p" . magit-push-other)
+             ("C-x g r" . magit-rebase-interactive)
+             ("C-x g s" . magit-status)
+             ("C-x g u" . magit-pull-other)
+             ("C-x g x" . magit-checkout))
+      :init
+      (progn
+        (setq magit-git-executable "tg")
+        (delete 'Git vc-handled-backends)
+        (defadvice magit-status (around magit-fullscreen activate)
+          (window-configuration-to-register :magit-fullscreen)
           ad-do-it
-          (when (eq 'magit-status-mode current-mode)
-            (jump-to-register :magit-fullscreen))))
-      (defun magit-maybe-commit (&optional show-options)
-        "Runs magit-commit unless prefix is passed"
-        (interactive "P")
-        (if show-options
-            (magit-key-mode-popup-committing)
-          (magit-commit-create)))
-      (define-key magit-mode-map "c" 'magit-maybe-commit)
+          (delete-other-windows))
+        (defadvice git-commit-commit (after delete-window activate)
+          (delete-window))
+        (defadvice git-commit-abort (after delete-window activate)
+          (delete-window))
+        (defun magit-commit-mode-init ()
+          (when (looking-at "\n")
+            (open-line 1))))
+      :config
+      (progn
+        (defadvice magit-quit-window (around magit-restore-screen activate)
+          (let ((current-mode major-mode))
+            ad-do-it
+            (when (eq 'magit-status-mode current-mode)
+              (jump-to-register :magit-fullscreen))))
+        (defun magit-maybe-commit (&optional show-options)
+          "Runs magit-commit unless prefix is passed"
+          (interactive "P")
+          (if show-options
+              (magit-key-mode-popup-committing)
+            (magit-commit-create)))
+        (define-key magit-mode-map "c" 'magit-maybe-commit)
 
-      (setq magit-completing-read-function 'ivy-completing-read
-            magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-            magit-status-buffer-switch-function 'switch-to-buffer
-            magit-diff-refine-hunk t
-            magit-rewrite-inclusive 'ask
-            magit-process-find-password-functions '(magit-process-password-auth-source)
-            magit-save-some-buffers t
-            magit-process-popup-time 10
-            magit-set-upstream-on-push 'askifnotset
-            magit-refs-show-commit-count 'all
-            magit-log-buffer-file-locket t)))
+        (setq magit-completing-read-function 'ivy-completing-read
+              magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+              magit-status-buffer-switch-function 'switch-to-buffer
+              magit-diff-refine-hunk t
+              magit-rewrite-inclusive 'ask
+              magit-process-find-password-functions '(magit-process-password-auth-source)
+              magit-save-some-buffers t
+              magit-process-popup-time 10
+              magit-set-upstream-on-push 'askifnotset
+              magit-refs-show-commit-count 'all
+              magit-log-buffer-file-locket t)))
 
-  (use-package magit-gitflow
-    :config
-    (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+    (use-package magit-gitflow
+      :config
+      (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 
-  (use-package git-gutter
-    :defer 1
-    :bind (("C-x C-g" . git-gutter)
-           ("C-x v =" . git-gutter:popup-hunk)
-           ("C-x p" . git-gutter:previous-hunk)
-           ("C-x n" . git-gutter:next-hunk)
-           ("C-x v s" . git-gutter:stage-hunk)
-           ("C-x v r" . git-gutter:revert-hunk)
-           ("C-x v SPC" . git-gutter:mark-hunk))
-    :config
-    (if (display-graphic-p)
-        (use-package git-gutter-fringe))
-    (global-git-gutter-mode t)
-    (setq-default fringes-outside-margins t)
-    (setq indicate-empty-lines nil)
-    (setq git-gutter:lighter ""
-          git-gutter:handled-backends '(git hg bzr svn))
-    (set-face-foreground 'git-gutter:modified "purple")
-    (set-face-foreground 'git-gutter:added "green")
-    (set-face-foreground 'git-gutter:deleted "red"))
+     (use-package git-gutter
+       :defer 1
+       :bind (("C-x C-g" . git-gutter)
+              ("C-x v =" . git-gutter:popup-hunk)
+             ("C-x p" . git-gutter:previous-hunk)
+             ("C-x n" . git-gutter:next-hunk)
+             ("C-x v s" . git-gutter:stage-hunk)
+             ("C-x v r" . git-gutter:revert-hunk)
+             ("C-x v SPC" . git-gutter:mark-hunk))
+      :config
+      (if (display-graphic-p)
+          (use-package git-gutter-fringe))
+      (global-git-gutter-mode t)
+      (setq-default fringes-outside-margins t)
+      (setq indicate-empty-lines nil)
+      (setq git-gutter:lighter ""
+            git-gutter:handled-backends '(git hg bzr svn))
+      (set-face-foreground 'git-gutter:modified "purple")
+      (set-face-foreground 'git-gutter:added "green")
+      (set-face-foreground 'git-gutter:deleted "red"))
 
-  (use-package gitconfig-mode
+   (use-package gitconfig-mode
     :defer t
     :mode ("/\\.?git/?config$"
            "/\\.gitmodules$")
@@ -827,6 +822,7 @@
     :config
     (setq ivy-posframe-width (window-width)
           ivy-posframe-hide-minibuffer nil
+          ivy-posframe-border-width 0
           ivy-posframe-parameters '((left-fringe . 10)
                                     (right-fringe . 10))
           ivy-display-function #'ivy-posframe-display-at-frame-bottom-left)
@@ -922,7 +918,7 @@
     (setq lsp-ui-sideline-enable t
           lsp-ui-sideline-ignore-duplicate t
           lsp-ui-sideline-show-hover nil
-          lsp-ui-doc-enable t)
+          lsp-ui-doc-enable nil)
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
@@ -932,8 +928,7 @@
     :defer t
     :commands company-lsp
     :config
-    (setq company-lsp-enable-snippet t
-          company-lsp-async t)
+    (setq company-lsp-async t)
     (push '(company-lsp :with company-yasnippet) company-backends))
 #+END_SRC
 * Makefile
@@ -958,6 +953,170 @@
            ("C-M-<down>" . 'md/duplicate-down))
     :init (global-move-dup-mode))
 #+END_SRC
+* mu4e
+  #+begin_src emacs-lisp
+    (use-package link-hint
+      :bind (("C-c l o" . link-hint-open-link)
+             ("C-c l c" . link-hint-copy-link)))
+
+    (use-package mu4e
+      :bind ("<f1>" . mu4e)
+      :preface
+      (defadvice mu4e (before mu4e-start activate)
+        "Antes de ejecutar `mu4e' borramos todas las ventanas"
+        (when (> 1 (count-windows))
+          (window-configuration-to-register :mu4e-fullscreen)
+          (delete-other-windows)))
+
+      (defadvice mu4e-quit (after mu4e-close-and-push activate)
+        "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
+        (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
+        (when (get-register :mu4e-fullscreen)
+          (jump-to-register :mu4e-fullscreen)))
+      :init
+      (require 'mu4e-contrib)
+      (setq mail-user-agent 'mu4e-user-agent
+            message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
+            message-citation-line-function 'message-insert-formatted-citation-line
+            message-cite-reply-position 'below
+            message-kill-buffer-on-exit t
+            message-send-mail-function 'message-send-mail-with-sendmail
+            mu4e-attachment-dir  "~/Descargas"
+            mu4e-auto-retrieve-keys t
+            mu4e-compose-context-policy 'ask
+            mu4e-compose-dont-reply-to-self t
+            mu4e-compose-keep-self-cc nil
+            mu4e-context-policy 'pick-first
+            mu4e-headers-date-format "%Y-%m-%d %H:%M"
+            mu4e-headers-include-related t
+            mu4e-headers-auto-update nil
+            mu4e-headers-leave-behavior 'ignore
+            mu4e-headers-visible-lines 8
+            mu4e-headers-fields '((:date . 25)
+                                  (:flags . 6)
+                                  (:from . 22)
+                                  (:subject . nil))
+            mu4e-view-prefer-html t
+            mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
+            mu4e-maildir "~/.mail"
+            mu4e-view-show-images t
+            sendmail-program "msmtp"
+            mu4e-get-mail-command "mbsync -aV")
+
+      (defun mu4e-message-maildir-matches (msg rx)
+        (when rx
+          (if (listp rx)
+              ;; If rx is a list, try each one for a match
+              (or (mu4e-message-maildir-matches msg (car rx))
+                  (mu4e-message-maildir-matches msg (cdr rx)))
+            ;; Not a list, check rx
+            (string-match rx (mu4e-message-field msg :maildir)))))
+
+      (defun choose-msmtp-account ()
+        (if (message-mail-p)
+            (save-excursion
+              (let*
+                  ((from (save-restriction
+                           (message-narrow-to-headers)
+                           (message-fetch-field "from")))
+                   (account
+                    (cond
+                     ((string-match "edison@disroot.org" from) "Personal")
+                     ((string-match "arkhan@disroot.org" from) "Work"))))
+                (setq message-sendmail-extra-arguments (list '"-a" account))))))
+
+      (when (fboundp 'imagemagick-register-types)
+        (imagemagick-register-types))
+
+      (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
+
+      (setq mu4e-contexts
+            `( ,(make-mu4e-context
+                 :name "Personal"
+                 :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
+                 :match-func (lambda (msg)
+                               (when msg
+                                 (mu4e-message-maildir-matches msg "^/personal")))
+                 :leave-func (lambda () (mu4e-clear-caches))
+                 :vars '((user-mail-address     . "edison@disroot.org")
+                         (user-full-name        . "Edison Ibáñez")
+                         (mu4e-sent-folder      . "/personal/Sent")
+                         (mu4e-drafts-folder    . "/personal/Drafts")
+                         (mu4e-trash-folder     . "/personal/Trash")
+                         (mu4e-refile-folder    . "/personal/Archive")))
+               ,(make-mu4e-context
+                 :name "Work"
+                 :enter-func (lambda () (mu4e-message "Switch to the Work context"))
+                 :match-func (lambda (msg)
+                               (when msg
+                                 (mu4e-message-maildir-matches msg "^/work")))
+                 :leave-func (lambda () (mu4e-clear-caches))
+                 :vars '((user-mail-address     . "arkhan@disroot.org")
+                         (user-full-name        . "Edison Ibáñez")
+                         (mu4e-sent-folder      . "/work/Sent")
+                         (mu4e-drafts-folder    . "/work/Drafts")
+                         (mu4e-trash-folder     . "/work/Trash")
+                         (mu4e-refile-folder    . "/work/Archive")))))
+
+      (add-hook 'message-send-mail-hook 'choose-msmtp-account)
+      (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
+
+      (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
+      (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
+
+    (use-package mu4e-alert
+      :if (executable-find "mu")
+      :init
+      (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+      (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+      (setq mu4e-compose-forward-as-attachment t
+            mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
+            mu4e-compose-crypto-reply-plain-policy 'sign
+            mu4e-index-update-in-background t
+            mu4e-alert-email-notification-types '(subjects))
+      :config
+      (defun conf:refresh-mu4e-alert-mode-line ()
+        (interactive)
+        (mu4e~proc-kill)
+        (mu4e-alert-enable-mode-line-display))
+      (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
+      (mu4e-alert-set-default-style 'libnotify))
+
+    (use-package org-mu4e
+      :straight nil
+      :config
+      (defun htmlize-and-send ()
+        "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+        (interactive)
+        (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+          (org-mime-htmlize)
+          (org-mu4e-compose-org-mode)
+          (mu4e-compose-mode)
+          (message-send-and-exit)))
+
+      ;; This overloads the amazing C-c C-c commands in org-mode with one more function
+      ;; namely the htmlize-and-send, above.
+      (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
+
+      ;; Originally, I set the `mu4e-compose-mode-hook' here, but
+      ;; this new hook works much, much better for me.
+      (add-hook 'mu4e-compose-post-hook
+                (defun do-compose-stuff ()
+                  "My settings for message composition."
+                  (org-mu4e-compose-org-mode))))
+
+    ;; (use-package mu4e-conversation
+    ;;   :after mu4e
+    ;;   :config
+    ;;   (setq mu4e-conversation-print-function 'mu4e-conversation-print-tree
+    ;;         mu4e-compose-dont-reply-to-self t
+    ;;         mu4e-conversation-kill-buffer-on-exit t)
+    ;;   (global-mu4e-conversation-mode))
+
+    (use-package mu4e-maildirs-extension
+      :after mu4e
+      :config (mu4e-maildirs-extension))
+  #+end_src
 * Multiple Cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
@@ -1071,10 +1230,10 @@
                   (switch-dictionary)))
 
       ;; set the modules enabled by default
-      (setq org-modules '(org-bbdb org-bibtex org-docview org-mhe org-rmail org-crypt
-                                   org-protocol org-gnus org-id org-info org-habit
-                                   org-irc org-annotate-file org-eval org-expiry org-tempo
-                                   org-man org-panel org-toc ox-md))
+      (setq org-modules '(org-bbdb org-bibtex org-docview org-mhe
+                          org-rmail org-crypt org-protocol org-id
+                          org-info org-habit org-irc org-annotate-file
+                          org-eval org-expiry org-tempo org-panel org-toc ox-md))
 
       ;; set default directories
       (setq org-id-locations-file (concat conf:cache-dir "org-id.el")
@@ -1176,7 +1335,6 @@
       (add-hook 'org-mode-hook #'my-org-mode-hook)
 
       ;; :::::: Org-Babel ::::::
-
       ;; languages supported
       (org-babel-do-load-languages
        (quote org-babel-load-languages)
@@ -1197,6 +1355,11 @@
   ;;   (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
   ;; (add-hook 'org-src-mode-hook 'disable-fylcheck-in-org-src-block)))
+
+  (use-package ob-sql
+    :defer t
+    :straight org-plus-contrib
+    :commands (org-babel-execute:sql))
 
   (use-package ob-python
     :defer t
@@ -1225,8 +1388,7 @@
     (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
 
   (use-package org-bullets
-    :hook (org-mode . org-bullets-mode)
-    :config (setq org-bullets-bullet-list '("*")))
+    :hook (org-mode . org-bullets-mode))
 
   (use-package org-inlinetask
     :straight nil
@@ -1443,7 +1605,8 @@
                 ("s"  . pdf-occur)
                 ("b"  . pdf-view-set-slice-from-bounding-box)
                 ("r"  . pdf-view-reset-slice))
-    :init (pdf-loader-install t t)
+    :init
+    (pdf-tools-install t t)
     :config
     (setq pdf-misc-print-programm "/usr/bin/gtklp"
           pdf-misc-print-programm-args (quote ("-o media=A4" "-o fitplot"))
@@ -1573,7 +1736,11 @@
                         ("==" . ?\u2261)
                         ("!=" . ?\u2260)
                         (">=" . ?\u2265)
-                        ("<=" . ?\u2264))))))
+                        ("<=" . ?\u2264)))))
+    (add-hook 'prog-common-hook
+              (lambda ()
+                (font-lock-add-keywords nil
+                                        '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t))))))
 #+END_SRC
 * Proced
 #+BEGIN_SRC emacs-lisp
@@ -1598,11 +1765,25 @@
     (projectile-mode))
 
   (use-package counsel-projectile
-    :bind ("C-x r R" . counsel-projectile-rg)
+    :bind (("C-x r R" . counsel-projectile-rg)
+           ("<C-tab>" . counsel-projectile-switch-project))
     :config
     (setq counsel-projectile-rg-options-history (list "-uuu"))
     (add-hook 'text-mode-hook 'counsel-projectile-mode)
     (add-hook 'prog-mode-hook 'counsel-projectile-mode))
+
+  (defun conf:switch-to-project-buffer-if-in-project (arg)
+    "Custom switch to buffer.
+    With universal argument ARG or when not in project, rely on
+    `ivy-switch-buffer'.
+    Otherwise, use `counsel-projectile-switch-to-buffer'."
+        (interactive "P")
+        (if (or arg
+                (not (projectile-project-p)))
+            (ivy-switch-buffer)
+          (counsel-projectile-switch-to-buffer)))
+
+  (bind-key* "C-x b" #'conf:switch-to-project-buffer-if-in-project)
 
   (use-package term-projectile)
 
@@ -1618,12 +1799,15 @@
     (insert "#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n\n"))
 
   (add-hook 'python-mode-hook
-            '(lambda () (when (empty-buffer?) (python-template))))
+            '(lambda ()
+               (when (empty-buffer?) (python-template))))
 
   (use-package python
-    :init
-    (setq python-shell-interpreter "python")
-    (add-hook 'python-mode-hook #'lsp))
+    :config
+    (setq python-shell-interpreter "python"
+          lsp-pyls-configuration-sources ["flake8"]
+          lsp-pyls-plugins-pylint-enabled nil)
+    (add-hook 'python-mode-hook 'lsp))
 #+END_SRC
 ** Pyenv
 #+BEGIN_SRC emacs-lisp
@@ -1631,6 +1815,7 @@
     :init (pyenv-mode))
 
   (use-package pyenv-mode-auto)
+;;    :config (add-hook 'projectile-after-switch-project-hook 'pyenv-mode-auto-hook)
 #+END_SRC
 ** PEP8
 #+BEGIN_SRC emacs-lisp
@@ -1663,7 +1848,7 @@
     :straight nil
     :config
     (setq recentf-save-file (concat conf:cache-dir "recentf")
-          recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/" "conf:cache-dir")
+          recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/" "conf:cache-dir" "~/.mail")
           recentf-max-saved-items 15
           recentf-max-menu-items 15
           recentf-keep '(file-remote-p file-readable-p)
@@ -1698,12 +1883,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package semantic
     :straight nil
-    :config
-    (defun cfg:inhibit-semantic-p ()
-      (not (equal major-mode 'nxml-mode)))
-
-    (with-eval-after-load 'semantic
-      (add-to-list 'semantic-inhibit-functions #'cfg:inhibit-semantic-p)))
+    :config (semantic-mode 1))
 #+END_SRC
 * Shackle
 #+BEGIN_SRC emacs-lisp
@@ -1741,7 +1921,7 @@
   (use-package terminal-here
     :bind (("C-<f5>" . terminal-here-launch)
            ("C-<f6>" . terminal-here-project-launch))
-    :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
+    :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmux")))
 #+END_SRC
 * SQL
 #+BEGIN_SRC emacs-lisp
@@ -1905,8 +2085,7 @@
 
   (use-package doom-modeline
     :init (setq doom-modeline-icon nil
-                doom-modeline-height 12
-                doom-modeline-mu4e nil)
+                doom-modeline-height 12)
     :hook (after-init . doom-modeline-mode))
 #+END_SRC
 * Sudo
@@ -2017,6 +2196,13 @@
     :config
     (setq which-key-sort-order 'which-key-key-order-alpha)
     (which-key-mode))
+
+  (use-package which-key-posframe
+    :straight (which-key-posframe :type git :host github :repo "yanghaoxie/which-key-posframe")
+    :config
+    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
+          which-key-posframe-border-width 0)
+    (which-key-posframe-enable))
 #+END_SRC
 * XML
 #+BEGIN_SRC emacs-lisp
@@ -2099,20 +2285,20 @@
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode)
 #+END_SRC
-* Yassnippet
+* YASnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :defer 2
     :diminish yas-minor-mode
     :config
-    (yas-global-mode)
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets")))
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+    (yas-global-mode))
 
   (use-package yasnippet-snippets)
 
   (use-package org-sync-snippets
-    :init (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets))
-
+    :init (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets)
+    :custom (org-sync-snippets-org-snippets-file "~/.emacs.d/snippets/snippets.org"))
 #+END_SRC
 * Ztree
 #+BEGIN_SRC emacs-lisp :tangle no

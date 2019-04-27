@@ -254,7 +254,7 @@ client.background       #000000
 # Xresources
 exec --no-startup-id xrdb $HOME/.Xresources
 # Wallpaper
-exec --no-startup-id $HOME/.fehbg
+exec --no-startup-id feh --bg-fill $HOME/.dots/walls/03.jpg
 # i3lock Fancy
 exec --no-startup-id xss-lock -- i3lock-fancy -p
 # Clipboard
@@ -290,7 +290,7 @@ for_window [class="(?i)pinentry"] floating enable
 for_window [class="(?i)GtkLP"] floating enable
 
 # Tabbed
-for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
+for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable
 for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
 for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed

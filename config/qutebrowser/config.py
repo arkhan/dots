@@ -98,7 +98,7 @@ c.spellcheck.languages = ["es-ES"]
 #   - never: Always hide the tab bar.
 #   - multiple: Hide the tab bar if only one tab is open.
 #   - switching: Show the tab bar when switching tabs.
-c.tabs.show = "never"
+c.tabs.show = "always"
 
 # Background color of the completion widget for odd rows.
 # Type: QssColor
@@ -135,7 +135,7 @@ c.colors.completion.match.fg = "#ffcc00"
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "Mononoki"
+c.fonts.monospace = "MonacoB"
 
 # Bindings for normal mode
 config.bind("/", None)
