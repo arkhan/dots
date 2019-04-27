@@ -954,7 +954,7 @@
     :init (global-move-dup-mode))
 #+END_SRC
 * mu4e
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
     (use-package link-hint
       :bind (("C-c l o" . link-hint-open-link)
              ("C-c l c" . link-hint-copy-link)))
@@ -1116,7 +1116,7 @@
     (use-package mu4e-maildirs-extension
       :after mu4e
       :config (mu4e-maildirs-extension))
-  #+end_src
+#+end_src
 * Multiple Cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
