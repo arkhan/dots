@@ -3,12 +3,13 @@
 #+SINCE:   {replace with next tagged release version}
 #+STARTUP: inlineimages
 
-* Table of Contents :TOC_3:noexport:
+* Table of Contents :TOC_5:noexport:
 - [[#config][Config]]
   - [[#initel][init.el]]
     - [[#lexical-binding][Lexical-binding]]
     - [[#initel-1][init.el]]
     - [[#auto-tangle][Auto Tangle]]
+  - [[#lang][Lang]]
 - [[#ui][UI]]
   - [[#cursor][Cursor]]
   - [[#font][Font]]
@@ -26,9 +27,13 @@
     - [[#disable-packages][Disable Packages]]
     - [[#lsp-python][lsp-python]]
     - [[#pyenv][pyenv]]
+      - [[#packages-1][packages]]
+      - [[#config-1][config]]
   - [[#vc][VC]]
 - [[#tools][Tools]]
   - [[#mu4e][mu4e]]
+    - [[#packages-2][packages]]
+    - [[#config-2][Config]]
 
 * Config
 ** init.el
@@ -136,6 +141,11 @@
       (async-shell-command "sh -c \"~/.emacs.d/bin/org-tangle ~/.doom.d/README.org\""))))
 
 (add-hook 'after-save-hook 'tangle-init-async)
+#+END_SRC
+** Lang
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq current-language-environment "Spanish"
+      org-export-default-language "es")
 #+END_SRC
 * UI
 ** Cursor
@@ -248,9 +258,11 @@
 (add-hook 'python-mode-hook 'lsp)
 #+END_SRC
 *** pyenv
+**** packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! pyenv-mode-auto)
 #+END_SRC
+**** config
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! pyenv-mode-auto)
 #+END_SRC
@@ -262,11 +274,14 @@
 #+END_SRC
 * Tools
 ** mu4e
+*** packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! link-hint)
 (package! mu4e-alert)
+(package! mu4e-conversation)
 (package! mu4e-maildirs-extension)
 #+END_SRC
+*** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! link-hint
   :bind (("C-c l o" . link-hint-open-link)
@@ -430,15 +445,15 @@
                 "My settings for message composition."
                 (org-mu4e-compose-org-mode))))
 
-  ;; (use-package mu4e-conversation
-  ;;   :after mu4e
-  ;;   :config
-  ;;   (setq mu4e-conversation-print-function 'mu4e-conversation-print-tree
-  ;;         mu4e-compose-dont-reply-to-self t
-  ;;         mu4e-conversation-kill-buffer-on-exit t)
-  ;;   (global-mu4e-conversation-mode))
+(def-package! mu4e-conversation
+  :after mu4e
+  :config
+  (setq mu4e-conversation-print-function 'mu4e-conversation-print-tree
+        mu4e-compose-dont-reply-to-self t
+        mu4e-conversation-kill-buffer-on-exit t)
+  (global-mu4e-conversation-mode))
 
-  (def-package! mu4e-maildirs-extension
-    :after mu4e
-    :config (mu4e-maildirs-extension))
+(def-package! mu4e-maildirs-extension
+  :after mu4e
+  :config (mu4e-maildirs-extension))
 #+END_SRC
