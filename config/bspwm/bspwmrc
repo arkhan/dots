@@ -48,10 +48,6 @@ bspc rule -a Wine follow=off desktop=^6 state=tiled
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
 bspc rule -a URxvt:terminal follow=off state=floating center=on
-bspc rule -a 'Firefox:firefox' follow=off state=floating manage=off
-bspc rule -a 'Firefox:Browser' follow=off state=floating manage=off
-bspc rule -a 'Firefox Developer Edition:firefox-developer-edition' follow=off state=floating manage=off
-bspc rule -a 'Firefox Developer Edition:Browser' follow=off state=floating manage=off
 
 # Xresources
 xrdb ~/.Xresources &

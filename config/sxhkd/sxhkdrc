@@ -28,7 +28,7 @@ super + shift + {f,i}
   urxvtcd {-name ranger -e ranger, -name chat -e weechat}
 
 # Volume
-alt + {m,Up,Down}
+{XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}
   pamixer {-t,-i 1,-d 1}
 
 # exit

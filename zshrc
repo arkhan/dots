@@ -51,16 +51,13 @@ typeset -gA ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[default]=bold
 ZSH_HIGHLIGHT_STYLES[line]=bold
 
-autoload -U zutil
-autoload -U compinit
-autoload -U complist
+# autoload -U zutil
+# autoload -U compinit
+# autoload -U complist
 
 #-----------------------------
 # Prompt
 #-----------------------------
-autoload -Uz async && async
-autoload -U colors; colors
-
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 function virtualenv_status() {
@@ -202,7 +199,7 @@ mypip() {
 }
 
 export PAGER="less"
-export LESS="-iMSx4 -FX"
+export LESS="-iMSx4 -XFR"
 if which lesspipe.sh >/dev/null 2>&1; then
    export LESSOPEN="| lesspipe.sh %s"
 fi

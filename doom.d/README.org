@@ -1,0 +1,398 @@
+#+TITLE:   Configuracion de Emacs usando Doom Emacs
+#+DATE:    mayo 13, 2019
+#+SINCE:   {replace with next tagged release version}
+#+STARTUP: inlineimages
+
+* Table of Contents :TOC_3:noexport:
+- [[#config][Config]]
+  - [[#initel][init.el]]
+    - [[#lexical-binding][Lexical-binding]]
+    - [[#initel-1][init.el]]
+    - [[#auto-tangle][Auto Tangle]]
+  - [[#generic][Generic]]
+- [[#ui][UI]]
+  - [[#cursor][Cursor]]
+  - [[#font][Font]]
+  - [[#modeline][Modeline]]
+  - [[#neotree][Neotree]]
+  - [[#theme][Theme]]
+- [[#prog][Prog]]
+  - [[#python][Python]]
+    - [[#disable-packages][Disable Packages]]
+    - [[#lsp-python][lsp-python]]
+    - [[#pyenv][pyenv]]
+- [[#tools][Tools]]
+  - [[#mu4e][mu4e]]
+
+* Config
+** init.el
+*** Lexical-binding
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;; init.el -*- lexical-binding: t; -*-
+#+END_SRC
+*** init.el
+#+BEGIN_SRC emacs-lisp :tangle init.el
+;;; init.el -*- lexical-binding: t; -*-
+
+(doom! :completion
+       (company +auto
+                +childframe)
+       (ivy +fuzzy)
+
+       :ui
+       doom
+       doom-dashboard
+       doom-quit
+       fill-column
+       hl-todo
+       indent-guides
+       modeline
+       nav-flash
+       ophints
+       (popup +all
+              +defaults)
+       pretty-code
+       neotree
+       unicode
+       vc-gutter
+       vi-tilde-fringe
+       window-select
+       workspaces
+
+       :editor
+       file-templates
+       fold
+       (format +onsave)
+       multiple-cursors
+       parinfer
+       rotate-text
+       snippets
+
+       :emacs
+       dired
+       electric
+       eshell
+       imenu
+       term
+       vc
+
+       :tools
+       ansible
+       docker
+       editorconfig
+       eval
+       flycheck
+       flyspell
+       (lookup +docsets)
+       lsp
+       magit
+       make
+       password-store
+       pdf
+       rgb
+       terraform
+       tmux
+       upload
+
+       :lang
+       data
+       emacs-lisp
+       latex
+       markdown
+       (org +attach
+            +babel
+            +capture
+            +export
+            +habit
+            +present
+            +protocol)
+       (python +pyenv)
+       rest
+       (sh +zsh)
+
+       :email
+       (mu4e +gmail)
+
+       :app
+       calendar
+       (write +langtool)
+
+       :collab
+
+       :config
+       (default +bindings +smartparens))
+#+END_SRC
+
+*** Auto Tangle
+#+BEGIN_SRC emacs-lisp :tangle init.el
+(defun tangle-init-async ()
+  "If the current buffer is 'README.org' the code-blocks are tangled."
+  (when (or (equal (buffer-file-name) (expand-file-name (concat user-emacs-directory "README.org")))
+            (equal (buffer-file-name) (expand-file-name "~/.doom.d/README.org")))
+    (let ((prog-mode-hook nil))
+      (async-shell-command "sh -c \"~/.emacs.d/bin/org-tangle ~/.doom.d/README.org\""))))
+
+(add-hook 'after-save-hook 'tangle-init-async)
+#+END_SRC
+** Generic
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! generic
+  :demand t
+  :config
+  (setq network-security-level 'high)
+  (map! :ne "M-=" (λ! (text-scale-set 0))
+        :ne "M-+" #'text-scale-increase
+        :ne "M--" #'text-scale-decrease)
+  (map! :ne "M-p" 'backward-paragraph
+        :ne "M-n" 'forward-paragraph))
+#+END_SRC
+* UI
+** Cursor
+#+BEGIN_SRC emacs-lisp :tangle config.el
+  (setq-default cursor-type '(hbar . 2))
+  (setq x-stretch-cursor t)
+
+  (def-package! frame
+    :config
+    (defun set-cursor-hook (frame)
+      (modify-frame-parameters
+       frame (list (cons 'cursor-color "white"))))
+
+    (add-hook 'after-make-frame-functions 'set-cursor-hook))
+#+END_SRC
+** Font
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq doom-font (font-spec :family "MonacoB" :size 15))
+#+END_SRC
+** Modeline
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! doom-modeline
+  :config
+  (setq doom-modeline-icon nil
+        doom-modeline-height 12))
+#+END_SRC
+** Neotree
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! neotree
+  :config
+  (setq neo-theme 'ascii)
+  (defun shrink-root-entry (node)
+    "shrink-print pwd in neotree"
+    (insert (propertize (concat (shrink-path-dirs node) "\n") 'face `(:inherit (,neo-root-dir-face)))))
+
+  (advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry))
+#+END_SRC
+** Theme
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! vibrant-ink-theme :recipe (:fetcher github :repo "arkhan/vibrant-ink-theme"))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! vibrant-ink-theme
+  :config (add-hook 'after-init-hook
+                    (lambda ()
+                      (load-theme 'vibrant-ink t))))
+#+END_SRC
+* Prog
+** Python
+*** Disable Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! anaconda-mode :disable t)
+(package! conda :disable t)
+(package! company-anaconda :disable t)
+(package! pipenv :disable t)
+#+END_SRC
+*** lsp-python
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(add-hook! python-mode
+  (setq python-shell-interpreter "python"
+        lsp-pyls-configuration-sources ["flake8"]
+        lsp-pyls-plugins-pylint-enabled nil))
+
+(add-hook 'python-mode-hook 'lsp)
+#+END_SRC
+*** pyenv
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! pyenv-mode-auto)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! pyenv-mode-auto)
+#+END_SRC
+* Tools
+** mu4e
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! link-hint)
+(package! mu4e-alert)
+(package! mu4e-maildirs-extension)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! link-hint)
+(def-package! mu4e
+  :preface
+  (defadvice mu4e (before mu4e-start activate)
+    "Antes de ejecutar `mu4e' borramos todas las ventanas"
+    (when (> 1 (count-windows))
+      (window-configuration-to-register :mu4e-fullscreen)
+      (delete-other-windows)))
+
+  (defadvice mu4e-quit (after mu4e-close-and-push activate)
+    "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
+    (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
+    (when (get-register :mu4e-fullscreen)
+      (jump-to-register :mu4e-fullscreen)))
+  :init
+  (def-package! mu4e-contrib)
+  (setq mail-user-agent 'mu4e-user-agent
+        message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
+        message-citation-line-function 'message-insert-formatted-citation-line
+        message-cite-reply-position 'below
+        message-kill-buffer-on-exit t
+        message-send-mail-function 'message-send-mail-with-sendmail
+        mu4e-attachment-dir  "~/Descargas"
+        mu4e-auto-retrieve-keys t
+        mu4e-compose-context-policy 'ask
+        mu4e-compose-dont-reply-to-self t
+        mu4e-compose-keep-self-cc nil
+        mu4e-context-policy 'pick-first
+        mu4e-headers-date-format "%Y-%m-%d %H:%M"
+        mu4e-headers-include-related t
+        mu4e-headers-auto-update nil
+        mu4e-headers-leave-behavior 'ignore
+        mu4e-headers-visible-lines 8
+        mu4e-headers-fields '((:date . 25)
+                              (:flags . 6)
+                              (:from . 22)
+                              (:subject . nil))
+        mu4e-view-prefer-html t
+        mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
+        mu4e-maildir "~/.mail"
+        mu4e-view-show-images t
+        sendmail-program "msmtp"
+        mu4e-get-mail-command "mbsync -aV")
+
+  (defun mu4e-message-maildir-matches (msg rx)
+    (when rx
+      (if (listp rx)
+          ;; If rx is a list, try each one for a match
+          (or (mu4e-message-maildir-matches msg (car rx))
+              (mu4e-message-maildir-matches msg (cdr rx)))
+        ;; Not a list, check rx
+        (string-match rx (mu4e-message-field msg :maildir)))))
+
+  (defun choose-msmtp-account ()
+    (if (message-mail-p)
+        (save-excursion
+          (let*
+              ((from (save-restriction
+                       (message-narrow-to-headers)
+                       (message-fetch-field "from")))
+               (account
+                (cond
+                 ((string-match "arkhan@disroot.org" from) "Personal")
+                 ((string-match "edison@disroot.org" from) "Work")
+                 ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
+            (setq message-sendmail-extra-arguments (list '"-a" account))))))
+
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+
+  (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
+
+  (setq mu4e-contexts
+        `( ,(make-mu4e-context
+             :name "Personal"
+             :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Personal")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "arkhan@disroot.org")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Personal/Sent")
+                     (mu4e-drafts-folder    . "/Personal/Drafts")
+                     (mu4e-trash-folder     . "/Personal/Trash")
+                     (mu4e-refile-folder    . "/Personal/Archive")))
+           ,(make-mu4e-context
+             :name "Work"
+             :enter-func (lambda () (mu4e-message "Switch to the Work context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Work")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "edison@disroot.org")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Work/Sent")
+                     (mu4e-drafts-folder    . "/Work/Drafts")
+                     (mu4e-trash-folder     . "/Work/Trash")
+                     (mu4e-refile-folder    . "/Work/Archive")))
+           ,(make-mu4e-context
+             :name "Work"
+             :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Gmail")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "arkhan.xxx@gmail.com")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Work/Sent Items")
+                     (mu4e-drafts-folder    . "/Work/Drafts")
+                     (mu4e-trash-folder     . "/Work/Deleted Items")
+                     (mu4e-refile-folder    . "/Work/Archive")))))
+
+  (add-hook 'message-send-mail-hook 'choose-msmtp-account)
+  (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
+
+  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
+  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
+
+  (def-package! mu4e-alert
+    :if (executable-find "mu")
+    :init
+    (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+    (setq mu4e-compose-forward-as-attachment t
+          mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
+          mu4e-compose-crypto-reply-plain-policy 'sign
+          mu4e-index-update-in-background t
+          mu4e-alert-email-notification-types '(subjects))
+    :config
+    (defun conf:refresh-mu4e-alert-mode-line ()
+      (interactive)
+      (mu4e~proc-kill)
+      (mu4e-alert-enable-mode-line-display))
+    (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
+    (mu4e-alert-set-default-style 'libnotify))
+
+  (def-package! org-mu4e
+    :config
+    (defun htmlize-and-send ()
+      "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+      (interactive)
+      (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+        (org-mime-htmlize)
+        (org-mu4e-compose-org-mode)
+        (mu4e-compose-mode)
+        (message-send-and-exit)))
+
+    ;; This overloads the amazing C-c C-c commands in org-mode with one more function
+    ;; namely the htmlize-and-send, above.
+    (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
+
+    ;; Originally, I set the `mu4e-compose-mode-hook' here, but
+    ;; this new hook works much, much better for me.
+    (add-hook 'mu4e-compose-post-hook
+              (defun do-compose-stuff ()
+                "My settings for message composition."
+                (org-mu4e-compose-org-mode))))
+
+  ;; (use-package mu4e-conversation
+  ;;   :after mu4e
+  ;;   :config
+  ;;   (setq mu4e-conversation-print-function 'mu4e-conversation-print-tree
+  ;;         mu4e-compose-dont-reply-to-self t
+  ;;         mu4e-conversation-kill-buffer-on-exit t)
+  ;;   (global-mu4e-conversation-mode))
+
+  (def-package! mu4e-maildirs-extension
+    :after mu4e
+    :config (mu4e-maildirs-extension))
+#+END_SRC

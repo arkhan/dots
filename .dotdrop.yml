@@ -5,106 +5,115 @@ config:
   dotpath: .dots
   ignoreempty: false
   keepdot: false
-  link_by_default: true
+  link_dotfile_default: nolink
+  link_on_import: link
   longkey: false
   showdiff: false
   workdir: ~/.config/dotdrop
 dotfiles:
   d_bin:
     dst: ~/.bin
-    link: true
+    link: link
     src: bin
   d_bspwm:
     dst: ~/.config/bspwm
-    link: true
+    link: link
     src: config/bspwm
+  d_doom.d:
+    dst: ~/.doom.d
+    link: link
+    src: doom.d
   d_dunst:
     dst: ~/.config/dunst
-    link: true
+    link: link
     src: config/dunst
-  d_emacs.d:
-    dst: ~/.emacs.d
-    link: true
-    src: emacs
+  # d_emacs.d:
+  #   dst: ~/.emacs.d
+  #   link: link
+  #   src: emacs
   d_i3:
     dst: ~/.config/i3
-    link: true
+    link: link
     src: config/i3
+  d_mpd:
+    dst: ~/.config/mpd
+    link: link
+    src: config/mpd
   d_networkmanager-dmenu:
     dst: ~/.config/networkmanager-dmenu
-    link: true
+    link: link
     src: config/networkmanager-dmenu
   d_polybar:
     dst: ~/.config/polybar
-    link: true
+    link: link
     src: config/polybar
   d_qutebrowser:
     dst: ~/.config/qutebrowser
-    link: true
+    link: link
     src: config/qutebrowser
   d_ranger:
     dst: ~/.config/ranger
-    link: true
+    link: link
     src: config/ranger
   d_rofi:
     dst: ~/.config/rofi
-    link: true
+    link: link
     src: config/rofi
   d_rofi-pass:
     dst: ~/.config/rofi-pass
-    link: true
+    link: link
     src: config/rofi-pass
   d_sxhkd:
     dst: ~/.config/sxhkd
-    link: true
+    link: link
     src: config/sxhkd
   d_teiler:
     dst: ~/.config/teiler
-    link: true
+    link: link
     src: config/teiler
   d_walls:
     dst: ~/.config/walls
-    link: true
+    link: link
     src: walls
   f_compton.conf:
     dst: ~/.compton.conf
-    link: true
+    link: link
     src: compton.conf
   f_editorconfig:
     dst: ~/.editorconfig
-    link: true
+    link: link
     src: editorconfig
   f_ncmpcpp:
     dst: ~/.config/ncmpcpp
-    link: true
+    link: link
     src: config/ncmpcpp
   f_rtorrent.rc:
     dst: ~/.rtorrent.rc
-    link: true
+    link: link
     src: rtorrent.rc
   f_safe-rm:
     dst: ~/.config/safe-rm
-    link: true
+    link: link
     src: config/safe-rm
   f_tmux.conf:
     dst: ~/.tmux.conf
-    link: true
+    link: link
     src: tmux.conf
   f_xprofile:
     dst: ~/.xprofile
-    link: true
+    link: link
     src: xprofile
   f_xresources:
     dst: ~/.Xresources
-    link: true
+    link: link
     src: Xresources
   f_zaturarc:
     dst: ~/.config/zathura/zathurarc
-    link: true
+    link: link
     src: config/zathura/zathurarc
   f_zshrc:
     dst: ~/.zshrc
-    link: true
+    link: link
     src: zshrc
 profiles:
   Pantheon:

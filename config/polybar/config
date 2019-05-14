@@ -48,6 +48,48 @@ modules-left = i3 mpd
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
 
+[module/bsp]
+type = internal/bspwm
+inline-mode = false
+fuzzy-match = true
+
+pin-workspaces = true
+
+ws-icon-default = 
+ws-icon-0 = 0;
+ws-icon-1 = 1;
+ws-icon-2 = 2;
+ws-icon-3 = 3;
+ws-icon-4 = 4;
+ws-icon-5 = 5;
+ws-icon-6 = 6;
+ws-icon-7 = 7;
+ws-icon-8 = 8;
+ws-icon-9 = 9;
+
+format = <label-state> <label-mode>
+
+label-dimmed-underline = ${colors.fg_normal}
+
+label-focused = %icon%
+label-focused-background = ${colors.bg_focus}
+label-focused-foreground = ${colors.fg_focus}
+label-focused-padding = 1
+label-focused-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-empty =
+
 [module/i3]
 type = internal/i3
 pin-workspaces = true
@@ -101,15 +143,10 @@ host = 127.0.0.1
 port = 6600
 interval = 1
 
-format-online = <label-song> <bar-progress> <label-time>
-label-song = %artist% - %title%
+format-online = <label-song> <label-time>
+label-song = %artist% - %album% - %title%
 
 label-offline =
-
-bar-progress-width = 10
-bar-progress-indicator = |
-bar-progress-fill = ─
-bar-progress-empty = ─
 
 [module/battery]
 type = internal/battery
@@ -175,7 +212,7 @@ animation-packetloss-framerate = 500
 
 [module/wired]
 type = internal/network
-interface = net0
+interface = eth0
 interval = 1.0
 format-connected = <ramp-signal> <label-connected>
 label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}

@@ -1,11 +1,19 @@
 *.el
+*.el~
 *.elc
 *.log
 *.pyc
+*.sql
 
+log
+pid
+database
+state
 
 emacs/elpa/
 emacs/cache/
+emacs/.cache/
+emacs/emms/
 emacs/local/
 emacs/straight/
 /config/teiler/profiles/
@@ -14,3 +22,4 @@ emacs/straight/
 /config/qutebrowser/bookmarks/urls
 *.extmap
 /config/qutebrowser/qsettings/
+/config/mpd/playlists/
