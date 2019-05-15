@@ -22,15 +22,15 @@ dotfiles:
   d_doom.d:
     dst: ~/.doom.d
     link: link
-    src: doom.d
+    src: doom
   d_dunst:
     dst: ~/.config/dunst
     link: link
     src: config/dunst
-  # d_emacs.d:
-  #   dst: ~/.emacs.d
-  #   link: link
-  #   src: emacs
+  d_emacs.d:
+    dst: ~/.emacs.d
+    link: link
+    src: emacs
   d_i3:
     dst: ~/.config/i3
     link: link

@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+[[ -d $HOME/.emacs.d/bin ]] && export PATH=$HOME/.emacs.d/bin:$PATH
 [[ -d $HOME/.bin ]] && export PATH=$HOME/.bin:$PATH
 
 if [ -d $HOME/perl5 ]; then

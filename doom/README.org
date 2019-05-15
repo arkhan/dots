@@ -15,11 +15,13 @@
   - [[#font][Font]]
   - [[#ivy][Ivy]]
     - [[#packages][Packages]]
-    - [[#ivy-posframe][ivy-posframe]]
+    - [[#ivi-posframe][ivi-posframe]]
     - [[#ivy-explorer][ivy-explorer]]
     - [[#swiper][Swiper]]
+  - [[#line-numbers][Line Numbers]]
   - [[#modeline][Modeline]]
   - [[#neotree][Neotree]]
+  - [[#pretty-code][Pretty Code]]
   - [[#theme][Theme]]
   - [[#which-key][Which-key]]
 - [[#prog][Prog]]
@@ -48,7 +50,8 @@
 (doom! :completion
        (company +auto
                 +childframe)
-       (ivy +fuzzy)
+       (ivy +fuzzy
+             +childframe)
 
        :ui
        doom-dashboard
@@ -118,9 +121,6 @@
        rest
        (sh +zsh)
 
-       :email
-       (mu4e +gmail)
-
        :app
        calendar
        (write +langtool)
@@ -168,21 +168,16 @@
 ** Ivy
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! ivy-posframe)
 (package! ivy-explorer)
 #+END_SRC
-*** ivy-posframe
+*** ivi-posframe
 #+BEGIN_SRC emacs-lisp :tangle config.el
- (def-package! ivy-posframe
-    :config
-    (setq ivy-posframe-width (frame-width)
-          ivy-posframe-hide-minibuffer nil
-          ivy-posframe-border-width 0
-          ivy-display-function #'ivy-posframe-display-at-frame-bottom-left)
-    (ivy-posframe-enable))
+(setq ivy-display-function #'ivy-posframe-display-at-frame-bottom-left
+      ivy-posframe-hide-minibuffer nil
+      ivy-posframe-border-width 0)
 #+END_SRC
 *** ivy-explorer
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! ivy-explorer
     :diminish ivy-explorer-mode
     :config
@@ -200,6 +195,10 @@
   (:map read-expression-map
     ("C-r" . counsel-minibuffer-history)))
 #+END_SRC
+** Line Numbers
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq display-line-numbers-type nil)
+#+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! doom-modeline
@@ -209,14 +208,49 @@
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! neotree
-  :config
-  (setq neo-theme 'ascii)
-  (defun shrink-root-entry (node)
-    "shrink-print pwd in neotree"
-    (insert (propertize (concat (shrink-path-dirs node) "\n") 'face `(:inherit (,neo-root-dir-face)))))
+(setq neo-theme 'ascii
+      neo-vc-integration nil
+      neo-window-width 36
+      neo-create-file-auto-open t
+      neo-smart-open t
+      neo-show-auto-change-root t
+      neo-autorefresh t
+      neo-banner-message nil
+      neo-mode-line-type 'neotree
+      neo-dont-be-alone t
+      neo-persist-show t
+      neo-show-updir-line nil
+      neo-show-hidden-files nil
+      neo-auto-indent-point t
+      neo-hidden-regexp-list '(".DS_Store" ".idea/" ".pyc" ".tern-port"
+                               ".git/*" "node_modules/*" ".meteor" "_build" "deps"))
+(defun shrink-root-entry (node)
+  "shrink-print pwd in neotree"
+  (insert (propertize (concat (shrink-path-dirs node) "\n") 'face `(:inherit (,neo-root-dir-face)))))
+(advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry)
+#+END_SRC
+** Pretty Code
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq +pretty-code-symbols
+      '(:name "»"
+        :src_block "»"
+        :src_block_end "«"
+        :lambda "λ"
+        :not "￢"
+        :in "∈"
+        :not-in "∉"
+        :and "∧"
+        :or "∨"))
 
-  (advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry))
+(defvar +pretty-code-extra-ligatures
+  '(("==" . ?\u2261)
+    ("!=" . ?\u2260)
+    (">=" . ?\u2265)
+    ("<=" . ?\u2264)))
+
+(setq-default prettify-symbols-alist
+              (append prettify-symbols-alist
+                      +pretty-code-extra-ligatures))
 #+END_SRC
 ** Theme
 #+BEGIN_SRC emacs-lisp :tangle packages.el
