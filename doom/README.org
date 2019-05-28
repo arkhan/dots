@@ -3,76 +3,6 @@
 #+SINCE:   {replace with next tagged release version}
 #+STARTUP: inlineimages
 
-* Table of Contents :TOC_5:noexport:
-- [[#config][Config]]
-  - [[#initel][init.el]]
-    - [[#initel-1][init.el]]
-    - [[#auto-tangle][Auto Tangle]]
-  - [[#lang][Lang]]
-- [[#editor][Editor]]
-  - [[#company][Company]]
-    - [[#packages][Packages]]
-    - [[#config-1][Config]]
-  - [[#move-dup][Move-dup]]
-    - [[#packages-1][Packages]]
-    - [[#config-2][Config]]
-  - [[#snnipets][Snnipets]]
-    - [[#packages-2][Packages]]
-    - [[#config-3][Config]]
-- [[#ui][UI]]
-  - [[#cursor][Cursor]]
-  - [[#fringe][Fringe]]
-  - [[#font][Font]]
-  - [[#ivy][Ivy]]
-    - [[#packages-3][Packages]]
-    - [[#ivy-prescient][ivy-prescient]]
-    - [[#ivy-posframe][ivy-posframe]]
-    - [[#ivy-explorer][ivy-explorer]]
-    - [[#swiper][Swiper]]
-  - [[#line-numbers][Line Numbers]]
-  - [[#modeline][Modeline]]
-  - [[#neotree][Neotree]]
-  - [[#pretty-code][Pretty Code]]
-  - [[#theme][Theme]]
-  - [[#which-key][Which-key]]
-- [[#lang-1][Lang]]
-  - [[#python][Python]]
-    - [[#disable-packages][Disable Packages]]
-    - [[#lsp-python][lsp-python]]
-    - [[#pyenv][pyenv]]
-      - [[#packages-4][packages]]
-      - [[#config-4][config]]
-  - [[#po][PO]]
-  - [[#org][Org]]
-  - [[#xml][Xml]]
-- [[#tools][Tools]]
-  - [[#bughunter][BugHunter]]
-    - [[#packages-5][Packages]]
-    - [[#config-5][Config]]
-  - [[#calendar][Calendar]]
-    - [[#packages-6][Packages]]
-    - [[#config-6][Config]]
-  - [[#flyspell][Flyspell]]
-  - [[#i3wm][i3wm]]
-    - [[#packages-7][Packages]]
-    - [[#config-7][Config]]
-  - [[#terminal][Terminal]]
-    - [[#packages-8][Packages]]
-    - [[#config-8][Config]]
-  - [[#mu4e][mu4e]]
-    - [[#packages-9][Packages]]
-    - [[#config-9][Config]]
-  - [[#pass][Pass]]
-  - [[#pkgbuild][PKGBUILD]]
-    - [[#packages-10][Packages]]
-    - [[#config-10][Config]]
-  - [[#vlf][VLF]]
-    - [[#packages-11][Packages]]
-    - [[#config-11][Config]]
-  - [[#xrdb][xrdb]]
-    - [[#packages-12][Packages]]
-    - [[#config-12][Config]]
-
 * Config
 ** init.el
 *** init.el
@@ -82,7 +12,8 @@
 (doom! :completion
        (company +auto
                 +childframe)
-       (ivy +childframe)
+       (ivy +childframe
+            +icons)
 
        :ui
        doom-dashboard
@@ -121,10 +52,8 @@
        editorconfig
        eval
        flycheck
-       (flyspell +hunspell
-                 +prog)
+       (flyspell +hunspell)
        (lookup +docsets)
-       lsp
        magit
        make
        pass
@@ -151,6 +80,7 @@
        (sh +zsh)
 
        :email
+       mu4e
 
        :app
        (write +langtool)
@@ -229,6 +159,11 @@
        frame (list (cons 'cursor-color "white"))))
 
     (add-hook 'after-make-frame-functions 'set-cursor-hook))
+
+(add-to-list 'default-frame-alist
+             '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist
+             '(ns-appearance . dark))
 #+END_SRC
 ** Fringe
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -283,17 +218,21 @@
 (setq display-line-numbers-type nil)
 #+END_SRC
 ** Modeline
-#+BEGIN_SRC emacs-lisp :tangle config.el
+#+BEGIN_SRC emacs-lisp :tangle no
 (def-package! doom-modeline
   :config
   (setq doom-modeline-icon nil
-        doom-modeline-height 12))
+        doom-modeline-height 12)
+  (defsubst fake-font-height () 0)
+  (advice-add #'doom-modeline--font-height :override #'fake-font-height))
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! shrink-path)
+
 (def-package! neotree
   :config
-  (setq neo-theme 'ascii
+  (setq neo-theme 'icons
         neo-vc-integration nil
         neo-window-width 36
         neo-create-file-auto-open t
@@ -363,13 +302,13 @@
 ** Python
 *** Disable Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! anaconda-mode :disable t)
-(package! conda :disable t)
-(package! company-anaconda :disable t)
+;;(package! anaconda-mode :disable t)
+;;(package! conda :disable t)
+;;(package! company-anaconda :disable t)
 (package! pipenv :disable t)
 #+END_SRC
 *** lsp-python
-#+BEGIN_SRC emacs-lisp :tangle config.el
+#+BEGIN_SRC emacs-lisp :tangle no
 (add-hook! python-mode
   (setq python-shell-interpreter "python"
         lsp-pyls-configuration-sources ["flake8"]
@@ -604,7 +543,6 @@
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! mu4e-alert)
-(package! mu4e-maildirs-extension)
 (package! link-hint)
 #+END_SRC
 *** Config
@@ -614,124 +552,51 @@
          ("C-c l c" . link-hint-copy-link)))
 
 (def-package! mu4e
-  :bind ("<f1>" . mu4e)
-  :preface
-  (defadvice mu4e (before mu4e-start activate)
-    "Antes de ejecutar `mu4e' borramos todas las ventanas"
-    (when (> 1 (count-windows))
-      (window-configuration-to-register :mu4e-fullscreen)
-      (delete-other-windows)))
+  :init
+  (setq mu4e-context-policy nil
+        mu4e-compose-context-policy 'ask
+        mu4e-view-use-gnus nil)
 
   (defadvice mu4e-quit (after mu4e-close-and-push activate)
     "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
     (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
     (when (get-register :mu4e-fullscreen)
       (jump-to-register :mu4e-fullscreen)))
-  :init
-  (require 'mu4e-contrib)
-  (setq mail-user-agent 'mu4e-user-agent
-        message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
-        message-citation-line-function 'message-insert-formatted-citation-line
-        message-cite-reply-position 'below
-        message-kill-buffer-on-exit t
-        message-send-mail-function 'message-send-mail-with-sendmail
-        mu4e-attachment-dir  "~/Descargas"
-        mu4e-auto-retrieve-keys t
-        mu4e-compose-context-policy 'ask
-        mu4e-compose-complete-addresses t
-        mu4e-compose-dont-reply-to-self t
-        mu4e-compose-keep-self-cc nil
-        mu4e-context-policy 'pick-first
-        mu4e-headers-date-format "%Y-%m-%d %H:%M"
-        mu4e-headers-include-related t
-        mu4e-headers-auto-update nil
-        mu4e-headers-leave-behavior 'ignore
-        mu4e-headers-visible-lines 8
-        mu4e-headers-fields '((:date . 25)
-                              (:flags . 6)
-                              (:from . 22)
-                              (:subject . nil))
-        mu4e-view-prefer-html t
-        mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
-        mu4e-maildir "~/.mail"
-        mu4e-view-show-images t
-        sendmail-program "msmtp"
-        mu4e-get-mail-command "mbsync -aV")
 
-  (defun mu4e-message-maildir-matches (msg rx)
-    (when rx
-      (if (listp rx)
-          ;; If rx is a list, try each one for a match
-          (or (mu4e-message-maildir-matches msg (car rx))
-              (mu4e-message-maildir-matches msg (cdr rx)))
-        ;; Not a list, check rx
-        (string-match rx (mu4e-message-field msg :maildir)))))
-
-  (defun choose-msmtp-account ()
-    (if (message-mail-p)
-        (save-excursion
-          (let*
-              ((from (save-restriction
-                       (message-narrow-to-headers)
-                       (message-fetch-field "from")))
-               (account
-                (cond
-                 ((string-match "arkhan@disroot.org" from) "Personal")
-                 ((string-match "edison@disroot.org" from) "Work")
-                 ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
-            (setq message-sendmail-extra-arguments (list '"-a" account))))))
-
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
-
-  (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
-
-  (setq mu4e-contexts
-        `(,(make-mu4e-context
-            :name "Personal"
-            :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
-            :match-func (lambda (msg)
-                          (when msg
-                            (mu4e-message-maildir-matches msg "^/Personal")))
-            :leave-func (lambda () (mu4e-clear-caches))
-            :vars '((user-mail-address     . "arkhan@disroot.org")
-                    (user-full-name        . "Edison Ibáñez")
-                    (mu4e-sent-folder      . "/Personal/Sent")
-                    (mu4e-drafts-folder    . "/Personal/Drafts")
-                    (mu4e-trash-folder     . "/Personal/Trash")
-                    (mu4e-refile-folder    . "/Personal/Archive")))
-          ,(make-mu4e-context
-            :name "Work"
-            :enter-func (lambda () (mu4e-message "Switch to the Work context"))
-            :match-func (lambda (msg)
-                          (when msg
-                            (mu4e-message-maildir-matches msg "^/Work")))
-            :leave-func (lambda () (mu4e-clear-caches))
-            :vars '((user-mail-address     . "edison@disroot.org")
-                    (user-full-name        . "Edison Ibáñez")
-                    (mu4e-sent-folder      . "/Work/Sent")
-                    (mu4e-drafts-folder    . "/Work/Drafts")
-                    (mu4e-trash-folder     . "/Work/Trash")
-                    (mu4e-refile-folder    . "/Work/Archive")))
-          ,(make-mu4e-context
-            :name "Gmail"
-            :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
-            :match-func (lambda (msg)
-                          (when msg
-                            (mu4e-message-maildir-matches msg "^/Gmail")))
-            :leave-func (lambda () (mu4e-clear-caches))
-            :vars '((user-mail-address     . "arkhan.xxx@gmail.com")
-                    (user-full-name        . "Edison Ibáñez")
-                    (mu4e-sent-folder      . "/Gmail/Sent Items")
-                    (mu4e-drafts-folder    . "/Gmail/Drafts")
-                    (mu4e-trash-folder     . "/Gmail/Deleted Items")
-                    (mu4e-refile-folder    . "/Gmail/Archive")))))
-
-  (add-hook 'message-send-mail-hook 'choose-msmtp-account)
   (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
 
-  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
-  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
+  (set-email-account! "Work"
+                      '((mu4e-sent-folder       . "/Work/Sent")
+                        (mu4e-drafts-folder     . "/Work/Drafts")
+                        (mu4e-trash-folder      . "/Work/Trash")
+                        (mu4e-refile-folder     . "/Work/Archive")
+                        (smtpmail-smtp-user     . "edison@disroot.org")
+                        (user-mail-address      . "edison@disroot.org")
+                        (user-full-name         . "Edison Ibáñez")
+                        (mu4e-compose-signature . "\nEdison Ibáñez"))
+                      t)
+
+  (set-email-account! "Personal"
+                      '((mu4e-sent-folder       . "/Personal/Sent")
+                        (mu4e-drafts-folder     . "/Personal/Drafts")
+                        (mu4e-trash-folder      . "/Personal/Trash")
+                        (mu4e-refile-folder     . "/Personal/Archive")
+                        (smtpmail-smtp-user     . "arkhan@disroot.org")
+                        (user-mail-address      . "arkhan@disroot.org")
+                        (user-full-name         . "Edison Ibáñez")
+                        (mu4e-compose-signature . "\nEdison Ibáñez"))
+                      t)
+
+  (set-email-account! "Gmail"
+                      '((mu4e-sent-folder       . "/Gmail/Sent Items")
+                        (mu4e-drafts-folder     . "/Gmail/Drafts")
+                        (mu4e-trash-folder      . "/Gmail/Deleted Items")
+                        (mu4e-refile-folder     . "/Gmail/Archive")
+                        (smtpmail-smtp-user     . "arkhan.xxx@gmail.com")
+                        (user-mail-address      . "arkhan.xxx@gmail.com")
+                        (user-full-name         . "Edison Ibáñez")
+                        (mu4e-compose-signature . "\nEdison Ibáñez"))
+                      t))
 
 (def-package! mu4e-alert
   :init
@@ -744,14 +609,9 @@
   (defun conf:refresh-mu4e-alert-mode-line ()
     (interactive)
     (mu4e~proc-kill)
-
     (mu4e-alert-enable-mode-line-display))
   (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
   (mu4e-alert-set-default-style 'libnotify))
-
-(def-package! mu4e-maildirs-extension
-  :after mu4e
-  :config (mu4e-maildirs-extension))
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el

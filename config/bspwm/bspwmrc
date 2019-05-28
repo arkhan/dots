@@ -54,12 +54,12 @@ xrdb ~/.Xresources &
 # Wallpaper
 [[ -e $HOME/.fehbg ]] && $HOME/.fehbg &
 # i3lock Fancy
-[[ -z `pgrep xss-lock` ]] && xss-lock -- i3lock-fancy -p &
+[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy -p &
 # clipboard
-[[ -z `pgrep clipboard` ]] && ~/.bin/clipboard &
+[[ -z $(pgrep clipboard) ]] && ~/.bin/clipboard &
 # panel
-[[ -z `pgrep panel` ]] && ~/.bin/panel &
+[[ -z $(pgrep panel) ]] && ~/.bin/panel &
 # udiskie
-[[ -z `pgrep udiskie` ]] && udiskie &
+[[ -z $(pgrep udiskie) ]] && udiskie &
 # sxhkd
-[[ -z `pgrep sxhkd` ]] && sxhkd &
+[[ -z $(pgrep sxhkd) ]] && sxhkd &

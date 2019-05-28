@@ -14,3 +14,18 @@ use_udp_trackers = yes
 dht = auto
 peer_exchange = yes
 system.method.set_key = event.download.finished,move_complete,"execute=mv,-u,$d.get_base_path=,~/rtorrent/share/;d.set_directory=~/rtorrent/share/"
+
+ui.color.complete.set=41
+ui.color.stopped.set=33
+
+ui.color.footer.set="bright cyan on 20"
+ui.color.even.set="on 234"
+ui.color.odd.set="on 232"
+
+ui.color.progress0.set=196
+ui.color.progress20.set=202
+ui.color.progress40.set=213
+ui.color.progress60.set=214
+ui.color.progress80.set=226
+ui.color.progress100.set=41
+ui.color.progress120.set="bold bright green"

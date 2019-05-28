@@ -75,11 +75,6 @@ ZSH_THEME_GIT_PROMPT_PREFIX=""
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
 ZSH_THEME_GIT_PROMPT_SEPARATOR=" "
 
-async_init
-
-# cache variable
-typeset -Ag prompt_data
-
 # section for dir
 function prompt_dir() {
   echo '%B%F{black}$(shrink_path -f)%f%b'
@@ -108,6 +103,11 @@ prompt_callback() {
   prompt_data[$job]=$output
   prompt_refresh
 }
+
+async_init
+
+# cache variable
+typeset -Ag prompt_data
 
 # Start async worker
 async_start_worker prompt_async -n
