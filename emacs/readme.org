@@ -440,21 +440,23 @@
 #+end_src
 * Flycheck
 #+begin_src emacs-lisp
-  (use-package flycheck
+(use-package flycheck
+  :defer 1
+  :bind (("C-c e n" . flycheck-next-error)
+         ("C-c e p" . flycheck-previous-error))
+  :config
+  (setq-default flycheck-disabled-checkers
+                (append flycheck-disabled-checkers
+                        '(javascript-jshint)))
 
-    :defer 1
-    :bind (("C-c e n" . flycheck-next-error)
-           ("C-c e p" . flycheck-previous-error))
-    :config
-    (add-hook 'after-init-hook #'global-flycheck-mode)
+  (setq-default flycheck-disabled-checkers
+                (append flycheck-disabled-checkers
+                        '(json-jsonlist)))
+  :hook (after-init . global-flycheck-mode))
 
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(javascript-jshint)))
-
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(json-jsonlist))))
+(use-package flycheck-posframe
+  :after flycheck
+  :hook (flycheck-mode . flycheck-posframe-mode))
 #+end_src
 * Flymake
 #+begin_src emacs-lisp :tangle no
@@ -467,66 +469,66 @@
 #+end_src
 * Flyspell
 #+begin_src emacs-lisp
-  (use-package flyspell
-    :bind (("C-c t s" . flyspell-mode)
-           ("C-c l b" . flyspell-buffer)
-           :map flyspell-mode-map
-           ("\M-\t" . nil)
-           ([down-mouse-2] . nil)
-           ([mouse-2] . nil))
-    :init
-    (dolist (hook '(TeX-mode-hook LaTeX-mode-hook text-mode-hook message-mode-hook markdown-mode-hook org-mode-hook))
-      (add-hook hook 'turn-on-flyspell))
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-    :config
-    (setq flyspell-use-meta-tab nil
-          flyspell-issue-welcome-flag nil
-          flyspell-issue-message-flag nil)
+(use-package flyspell
+  :bind (("C-c t s" . flyspell-mode)
+         ("C-c l b" . flyspell-buffer)
+         :map flyspell-mode-map
+         ("\M-\t" . nil)
+         ([down-mouse-2] . nil)
+         ([mouse-2] . nil))
+  :init
+  (dolist (hook '(TeX-mode-hook LaTeX-mode-hook text-mode-hook message-mode-hook markdown-mode-hook org-mode-hook))
+    (add-hook hook 'turn-on-flyspell))
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  :config
+  (setq flyspell-use-meta-tab nil
+        flyspell-issue-welcome-flag nil
+        flyspell-issue-message-flag nil)
 
-    (setq-default ispell-program-name "hunspell"
-                  ispell-really-hunspell t
-                  ispell-check-comments t
-                  ispell-local-dictionary "en_US"
-                  ispell-local-dictionary-alist
-                  '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
-                    ("es_EC" "[[:alpha:]]" "[^[:alpha:]]" "[ñ]" nil ("-d" "es_EC") nil utf-8)))
+  (setq-default ispell-program-name "hunspell"
+                ispell-really-hunspell t
+                ispell-check-comments t
+                ispell-local-dictionary "en_US"
+                ispell-local-dictionary-alist
+                '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+                  ("es_EC" "[[:alpha:]]" "[^[:alpha:]]" "[ñ]" nil ("-d" "es_EC") nil utf-8)))
 
-    (defun switch-dictionary ()
-      (interactive)
-      (let* ((dic ispell-current-dictionary)
-             (change (if (string= dic "en_US") "es_EC" "en_US")))
-        (ispell-change-dictionary change)
-        (message "Dictionary switched from %s to %s" dic change)))
+  (defun switch-dictionary ()
+    (interactive)
+    (let* ((dic ispell-current-dictionary)
+           (change (if (string= dic "en_US") "es_EC" "en_US")))
+      (ispell-change-dictionary change)
+      (message "Dictionary switched from %s to %s" dic change)))
 
-    (defun turn-on-spell-check ()
-      (flyspell-mode 1))
+  (defun turn-on-spell-check ()
+    (flyspell-mode 1))
 
-    (global-set-key (kbd "M-i") 'switch-dictionary)
+  (global-set-key (kbd "M-i") 'switch-dictionary)
 
-    (defun flyspell-add-word-to-dict ()
-      "Add the word at the current location to the private dictionary
+  (defun flyspell-add-word-to-dict ()
+    "Add the word at the current location to the private dictionary
        without question."
-      (interactive)
-      ;; use the correct dictionary
-      (flyspell-accept-buffer-local-defs)
-      (setq opoint (point-marker))
-      (let ((cursor-location (point))
-            (word (flyspell-get-word nil)))
-        (if (consp word)
-            (let ((start (car (cdr word)))
-                  (end (car (cdr (cdr word))))
-                  (word (car word)))
-              ;; The word is incorrect, we have to propose a replacement.
-              (flyspell-do-correct 'save nil word cursor-location start end opoint)))
-        (ispell-pdict-save t)))
+    (interactive)
+    ;; use the correct dictionary
+    (flyspell-accept-buffer-local-defs)
+    (setq opoint (point-marker))
+    (let ((cursor-location (point))
+          (word (flyspell-get-word nil)))
+      (if (consp word)
+          (let ((start (car (cdr word)))
+                (end (car (cdr (cdr word))))
+                (word (car word)))
+            ;; The word is incorrect, we have to propose a replacement.
+            (flyspell-do-correct 'save nil word cursor-location start end opoint)))
+      (ispell-pdict-save t)))
 
-    (define-key flyspell-mode-map [(control ?\")] 'flyspell-add-word-to-dict))
+  (define-key flyspell-mode-map [(control ?\")] 'flyspell-add-word-to-dict))
 
-  (use-package flyspell-correct-popup
-    :bind ("C-M-'" . flyspell-correct-wrapper)
-    :init
-    (setq flyspell-correct-interface #'flyspell-correct-popup
-          flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
+(use-package flyspell-correct-popup
+  :bind ("C-M-'" . flyspell-correct-wrapper)
+  :init
+  (setq flyspell-correct-interface #'flyspell-correct-popup
+        flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
 #+end_src
 * Font
 #+begin_src emacs-lisp
@@ -553,196 +555,192 @@
 #+end_src
 * Git
 #+begin_src emacs-lisp
-  (setq vc-follows-symlinks t
-        find-file-visit-truename t
-        vc-handled-backends nil)
+(setq vc-follows-symlinks t
+      find-file-visit-truename t
+      vc-handled-backends nil)
 
-    (use-package transient
-      :config (setq transient-history-file (concat conf:cache-dir "transient.el")))
+(use-package transient
+  :config (setq transient-history-file (concat conf:cache-dir "transient.el")))
 
-    (use-package magit
+(use-package magit
 
-      :bind (("C-x g c" . magit-commit-create)
-             ("C-x g e" . magit-ediff-resolve)
-             ("C-x g g" . magit-grep)
-             ("C-x g l" . magit-file-log)
-             ("C-x g p" . magit-push-other)
-             ("C-x g r" . magit-rebase-interactive)
-             ("C-x g s" . magit-status)
-             ("C-x g u" . magit-pull-other)
-             ("C-x g x" . magit-checkout))
-      :init
-      (progn
-        (setq magit-git-executable "tg")
-        (delete 'Git vc-handled-backends)
-        (defadvice magit-status (around magit-fullscreen activate)
-          (window-configuration-to-register :magit-fullscreen)
-          ad-do-it
-          (delete-other-windows))
-        (defadvice git-commit-commit (after delete-window activate)
-          (delete-window))
-        (defadvice git-commit-abort (after delete-window activate)
-          (delete-window))
-        (defun magit-commit-mode-init ()
-          (when (looking-at "\n")
-            (open-line 1))))
-      :config
-      (progn
-        (defadvice magit-quit-window (around magit-restore-screen activate)
-          (let ((current-mode major-mode))
-            ad-do-it
-            (when (eq 'magit-status-mode current-mode)
-              (jump-to-register :magit-fullscreen))))
-        (defun magit-maybe-commit (&optional show-options)
-          "Runs magit-commit unless prefix is passed"
-          (interactive "P")
-          (if show-options
-              (magit-key-mode-popup-committing)
-            (magit-commit-create)))
-        (define-key magit-mode-map "c" 'magit-maybe-commit)
+  :bind (("C-x g c" . magit-commit-create)
+         ("C-x g e" . magit-ediff-resolve)
+         ("C-x g g" . magit-grep)
+         ("C-x g l" . magit-file-log)
+         ("C-x g p" . magit-push-other)
+         ("C-x g r" . magit-rebase-interactive)
+         ("C-x g s" . magit-status)
+         ("C-x g u" . magit-pull-other)
+         ("C-x g x" . magit-checkout))
+  :init
+  (progn
+    (setq magit-git-executable "tg")
+    (delete 'Git vc-handled-backends)
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows))
+    (defadvice git-commit-commit (after delete-window activate)
+      (delete-window))
+    (defadvice git-commit-abort (after delete-window activate)
+      (delete-window))
+    (defun magit-commit-mode-init ()
+      (when (looking-at "\n")
+        (open-line 1))))
+  :config
+  (progn
+    (defadvice magit-quit-window (around magit-restore-screen activate)
+      (let ((current-mode major-mode))
+        ad-do-it
+        (when (eq 'magit-status-mode current-mode)
+          (jump-to-register :magit-fullscreen))))
+    (defun magit-maybe-commit (&optional show-options)
+      "Runs magit-commit unless prefix is passed"
+      (interactive "P")
+      (if show-options
+          (magit-key-mode-popup-committing)
+        (magit-commit-create)))
+    (define-key magit-mode-map "c" 'magit-maybe-commit)
 
-        (setq magit-completing-read-function 'ivy-completing-read
-              magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-              magit-status-buffer-switch-function 'switch-to-buffer
-              magit-diff-refine-hunk t
-              magit-rewrite-inclusive 'ask
-              magit-process-find-password-functions '(magit-process-password-auth-source)
-              magit-save-some-buffers t
-              magit-process-popup-time 10
-              magit-set-upstream-on-push 'askifnotset
-              magit-refs-show-commit-count 'all
-              magit-log-buffer-file-locket t)))
+    (setq magit-completing-read-function 'ivy-completing-read
+          magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+          magit-status-buffer-switch-function 'switch-to-buffer
+          magit-diff-refine-hunk t
+          magit-rewrite-inclusive 'ask
+          magit-process-find-password-functions '(magit-process-password-auth-source)
+          magit-save-some-buffers t
+          magit-process-popup-time 10
+          magit-set-upstream-on-push 'askifnotset
+          magit-refs-show-commit-count 'all
+          magit-log-buffer-file-locket t)))
 
-    (use-package magit-gitflow
-      :config
-      (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+(use-package magit-gitflow
+  :config
+  (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
 
-     (use-package git-gutter
-       :defer 1
-       :bind (("C-x C-g" . git-gutter)
-              ("C-x v =" . git-gutter:popup-hunk)
-             ("C-x p" . git-gutter:previous-hunk)
-             ("C-x n" . git-gutter:next-hunk)
-             ("C-x v s" . git-gutter:stage-hunk)
-             ("C-x v r" . git-gutter:revert-hunk)
-             ("C-x v SPC" . git-gutter:mark-hunk))
-      :config
-      (if (display-graphic-p)
-          (use-package git-gutter-fringe))
-      (global-git-gutter-mode t)
-      (setq indicate-empty-lines nil)
-      (setq git-gutter:lighter ""
-            git-gutter:handled-backends '(git hg bzr svn))
-      (set-face-foreground 'git-gutter:modified "purple")
-      (set-face-foreground 'git-gutter:added "green")
-      (set-face-foreground 'git-gutter:deleted "red"))
+(use-package git-gutter
+  :defer 1
+  :bind (("C-x C-g" . git-gutter)
+         ("C-x v =" . git-gutter:popup-hunk)
+         ("C-x p" . git-gutter:previous-hunk)
+         ("C-x n" . git-gutter:next-hunk)
+         ("C-x v s" . git-gutter:stage-hunk)
+         ("C-x v r" . git-gutter:revert-hunk)
+         ("C-x v SPC" . git-gutter:mark-hunk))
+  :config
+  (if (display-graphic-p)
+      (use-package git-gutter-fringe))
+  (global-git-gutter-mode t)
+  (setq indicate-empty-lines nil)
+  (setq git-gutter:lighter ""
+        git-gutter:handled-backends '(git hg bzr svn))
+  (set-face-foreground 'git-gutter:modified "purple")
+  (set-face-foreground 'git-gutter:added "green")
+  (set-face-foreground 'git-gutter:deleted "red"))
 
-   (use-package gitconfig-mode
-    :defer t
-    :mode ("/\\.?git/?config$"
-           "/\\.gitmodules$")
-    :init (add-hook 'gitconfig-mode-hook 'flyspell-mode))
+(use-package gitconfig-mode
+  :defer t
+  :mode ("/\\.?git/?config$"
+         "/\\.gitmodules$")
+  :init (add-hook 'gitconfig-mode-hook 'flyspell-mode))
 
-  (use-package gitignore-mode
-    :defer t
-    :mode ("/\\.gitignore$"
-           "/\\.git/info/exclude$"
-           "/git/ignore$"))
+(use-package gitignore-mode
+  :defer t
+  :mode ("/\\.gitignore$"
+         "/\\.git/info/exclude$"
+         "/git/ignore$"))
 
-  (use-package gitattributes-mode :defer t)
+(use-package gitattributes-mode :defer t)
 
-  (use-package git-timemachine
-    :defer t
-    :commands git-timemachine
-    :bind (:map git-timemachine-mode
-                ("c" . git-timemachine-show-current-revision)
-                ("b" . git-timemachine-switch-branch)))
+(use-package git-timemachine
+  :defer t
+  :commands git-timemachine
+  :bind (:map git-timemachine-mode
+              ("c" . git-timemachine-show-current-revision)
+              ("b" . git-timemachine-switch-branch)))
 
-  (use-package smerge-mode
-    :defer t
-    :config
-    (defun enable-smerge-maybe ()
-      (when (and buffer-file-name (vc-backend buffer-file-name))
-        (save-excursion
-          (goto-char (point-min))
-          (when (re-search-forward "^<<<<<<< " nil t)
-            (smerge-mode +1)))))
+(use-package smerge-mode
+  :defer t
+  :config
+  (defun enable-smerge-maybe ()
+    (when (and buffer-file-name (vc-backend buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^<<<<<<< " nil t)
+          (smerge-mode +1)))))
 
-    (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
-#+end_src
-* GraphViz
-#+begin_src emacs-lisp :tangle no
-  (use-package graphviz-dot-mode)
+  (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
 #+end_src
 * highlight-indent-guides
-  #+begin_src emacs-lisp
-    (use-package highlight-indent-guides
-      :config
-      (setq highlight-indent-guides-method 'character)
-      (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
-  #+end_src
+#+begin_src emacs-lisp
+(use-package highlight-indent-guides
+  :diminish highlight-indent-guides-mode
+  :config (setq highlight-indent-guides-method 'character)
+  :hook (prog-mode . highlight-indent-guides-mode))
+#+end_src
 * Historial
 #+begin_src emacs-lisp
-  (setq-default history-length 1000)
-  (setq savehist-file (concat conf:cache-dir "history")
-        history-delete-duplicates t
-        savehist-save-minibuffer-history 1
-        savehist-additional-variables
-        '(kill-ring
-          search-ring
-          regexp-search-ring))
-  (savehist-mode t)
+(setq-default history-length 1000)
+(setq savehist-file (concat conf:cache-dir "history")
+      history-delete-duplicates t
+      savehist-save-minibuffer-history 1
+      savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
+(savehist-mode t)
 #+end_src
 * i3wm
 #+begin_src emacs-lisp
-   (use-package i3wm-config-mode
-     :straight (i3wm-config-mode :type git :host github :repo "Alexander-Miller/i3wm-Config-Mode"))
+(use-package i3wm-config-mode
+  :straight (i3wm-config-mode :type git :host github :repo "Alexander-Miller/i3wm-Config-Mode"))
 #+end_src
 * IBuffer
 #+begin_src emacs-lisp
-  (use-package ibuffer
-    :bind ("C-x C-b" . ibuffer)
-    :config
-    (setq ibuffer-saved-filter-groups
-          (quote (("default"
-                   ("org" (name . "^.*org$"))
+(use-package ibuffer
+  :bind ("C-x C-b" . ibuffer)
+  :config
+  (setq ibuffer-saved-filter-groups
+        (quote (("default"
+                 ("org" (name . "^.*org$"))
 
-                   ("web" (or (mode . web-mode)
-                              (mode . php-mode)
-                              (mode . js2-mode)))
-                   ("shell" (or (mode . eshell-mode)
-                                (mode . term-mode)
-                                (mode . shell-mode)))
-                   ("prog" (or (mode . python-mode)
-                               (mode . nxml-mode)
-                               (mode . c++-mode)))
-                   ("emacs" (or
-                             (name . "^\\*scratch\\*$")
-                             (name . "^\\*Messages\\*$")))
-                   ))))
-    (add-hook 'ibuffer-mode-hook
-              (lambda ()
-                (ibuffer-auto-mode 1)
-                (ibuffer-switch-to-saved-filter-groups "default")))
+                 ("web" (or (mode . web-mode)
+                            (mode . php-mode)
+                            (mode . js2-mode)))
+                 ("shell" (or (mode . eshell-mode)
+                              (mode . term-mode)
+                              (mode . shell-mode)))
+                 ("prog" (or (mode . python-mode)
+                             (mode . nxml-mode)
+                             (mode . c++-mode)))
+                 ("emacs" (or
+                           (name . "^\\*scratch\\*$")
+                           (name . "^\\*Messages\\*$")))
+                 ))))
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-auto-mode 1)
+              (ibuffer-switch-to-saved-filter-groups "default")))
 
-    ;; don't show these
-                                          ;(add-to-list 'ibuffer-never-show-predicates "zowie")
-    ;; Don't show filter groups if there are no buffers in that group
-    (setq ibuffer-show-empty-filter-groups nil)
+  ;; don't show these
+                                        ;(add-to-list 'ibuffer-never-show-predicates "zowie")
+  ;; Don't show filter groups if there are no buffers in that group
+  (setq ibuffer-show-empty-filter-groups nil)
 
-    ;; Don't ask for confirmation to delete marked buffers
-    (setq ibuffer-expert t))
+  ;; Don't ask for confirmation to delete marked buffers
+  (setq ibuffer-expert t))
 #+end_src
 * Imenu
 #+begin_src emacs-lisp
-  (use-package imenu-list
-    :defer t
-    :bind ("M-2" . imenu-list-smart-toggle)
-    :config
-    (setq imenu-list-size 36
-          imenu-list-position 'left
-          imenu-list-focus-after-activation t
-          imenu-list-after-jump-hook nil))
+(use-package imenu-list
+  :defer t
+  :bind ("M-2" . imenu-list-smart-toggle)
+  :config
+  (setq imenu-list-size 36
+        imenu-list-position 'left
+        imenu-list-focus-after-activation t
+        imenu-list-after-jump-hook nil))
 #+end_src
 * avy
 #+begin_src emacs-lisp
@@ -994,150 +992,150 @@
 #+end_src
 * mu4e
 #+begin_src emacs-lisp
-    (use-package link-hint
-      :bind (("C-c l o" . link-hint-open-link)
-             ("C-c l c" . link-hint-copy-link)))
+(use-package link-hint
+  :bind (("C-c l o" . link-hint-open-link)
+         ("C-c l c" . link-hint-copy-link)))
 
-    (use-package mu4e
-      :bind ("<f1>" . mu4e)
-      :preface
-      (defadvice mu4e (before mu4e-start activate)
-        "Antes de ejecutar `mu4e' borramos todas las ventanas"
-        (when (> 1 (count-windows))
-          (window-configuration-to-register :mu4e-fullscreen)
-          (delete-other-windows)))
+(use-package mu4e
+  :bind ("<f1>" . mu4e)
+  :preface
+  (defadvice mu4e (before mu4e-start activate)
+    "Antes de ejecutar `mu4e' borramos todas las ventanas"
+    (when (> 1 (count-windows))
+      (window-configuration-to-register :mu4e-fullscreen)
+      (delete-other-windows)))
 
-      (defadvice mu4e-quit (after mu4e-close-and-push activate)
-        "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
-        (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
-        (when (get-register :mu4e-fullscreen)
-          (jump-to-register :mu4e-fullscreen)))
-      :init
-      (require 'mu4e-contrib)
-      (setq mail-user-agent 'mu4e-user-agent
-            message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
-            message-citation-line-function 'message-insert-formatted-citation-line
-            message-cite-reply-position 'below
-            message-kill-buffer-on-exit t
-            message-send-mail-function 'message-send-mail-with-sendmail
-            mu4e-attachment-dir  "~/Descargas"
-            mu4e-auto-retrieve-keys t
-            mu4e-compose-context-policy 'ask
-            mu4e-compose-dont-reply-to-self t
-            mu4e-compose-keep-self-cc nil
-            mu4e-context-policy 'pick-first
-            mu4e-headers-date-format "%Y-%m-%d %H:%M"
-            mu4e-headers-include-related t
-            mu4e-headers-auto-update nil
-            mu4e-headers-leave-behavior 'ignore
-            mu4e-headers-visible-lines 8
-            mu4e-headers-fields '((:date . 25)
-                                  (:flags . 6)
-                                  (:from . 22)
-                                  (:subject . nil))
-            mu4e-view-prefer-html t
-            mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
-            mu4e-maildir "~/.mail"
-            mu4e-view-show-images t
-            sendmail-program "msmtp"
-            mu4e-get-mail-command "mbsync -aV")
+  (defadvice mu4e-quit (after mu4e-close-and-push activate)
+    "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
+    (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
+    (when (get-register :mu4e-fullscreen)
+      (jump-to-register :mu4e-fullscreen)))
+  :init
+  (require 'mu4e-contrib)
+  (setq mail-user-agent 'mu4e-user-agent
+        message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
+        message-citation-line-function 'message-insert-formatted-citation-line
+        message-cite-reply-position 'below
+        message-kill-buffer-on-exit t
+        message-send-mail-function 'message-send-mail-with-sendmail
+        mu4e-attachment-dir  "~/Descargas"
+        mu4e-auto-retrieve-keys t
+        mu4e-compose-context-policy 'ask
+        mu4e-compose-dont-reply-to-self t
+        mu4e-compose-keep-self-cc nil
+        mu4e-context-policy 'pick-first
+        mu4e-headers-date-format "%Y-%m-%d %H:%M"
+        mu4e-headers-include-related t
+        mu4e-headers-auto-update nil
+        mu4e-headers-leave-behavior 'ignore
+        mu4e-headers-visible-lines 8
+        mu4e-headers-fields '((:date . 25)
+                              (:flags . 6)
+                              (:from . 22)
+                              (:subject . nil))
+        mu4e-view-prefer-html t
+        mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
+        mu4e-maildir "~/.mail"
+        mu4e-view-show-images t
+        sendmail-program "msmtp"
+        mu4e-get-mail-command "mbsync -aV")
 
-      (defun mu4e-message-maildir-matches (msg rx)
-        (when rx
-          (if (listp rx)
-              ;; If rx is a list, try each one for a match
-              (or (mu4e-message-maildir-matches msg (car rx))
-                  (mu4e-message-maildir-matches msg (cdr rx)))
-            ;; Not a list, check rx
-            (string-match rx (mu4e-message-field msg :maildir)))))
+  (defun mu4e-message-maildir-matches (msg rx)
+    (when rx
+      (if (listp rx)
+          ;; If rx is a list, try each one for a match
+          (or (mu4e-message-maildir-matches msg (car rx))
+              (mu4e-message-maildir-matches msg (cdr rx)))
+        ;; Not a list, check rx
+        (string-match rx (mu4e-message-field msg :maildir)))))
 
-      (defun choose-msmtp-account ()
-        (if (message-mail-p)
-            (save-excursion
-              (let*
-                  ((from (save-restriction
-                           (message-narrow-to-headers)
-                           (message-fetch-field "from")))
-                   (account
-                    (cond
-                     ((string-match "arkhan@disroot.org" from) "Personal")
-                     ((string-match "edison@disroot.org" from) "Work")
-                     ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
-                (setq message-sendmail-extra-arguments (list '"-a" account))))))
+  (defun choose-msmtp-account ()
+    (if (message-mail-p)
+        (save-excursion
+          (let*
+              ((from (save-restriction
+                       (message-narrow-to-headers)
+                       (message-fetch-field "from")))
+               (account
+                (cond
+                 ((string-match "arkhan@disroot.org" from) "Personal")
+                 ((string-match "edison@disroot.org" from) "Work")
+                 ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
+            (setq message-sendmail-extra-arguments (list '"-a" account))))))
 
-      (when (fboundp 'imagemagick-register-types)
-        (imagemagick-register-types))
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
 
-      (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
+  (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
 
-      (setq mu4e-contexts
-            `( ,(make-mu4e-context
-                 :name "Personal"
-                 :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
-                 :match-func (lambda (msg)
-                               (when msg
-                                 (mu4e-message-maildir-matches msg "^/Personal")))
-                 :leave-func (lambda () (mu4e-clear-caches))
-                 :vars '((user-mail-address     . "arkhan@disroot.org")
-                         (user-full-name        . "Edison Ibáñez")
-                         (mu4e-sent-folder      . "/Personal/Sent")
-                         (mu4e-drafts-folder    . "/Personal/Drafts")
-                         (mu4e-trash-folder     . "/Personal/Trash")
-                         (mu4e-refile-folder    . "/Personal/Archive")))
-               ,(make-mu4e-context
-                 :name "Work"
-                 :enter-func (lambda () (mu4e-message "Switch to the Work context"))
-                 :match-func (lambda (msg)
-                               (when msg
-                                 (mu4e-message-maildir-matches msg "^/Work")))
-                 :leave-func (lambda () (mu4e-clear-caches))
-                 :vars '((user-mail-address     . "edison@disroot.org")
-                         (user-full-name        . "Edison Ibáñez")
-                         (mu4e-sent-folder      . "/Work/Sent")
-                         (mu4e-drafts-folder    . "/Work/Drafts")
-                         (mu4e-trash-folder     . "/Work/Trash")
-                         (mu4e-refile-folder    . "/Work/Archive")))
-               ,(make-mu4e-context
-                 :name "Gmail"
-                 :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
-                 :match-func (lambda (msg)
-                               (when msg
-                                 (mu4e-message-maildir-matches msg "^/Gmail")))
-                 :leave-func (lambda () (mu4e-clear-caches))
-                 :vars '((user-mail-address     . "arkhan.xxx@gmail.com")
-                         (user-full-name        . "Edison Ibáñez")
-                         (mu4e-sent-folder      . "/Gmail/Sent Mail")
-                         (mu4e-trash-folder     . "/Gmail/Trash")
-                         (mu4e-refile-folder    . "/Gmail/All Mail")
-                         (mu4e-drafts-folder    . "/Gmail/Drafts")))))
+  (setq mu4e-contexts
+        `( ,(make-mu4e-context
+             :name "Personal"
+             :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Personal")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "arkhan@disroot.org")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Personal/Sent")
+                     (mu4e-drafts-folder    . "/Personal/Drafts")
+                     (mu4e-trash-folder     . "/Personal/Trash")
+                     (mu4e-refile-folder    . "/Personal/Archive")))
+           ,(make-mu4e-context
+             :name "Work"
+             :enter-func (lambda () (mu4e-message "Switch to the Work context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Work")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "edison@disroot.org")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Work/Sent")
+                     (mu4e-drafts-folder    . "/Work/Drafts")
+                     (mu4e-trash-folder     . "/Work/Trash")
+                     (mu4e-refile-folder    . "/Work/Archive")))
+           ,(make-mu4e-context
+             :name "Gmail"
+             :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/Gmail")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "arkhan.xxx@gmail.com")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/Gmail/Sent Mail")
+                     (mu4e-trash-folder     . "/Gmail/Trash")
+                     (mu4e-refile-folder    . "/Gmail/All Mail")
+                     (mu4e-drafts-folder    . "/Gmail/Drafts")))))
 
-      (add-hook 'message-send-mail-hook 'choose-msmtp-account)
-      (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
+  (add-hook 'message-send-mail-hook 'choose-msmtp-account)
+  (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
 
-      (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
-      (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
+  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
+  (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
 
-    (use-package mu4e-alert
-      :if (executable-find "mu")
-      :init
-      (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-      (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-      (setq mu4e-compose-forward-as-attachment t
-            mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
-            mu4e-compose-crypto-reply-plain-policy 'sign
-            mu4e-index-update-in-background t
-            mu4e-alert-email-notification-types '(subjects))
-      :config
-      (defun conf:refresh-mu4e-alert-mode-line ()
-        (interactive)
-        (mu4e~proc-kill)
-        (mu4e-alert-enable-mode-line-display))
-      (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
-      (mu4e-alert-set-default-style 'libnotify))
+(use-package mu4e-alert
+  :if (executable-find "mu")
+  :init
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+  (setq mu4e-compose-forward-as-attachment t
+        mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
+        mu4e-compose-crypto-reply-plain-policy 'sign
+        mu4e-index-update-in-background t
+        mu4e-alert-email-notification-types '(subjects))
+  :config
+  (defun conf:refresh-mu4e-alert-mode-line ()
+    (interactive)
+    (mu4e~proc-kill)
+    (mu4e-alert-enable-mode-line-display))
+  (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
+  (mu4e-alert-set-default-style 'libnotify))
 
-    (use-package mu4e-maildirs-extension
-      :after mu4e
-      :config (mu4e-maildirs-extension))
+(use-package mu4e-maildirs-extension
+  :after mu4e
+  :config (mu4e-maildirs-extension))
 #+end_src
 * Multiple Cursors
 #+begin_src emacs-lisp
@@ -1203,102 +1201,102 @@
 #+end_src
 * Dired
 #+begin_src emacs-lisp
-  (use-package dired
-    :straight nil
-    :config
-    (progn
-      (setq dired-listing-switches "-lXGh --group-directories-first")
-      (add-hook 'dired-mode-hook 'dired-hide-details-mode)))
+(use-package dired
+  :straight nil
+  :config
+  (progn
+    (setq dired-listing-switches "-lXGh --group-directories-first")
+    (add-hook 'dired-mode-hook 'dired-hide-details-mode)))
 
-  (defun mhj/toggle-project-explorer ()
-    "Toggle the project explorer window."
-    (interactive)
-    (let* ((buffer (dired-noselect (projectile-project-root)))
-      (window (get-buffer-window buffer)))
-      (if window
-      (mhj/hide-project-explorer)
-        (mhj/show-project-explorer))))
+(defun mhj/toggle-project-explorer ()
+  "Toggle the project explorer window."
+  (interactive)
+  (let* ((buffer (dired-noselect (projectile-project-root)))
+         (window (get-buffer-window buffer)))
+    (if window
+        (mhj/hide-project-explorer)
+      (mhj/show-project-explorer))))
 
-  (defun mhj/show-project-explorer ()
-    "Project dired buffer on the side of the frame.
+(defun mhj/show-project-explorer ()
+  "Project dired buffer on the side of the frame.
   Shows the projectile root folder using dired on the left side of
   the frame and makes it a dedicated window for that buffer."
-    (let ((buffer (dired-noselect (projectile-project-root))))
-      (progn
-        (display-buffer-in-side-window buffer '((side . left) (window-width . 0.2)))
-        (set-window-dedicated-p (get-buffer-window buffer) t))))
-
-  (defun mhj/hide-project-explorer ()
-    "Hide the project-explorer window."
-    (let ((buffer (dired-noselect (projectile-project-root))))
-      (progn
-        (delete-window (get-buffer-window buffer))
-        (kill-buffer buffer))))
-
-
-  (use-package dired-toggle
-    :defer t
-    :bind (("<f3>" . #'dired-toggle)
-           :map dired-mode-map
-           ("q" . #'dired-toggle-quit)
-           ([remap dired-find-file] . #'dired-toggle-find-file)
-           ([remap dired-up-directory] . #'dired-toggle-up-directory)
-           ("C-c C-u" . #'dired-toggle-up-directory))
-    :config
-    (setq dired-toggle-window-size 32)
-    (setq dired-toggle-window-side 'left)
-
-    ;; Optional, enable =visual-line-mode= for our narrow dired buffer:
-    (add-hook 'dired-toggle-mode-hook
-              (lambda () (interactive)
-                (visual-line-mode 1)
-                (setq-local visual-line-fringe-indicators '(nil right-curly-arrow))
-                (setq-local word-wrap nil))))
-
-  (use-package dired-subtree
-    :demand
-    :bind
-    (:map dired-mode-map
-      ("<enter>" . mhj/dwim-toggle-or-open)
-      ("<return>" . mhj/dwim-toggle-or-open)
-      ("<tab>" . mhj/dwim-toggle-or-open)
-      ("<down-mouse-1>" . mhj/mouse-dwim-to-toggle-or-open))
-    :config
+  (let ((buffer (dired-noselect (projectile-project-root))))
     (progn
-      ;; Function to customize the line prefixes (I simply indent the lines a bit)
-      (setq dired-subtree-line-prefix (lambda (depth) (make-string (* 2 depth) ?\s)))
-      (setq dired-subtree-use-backgrounds nil)))
+      (display-buffer-in-side-window buffer '((side . left) (window-width . 0.2)))
+      (set-window-dedicated-p (get-buffer-window buffer) t))))
 
-  (defun mhj/dwim-toggle-or-open ()
-    "Toggle subtree or open the file."
-    (interactive)
-    (if (file-directory-p (dired-get-file-for-visit))
-        (progn
-      (dired-subtree-toggle)
-      (revert-buffer))
-      (dired-find-file)))
+(defun mhj/hide-project-explorer ()
+  "Hide the project-explorer window."
+  (let ((buffer (dired-noselect (projectile-project-root))))
+    (progn
+      (delete-window (get-buffer-window buffer))
+      (kill-buffer buffer))))
 
-  (defun mhj/mouse-dwim-to-toggle-or-open (event)
-    "Toggle subtree or the open file on mouse-click in dired."
-    (interactive "e")
-    (let* ((window (posn-window (event-end event)))
-       (buffer (window-buffer window))
-       (pos (posn-point (event-end event))))
+
+(use-package dired-toggle
+  :defer t
+  :bind (("<f3>" . #'dired-toggle)
+         :map dired-mode-map
+         ("q" . #'dired-toggle-quit)
+         ([remap dired-find-file] . #'dired-toggle-find-file)
+         ([remap dired-up-directory] . #'dired-toggle-up-directory)
+         ("C-c C-u" . #'dired-toggle-up-directory))
+  :config
+  (setq dired-toggle-window-size 32)
+  (setq dired-toggle-window-side 'left)
+
+  ;; Optional, enable =visual-line-mode= for our narrow dired buffer:
+  (add-hook 'dired-toggle-mode-hook
+            (lambda () (interactive)
+              (visual-line-mode 1)
+              (setq-local visual-line-fringe-indicators '(nil right-curly-arrow))
+              (setq-local word-wrap nil))))
+
+(use-package dired-subtree
+  :demand
+  :bind
+  (:map dired-mode-map
+        ("<enter>" . mhj/dwim-toggle-or-open)
+        ("<return>" . mhj/dwim-toggle-or-open)
+        ("<tab>" . mhj/dwim-toggle-or-open)
+        ("<down-mouse-1>" . mhj/mouse-dwim-to-toggle-or-open))
+  :config
+  (progn
+    ;; Function to customize the line prefixes (I simply indent the lines a bit)
+    (setq dired-subtree-line-prefix (lambda (depth) (make-string (* 2 depth) ?\s)))
+    (setq dired-subtree-use-backgrounds nil)))
+
+(defun mhj/dwim-toggle-or-open ()
+  "Toggle subtree or open the file."
+  (interactive)
+  (if (file-directory-p (dired-get-file-for-visit))
       (progn
-        (with-current-buffer buffer
-      (goto-char pos)
-      (mhj/dwim-toggle-or-open)))))
+        (dired-subtree-toggle)
+        (revert-buffer))
+    (dired-find-file)))
+
+(defun mhj/mouse-dwim-to-toggle-or-open (event)
+  "Toggle subtree or the open file on mouse-click in dired."
+  (interactive "e")
+  (let* ((window (posn-window (event-end event)))
+         (buffer (window-buffer window))
+         (pos (posn-point (event-end event))))
+    (progn
+      (with-current-buffer buffer
+        (goto-char pos)
+        (mhj/dwim-toggle-or-open)))))
 
 
-  (use-package dired-hide-dotfiles
-    :config
-    (defun my-dired-mode-hook ()
-      "My `dired' mode hook."
-      ;; To hide dot-files by default
-      (dired-hide-dotfiles-mode)
-      ;; To toggle hiding
-      (define-key dired-mode-map "." #'dired-hide-dotfiles-mode))
-    (add-hook 'dired-mode-hook #'my-dired-mode-hook))
+(use-package dired-hide-dotfiles
+  :config
+  (defun my-dired-mode-hook ()
+    "My `dired' mode hook."
+    ;; To hide dot-files by default
+    (dired-hide-dotfiles-mode)
+    ;; To toggle hiding
+    (define-key dired-mode-map "." #'dired-hide-dotfiles-mode))
+  (add-hook 'dired-mode-hook #'my-dired-mode-hook))
 #+end_src
 * Nginx
 #+begin_src emacs-lisp
