@@ -15,4 +15,4 @@ unclutter &
 
 wmname LG3D &
 
-compton --config ~/.compton.conf &
+compton -CG &
