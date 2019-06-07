@@ -592,6 +592,12 @@
 #+end_src
 * Font
 #+begin_src emacs-lisp
+(use-package pcache
+  :init
+  (setq pcache-directory (let ((dir (concat conf:cache-dir "pcache/")))
+                           (make-directory dir t)
+                           dir)))
+
 (use-package unicode-fonts
   :init (unicode-fonts-setup))
 
@@ -632,7 +638,6 @@
          ("C-x g x" . magit-checkout))
   :init
   (progn
-    (setq magit-git-executable "tg")
     (delete 'Git vc-handled-backends)
     (defadvice magit-status (around magit-fullscreen activate)
       (window-configuration-to-register :magit-fullscreen)
@@ -660,7 +665,8 @@
         (magit-commit-create)))
     (define-key magit-mode-map "c" 'magit-maybe-commit)
 
-    (setq magit-completing-read-function 'ivy-completing-read
+    (setq magit-git-executable "tg"
+          magit-completing-read-function 'ivy-completing-read
           magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
           magit-status-buffer-switch-function 'switch-to-buffer
           magit-diff-refine-hunk t
@@ -809,6 +815,55 @@
     :config
     (setq avy-all-windows t))
 #+end_src
+* Hardcore
+#+begin_src emacs-lisp :tangle no
+(use-package hardcore-mode
+  :config
+  (global-set-key "\M-p" 'backward-paragraph)
+  (global-set-key "\M-n" 'forward-paragraph)
+  (define-key key-translation-map [?\C-h] [?\C-?])
+  (define-key hardcore-mode-map
+    (kbd "<C-up>") (lambda ()
+		       (interactive)
+		       (message "This key is disabled. Use M-p instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<C-down>") (lambda ()
+		       (interactive)
+		       (message "This key is disabled. Use M-n instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<C-left>") (lambda ()
+		       (interactive)
+		       (message "This key is disabled. Use M-b instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<C-right>") (lambda ()
+		       (interactive)
+		       (message "This key is disabled. Use M-f instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<prior>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use M-v instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<next>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use C-v instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<home>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use C-a instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<C-home>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use M-< instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<end>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use C-e instead.")))
+  (define-key hardcore-mode-map
+    (kbd "<C-end>") (lambda ()
+			(interactive)
+			(message "This key is disabled. Use M-> instead.")))
+  (global-hardcore-mode))
+#+end_src
 * Ivy, Counsel, Swiper
 #+begin_src emacs-lisp
 (use-package ivy
@@ -856,6 +911,19 @@
 (use-package ivy-prescient
   :after ivy
   :init (ivy-prescient-mode))
+
+(use-package ivy-posframe
+  :after ivy
+  :diminish ivy-posframe-mode
+  :init
+  (setq ivy-posframe-parameters
+        '((left-fringe . 10)
+          (right-fringe . 10))
+        ivy-posframe-hide-minibuffer t
+        ivy-posframe-border-width 0
+        ivy-posframe-width (window-width)
+        ivy-display-function #'vy-posframe-display-at-frame-bottom-left)
+  :config (ivy-posframe-enable))
 
 (setq confirm-nonexistent-file-or-buffer t)
 
@@ -969,12 +1037,12 @@
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-(use-package company-lsp
-  :defer t
-  :commands company-lsp
-  :config
-  (setq company-lsp-async t)
-  (push '(company-lsp :with company-yasnippet) company-backends))
+;; (use-package company-lsp
+;;   :defer t
+;;   :commands company-lsp
+;;   :config
+;;   (setq company-lsp-async t)
+;;   (push '(company-lsp :with company-yasnippet) company-backends))
 #+end_src
 * Makefile
 #+begin_src emacs-lisp
@@ -1519,7 +1587,8 @@
 (use-package ob-plantuml
   :defer t
   :straight org-plus-contrib
-  :commands (org-babel-execute:plantuml))
+  :commands (org-babel-execute:plantuml)
+  :config (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"))
 
 (use-package org-timeline
   :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
@@ -1766,13 +1835,12 @@
 #+end_src
 * Plantuml
 #+begin_src emacs-lisp
-  (use-package plantuml-mode
-    :config (setq plantuml-jar-path "/opt/plantuml/plantuml.jar"
-                  org-plantuml-jar-path "/opt/plantuml/plantuml.jar"))
+(use-package plantuml-mode
+  :config (setq plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"))
 
-  (use-package flycheck-plantuml
-    :after flycheck
-    :config (flycheck-plantuml-setup))
+(use-package flycheck-plantuml
+  :after flycheck
+  :config (flycheck-plantuml-setup))
 #+end_src
 * PO
 #+begin_src emacs-lisp
@@ -1930,32 +1998,14 @@
 #+begin_src emacs-lisp
 (use-package elpy
   :diminish elpy-mode
+  :init (advice-add 'python-mode :before 'elpy-enable)
   :config
-  (elpy-enable)
   (setq elpy-rpc-backend "jedi"
-        elpy-shell-echo-input nil
-        elpy-modules (dolist (elem
-                              '(elpy-module-sane-defaults
-                                elpy-module-company
-                                elpy-module-eldoc
-                                elpy-module-highlight-indentation
-                                elpy-module-pyvenv
-                                elpy-module-yasnippet
-                                elpy-module-flymake))))
+        elpy-shell-echo-input nil)
 
   (add-to-list 'company-backends 'elpy-company-backend)
   (require 'smartparens-python)
   (require 'electric)
-
-  (with-eval-after-load 'python
-    (defun python-shell-completion-native-try ()
-      "Return non-nil if can trigger native completion."
-      (let ((python-shell-completion-native-enable t)
-            (python-shell-completion-native-output-timeout
-             python-shell-completion-native-try-output-timeout))
-        (python-shell-completion-native-get-completions
-         (get-buffer-process (current-buffer))
-         nil "_"))))
 
   (when (require 'flycheck nil t)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -2338,8 +2388,9 @@
 (use-package dashboard
   :config
   (dashboard-setup-startup-hook)
-  (setq dashboard-banner-logo-title (concat "kernel " (car (split-string (shell-command-to-string "uname -r") "-"))
-                                            " x86_64 " (car (split-string (shell-command-to-string ". /etc/os-release && echo $PRETTY_NAME") "\n")))
+  (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version
+                                              " kernel " (car (split-string (shell-command-to-string "uname -r") "-"))
+                                              " x86_64 " (car (split-string (shell-command-to-string ". /etc/os-release && echo $PRETTY_NAME") "\n")))
         show-week-agenda-p t
         dashboard-set-init-info t
         dashboard-center-content t
@@ -2351,11 +2402,11 @@
 #+end_src
 * Theme
 #+begin_src emacs-lisp
-  (use-package vibrant-ink-theme
-    :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
-    :init (add-hook 'after-init-hook
-                    (lambda ()
-                      (load-theme 'vibrant-ink t))))
+(use-package vibrant-ink-theme
+  :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
+  :init (add-hook 'after-init-hook
+                  (lambda ()
+                    (load-theme 'vibrant-ink t))))
 #+end_src
 * Tramp
 #+begin_src emacs-lisp
@@ -2641,4 +2692,9 @@
 (use-package exwm-systemtray
   :straight exwm
   :config (exwm-systemtray-enable))
+#+end_src
+* StumpWM
+#+begin_src emacs-lisp
+(use-package stumpwm-mode
+  :mode ("\\.stumpwmrc\\'" . stumpwm-mode))
 #+end_src

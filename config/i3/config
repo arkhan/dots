@@ -58,6 +58,8 @@ bindsym $mod4+Control+t exec $term -name Ranger -e ranger
 bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 ## Ncmpcpp
 bindsym $mod4+Control+p exec $term -name Ncmpcpp -e ncmpcpp
+## Emacs
+bindsym $mod4+Control+e exec /usr/bin/emacs
 
 # Pamixer Control
 ## Toggle Mute

@@ -106,6 +106,7 @@ prompt_callback() {
 async_init
 
 # cache variable
+typeset -Ag prompt_async
 typeset -Ag prompt_data
 
 # Start async worker
