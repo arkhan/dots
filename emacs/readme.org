@@ -602,7 +602,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "MonacoB:pixelsize=15")
+(set-face-attribute 'default nil :font "Office Code Pro D:pixelsize=15")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -765,7 +765,6 @@
   :config
   (setq ibuffer-saved-filter-groups
         (quote (("default"
-                 ("EXWM" (mode . exwm-mode))
                  ("org" (name . "^.*org$"))
 
                  ("web" (or (mode . web-mode)
@@ -1253,9 +1252,8 @@
 #+end_src
 * Multiple Cursors
 #+begin_src emacs-lisp
-  (use-package multiple-cursors
-    :defer t
-    :init (add-hook 'multiple-cursors-mode-hook #'conf:lsp-on-change-modify-hook))
+(use-package multiple-cursors
+  :defer t)
 #+end_src
 * Neotree
 #+begin_src emacs-lisp
@@ -1594,9 +1592,8 @@
   :init (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append))
 
 (use-package secretaria
-  :init
-  (setf secretaria-clocked-task-save-file "~/.secretaria-tarea")
-  (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me))
+  :init (setq secretaria-clocked-task-save-file "~/.secretaria-tarea")
+  :hook (after-init . secretaria-unknown-time-always-remind-me))
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
@@ -1752,6 +1749,23 @@
      ("C-2" . conf:org-tree-slide-set-profile)
      ("C-3" . org-tree-slide-simple-profile)
      ("C-4" . org-tree-slide-presentation-profile))))
+
+(use-package org-super-agenda
+  :config
+  (setq org-super-agenda-groups '((:name "Today"
+                                         :time-grid t
+                                         :scheduled today)
+                                  (:name "Due today"
+                                         :deadline today)
+                                  (:name "Important"
+                                         :priority "A")
+                                  (:name "Overdue"
+                                         :deadline past)
+                                  (:name "Due soon"
+                                         :deadline future)
+                                  (:name "Big Outcomes"
+                                         :tag "bo")))
+  (org-super-agenda-mode))
 #+end_src
 * Pacfiles
 #+begin_src emacs-lisp
@@ -2127,6 +2141,18 @@
           recentf-auto-cleanup 'never)
     (recentf-mode +1))
 #+end_src
+* RestClient
+#+begin_src emacs-lisp
+(use-package restclient)
+
+(use-package company-restclient
+  :after restclient
+  :config (add-to-list 'company-backends 'company-restclient))
+
+(use-package ob-restclient
+  :defer t
+  :commands (org-babel-execute:restclient))
+#+end_src
 * restart emacs
   #+begin_src emacs-lisp
     (use-package restart-emacs)
@@ -2197,31 +2223,28 @@
 #+end_src
 * SQL
 #+begin_src emacs-lisp
-  (use-package edbi-database-url)
+(use-package edbi-database-url)
 
-  (use-package edbi-minor-mode
-    :config
-    (add-hook 'sql-mode-hook 'edbi-minor-mode))
+(use-package edbi-minor-mode
+  :config
+  (add-hook 'sql-mode-hook 'edbi-minor-mode))
 
-  (use-package company-edbi
-    :init
-    (defun cfg:edbi-mode-hook()
-      (add-to-list 'company-backends 'company-edbi))
-    (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
+(use-package company-edbi
+  :init
+  (defun cfg:edbi-mode-hook()
+    (add-to-list 'company-backends 'company-edbi))
+  (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
 
-  (use-package sqlup-mode
-    :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
-    :init
-    (add-hook 'sql-mode-hook 'sqlup-mode)
-    (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
-    (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+(use-package sqlup-mode
+  :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
+  :init
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 
-  (use-package sql-indent
-    :after sql
-    :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer))))
-
-  (use-package sqlformat
-    :config (add-hook 'sql-mode-hook 'sqlformat-mode))
+(use-package sql-indent
+  :after sql
+  :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer))))
 #+end_src
 * SSH
 #+begin_src emacs-lisp
@@ -2624,77 +2647,4 @@
                                (float-time
                                 (time-subtract after-init-time before-init-time)))
                        gcs-done)))
-#+end_src
-* EXWM
-** Clipboard
-#+begin_src emacs-lisp
-(use-package gpastel
-  :if (string= (getenv "XDG_CURRENT_DESKTOP") "exwm"))
-#+end_src
-** WM
-#+begin_src emacs-lisp
-(use-package exwm
-  :if (string= (getenv "XDG_CURRENT_DESKTOP") "exwm")
-  :demand t
-  :preface
-  (progn
-    (defun my/exwm-reliable-class-p ()
-      "Return t if application's class is suitable for naming."
-      (and (not (string-prefix-p "sun-awt-X11-" exwm-instance-name))
-           ;; gimp has several windows with the same class:
-           (not (string= "gimp" exwm-instance-name))))
-
-    (defun my/exwm-class-updated ()
-      "Use class names if `my/exwm-reliable-class-p'."
-      (when (my/exwm-reliable-class-p)
-        (exwm-workspace-rename-buffer exwm-class-name)))
-
-    (defun my/exwm-title-updated ()
-      "Use title unless `my/exwm-reliable-class-p'."
-      (unless (my/exwm-reliable-class-p)
-        (exwm-workspace-rename-buffer exwm-class-name))))
-
-  :hook ((exwm-init . gpastel-mode)
-         (exwm-init . display-battery-mode)
-         (exwm-init . display-time-mode)
-         (exwm-update-class . my/exwm-class-updated)
-         (exwm-update-title . my/exwm-title-updated))
-  :config
-  (setq exwm-workspace-number 4)
-  (setq exwm-input-global-keys
-        `(
-          ;; Bind "s-r" to exit char-mode and fullscreen mode.
-          ([?\s-r] . exwm-reset)
-          ;; Bind "s-w" to switch workspace interactively.
-          ([?\s-w] . exwm-workspace-switch)
-          ;; Bind "s-0" to "s-9" to switch to a workspace by its index.
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))
-          ;; Bind "s-&" to launch applications ('M-&' also works if the output
-          ;; buffer does not bother you).
-          ([?\s-&] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
-          ;; Bind "s-<f2>" to "slock", a simple X display locker.
-          ([s-f2] . (lambda ()
-                      (interactive)
-                      (start-process "" nil "/usr/bin/slock")))))
-
-  (define-key exwm-mode-map [?\C-q] #'exwm-input-send-next-key)
-
-  (setq exwm-input-simulation-keys nil)
-  (exwm-enable))
-
-(use-package exwm-systemtray
-  :straight exwm
-  :config (exwm-systemtray-enable))
-#+end_src
-* StumpWM
-#+begin_src emacs-lisp
-(use-package stumpwm-mode
-  :mode ("\\.stumpwmrc\\'" . stumpwm-mode))
 #+end_src

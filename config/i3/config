@@ -58,6 +58,8 @@ bindsym $mod4+Control+t exec $term -name Ranger -e ranger
 bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 ## Ncmpcpp
 bindsym $mod4+Control+p exec $term -name Ncmpcpp -e ncmpcpp
+## RTorrent
+bindsym $mod4+Control+d exec $term -name RTorrent -e rtorrent
 ## Emacs
 bindsym $mod4+Control+e exec /usr/bin/emacs
 
@@ -271,6 +273,7 @@ assign [class="(?i)tuxcmd|Spacefm|doublecmd"] $ws4
 assign [class="URxvt" instance="Ranger"] $ws4
 assign [class="(?i)thunderbird|(?i)icedove"] $ws3
 assign [class="JDownloader|Syncthing GTK"] $ws5
+assign [class="URxvt" instance="RTorrent"] $ws5
 assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
 assign [class="URxvt" instance="Ncmpcpp"] $ws7
 assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
@@ -282,19 +285,12 @@ assign [title="nomacs"] $ws7
 assign [class="Wine"] $ws6
 
 # Floating
-for_window [class="(?i)lxappearance"] floating enable
+for_window [class="(?i)lxappearance|(?i)qt5ct|(?i)urxvt|(?i)pinentry|(?i)GtkLP"] floating enable
 for_window [title="(?i)systemsettings"] floating enable
-for_window [class="(?i)qt5ct"] floating enable
-for_window [class="(?i)urxvt"] floating enable
-for_window [title="Redac(?i)"] floating enable
-for_window [title="Cop(?i)"] floating enable
-for_window [class="(?i)pinentry"] floating enable
-for_window [class="(?i)GtkLP"] floating enable
 
 # Tabbed
 for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable
-for_window [class="URxvt" instance="Ranger"] floating disable layout tabbed
-for_window [class="URxvt" instance="Weechat"] floating disable layout tabbed
+for_window [class="URxvt" instance="Ranger|Weechat|RTorrent|Ncmpcpp"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
 for_window [class="(?i)emacs"] floating disable layout tabbed focus
 for_window [title="zathura"] floating disable layout tabbed

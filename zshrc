@@ -199,12 +199,12 @@ mypip() {
   curl -s ipinfo.io/ip
 }
 
-export PAGER="less"
-export LESS="-iMSx4 -XFR"
+export PAGER="eless"
+#export LESS="-iMSx4 -XFR"
 if which lesspipe.sh >/dev/null 2>&1; then
    export LESSOPEN="| lesspipe.sh %s"
 fi
-alias lv="less"
+alias lv="eless"
 
 # term-projectile support
 function environment_variable_exists {
@@ -251,17 +251,17 @@ fi
 # ShellFuncs
 #------------------------------
 # -- coloured manuals
-man() {
-  env \
-    LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-    LESS_TERMCAP_md=$(printf "\e[1;31m") \
-    LESS_TERMCAP_me=$(printf "\e[0m") \
-    LESS_TERMCAP_se=$(printf "\e[0m") \
-    LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-    LESS_TERMCAP_ue=$(printf "\e[0m") \
-    LESS_TERMCAP_us=$(printf "\e[1;32m") \
-    man "$@"
-}
+# man() {
+#   env \
+#     LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+#     LESS_TERMCAP_md=$(printf "\e[1;31m") \
+#     LESS_TERMCAP_me=$(printf "\e[0m") \
+#     LESS_TERMCAP_se=$(printf "\e[0m") \
+#     LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+#     LESS_TERMCAP_ue=$(printf "\e[0m") \
+#     LESS_TERMCAP_us=$(printf "\e[1;32m") \
+#     man "$@"
+# }
 
 
 #------------------------------
@@ -315,7 +315,7 @@ alias -s html=q
 
 # Global aliases (expand whatever their position)
 #  e.g. find . E L
-alias -g L='| less'
+alias -g L='| eless'
 alias -g H='| head'
 alias -g S='| sort'
 alias -g T='| tail'
