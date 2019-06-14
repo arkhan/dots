@@ -602,7 +602,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Office Code Pro D:pixelsize=15")
+(set-face-attribute 'default nil :font "MonacoB:pixelsize=15")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -734,6 +734,14 @@
           (smerge-mode +1)))))
 
   (add-hook 'buffer-list-update-hook #'enable-smerge-maybe))
+#+end_src
+* gif-screencast
+#+begin_src emacs-lisp
+(use-package gif-screencast
+  :bind (("<f8>" . gif-screencast)
+         (:map gif-screencast-mode-map
+              ("<f8>" . gif-screencast-toggle-pause)
+              ("<f9>" . gif-screencast-stop))))
 #+end_src
 * highlight-indent-guides
 #+begin_src emacs-lisp
@@ -911,18 +919,22 @@
   :after ivy
   :init (ivy-prescient-mode))
 
+;; (use-package ivy-explorer
+;;   :after ivy
+;;   :init
+;;   (if (display-graphic-p)
+;;       (setq ivy-explorer-message-function #'ivy-explorer--posframe))
+;;   (ivy-explorer-mode 1))
+
 (use-package ivy-posframe
   :after ivy
   :diminish ivy-posframe-mode
   :init
-  (setq ivy-posframe-parameters
-        '((left-fringe . 10)
-          (right-fringe . 10))
-        ivy-posframe-hide-minibuffer t
+  (setq ivy-posframe-hide-minibuffer nil
         ivy-posframe-border-width 0
         ivy-posframe-width (window-width)
-        ivy-display-function #'vy-posframe-display-at-frame-bottom-left)
-  :config (ivy-posframe-enable))
+        ivy-display-function #'ivy-posframe-display-at-window-bottom-left)
+  :config (ivy-posframe-mode))
 
 (setq confirm-nonexistent-file-or-buffer t)
 
@@ -1486,6 +1498,7 @@
           org-agenda-start-on-weekday nil
           org-agenda-start-day "-1d"
           org-agenda-span 7
+          show-week-agenda-p t
           org-agenda-timegrid-use-ampm 1
           org-agenda-inhibit-startup t
           org-agenda-files (quote
@@ -1670,7 +1683,7 @@
 
 (use-package ob-translate)
 
-(use-package ox-reveal)
+(use-package org-re-reveal)
 
 (use-package htmlize)
 
@@ -1782,7 +1795,8 @@
     (set-face-foreground 'show-paren-match "#def")
     (set-face-attribute 'show-paren-match nil :weight 'extra-bold))
 
-  (use-package smartparens
+  (use-package smartparens-config
+    :straight smartparens
     :commands
     (smartparens-mode
      smartparens-strict-mode)
@@ -1791,9 +1805,7 @@
           ("C-}" . sp-forward-slurp-sexp)
           ("M-s" . sp-backward-unwrap-sexp)
           ("C-c [" . sp-select-next-thing)
-          ("C-c ]" . sp-select-next-thing-exchange))
-    :config
-    (require 'smartparens-config))
+          ("C-c ]" . sp-select-next-thing-exchange)))
 
   (use-package rainbow-delimiters
     :config
@@ -1934,8 +1946,11 @@
             (lambda ()
               (mapc (lambda (pair) (push pair prettify-symbols-alist))
                     '(("in" . ?\u2208)
+                      ("IN" . ?\u2208)
                       ("not in" . ?\u2209)
+                      ("NOT IN" . ?\u2209)
                       ("not" . ?\u00AC)
+                      ("NOT" . ?\u00AC)
                       ("==" . ?\u2261)
                       ("!=" . ?\u2260)
                       (">=" . ?\u2265)
@@ -2414,7 +2429,6 @@
   (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version
                                               " kernel " (car (split-string (shell-command-to-string "uname -r") "-"))
                                               " x86_64 " (car (split-string (shell-command-to-string ". /etc/os-release && echo $PRETTY_NAME") "\n")))
-        show-week-agenda-p t
         dashboard-set-init-info t
         dashboard-center-content t
         dashboard-items '((recents  . 5)
