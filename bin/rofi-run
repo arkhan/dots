@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/bin/sh
 command="rofi -width 15 -run-command \"zsh -i -c '{cmd}'\" -show run"
 
 [[ -d "$HOME/.bin" ]] && PATH=$HOME/.bin:$PATH eval $command || eval $command

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script intended to be executed from ncmpcpp (execute_on_song_change
 # preference) running from urxvt to set album cover as background image

@@ -1,9 +1,9 @@
 #-*- mode: i3wm-config -*-
-# Terminal
-set $term urxvtcd --geometry 100x30
-
 # Bin dir
 set $bin $HOME/.bin
+
+# Terminal
+set $term ~/.bin/urxvtcd --geometry 100x30
 
 # Display
 set $edp1 eDP1
@@ -16,7 +16,7 @@ set $mod4 Mod4
 set $mod1 Mod1
 
 # Font for window titles.
-font pango:xos4 Terminus 12
+font pango:Terminus 12
 
 # Use Mouse+$mod4 to drag floating windows to their wanted position
 floating_modifier $mod4
@@ -63,13 +63,13 @@ bindsym $mod4+Control+d exec $term -name RTorrent -e rtorrent
 ## Emacs
 bindsym $mod4+Control+e exec /usr/bin/emacs
 
-# Pamixer Control
+# Pulsemixer Control
 ## Toggle Mute
-bindsym XF86AudioMute exec pamixer -t
+bindsym XF86AudioMute exec pulsemixer --toggle-mute
 ## Increase
-bindsym XF86AudioRaiseVolume exec pamixer -i 1
+bindsym XF86AudioRaiseVolume exec pulsemixer --change-volume +1
 ## Decrease
-bindsym XF86AudioLowerVolume exec pamixer -d 1
+bindsym XF86AudioLowerVolume exec pulsemixer --change-volume -1
 
 # kill focused window
 bindsym $mod4+Shift+q kill
@@ -305,6 +305,6 @@ floating_minimum_size -1 x -1
 floating_maximum_size -1 x -1
 
 # i3-gaps
-smart_borders on
-gaps inner 2
-gaps outer 2
+#smart_borders on
+#gaps inner 2
+#gaps outer 2

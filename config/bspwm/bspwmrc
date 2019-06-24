@@ -20,6 +20,9 @@ bspc config click_to_focus any
 bspc config honor_size_hints false
 bspc config ignore_ewmh_focus true
 
+# External Rules
+bspc config external_rules_command ~/.config/bspwm/external.sh
+
 # Workspaces
 bspc rule -a 'Firefox:Navigator' follow=on desktop=^1
 bspc rule -a 'Firefox Developer Edition:Navigator' follow=on desktop=^1
@@ -47,14 +50,14 @@ bspc rule -a Wine follow=off desktop=^6 state=tiled
 
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
-bspc rule -a URxvt:terminal follow=off state=floating center=on
+bspc rule -a URxvt:Terminal follow=off state=floating center=on
 
 # Xresources
 xrdb ~/.Xresources &
 # Wallpaper
-[[ -e $HOME/.fehbg ]] && $HOME/.fehbg &
+[[ -z $(pgrep feh) ]] && feh --bg-fill $HOME/.dots/walls/03.jpg &
 # i3lock Fancy
-[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy -p &
+[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p &
 # clipboard
 [[ -z $(pgrep clipboard) ]] && ~/.bin/clipboard &
 # panel

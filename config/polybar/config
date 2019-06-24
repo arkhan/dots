@@ -40,13 +40,15 @@ underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
-font-0 = Tamzen:size=14;0
+font-0 = xos4 Terminus:size=14;0
 font-1 = Siji:size=14;1
-font-2 = DejaVuSansMono Nerd Font:size=10;1
+font-2 = FontAwesome:size=10;1
 
-modules-left = i3 mpd
+modules-left = bsp mpd
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
+
+wm-restack = bspwm
 
 [module/bsp]
 type = internal/bspwm
@@ -101,7 +103,7 @@ ws-icon-2 = 2;
 ws-icon-3 = 3;
 ws-icon-4 = 4;
 ws-icon-5 = 5;
-ws-icon-6 = 6;
+ws-icon-6 = 6;
 ws-icon-7 = 7;
 ws-icon-8 = 8;
 ws-icon-9 = 9;
@@ -189,7 +191,7 @@ animation-charging-framerate = 750
 
 [module/wireless]
 type = internal/network
-interface = wlan0
+interface = wlp61s0
 interval = 1.0
 ping-interval = 10
 
@@ -212,7 +214,7 @@ animation-packetloss-framerate = 500
 
 [module/wired]
 type = internal/network
-interface = eth0
+interface = enp60s0
 interval = 1.0
 format-connected = <ramp-signal> <label-connected>
 label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}

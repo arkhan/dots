@@ -94,7 +94,7 @@ prompt_refresh() {
   PROMPT="$prompt_data[prompt_venv] %(!,%B%F{red}#%f%b,%B%F{blue}>%f%b) "
   RPROMPT="$prompt_data[prompt_dir]$prompt_data[prompt_git]"
   # Redraw the prompt.
-  zle && zle reset-prompt
+  zle reset-prompt
 }
 
 prompt_callback() {

@@ -5,7 +5,11 @@
 
 # terminal emulator
 super + Return
-	urxvtcd --geometry 100x30 -name terminal
+	urxvtcd --geometry 100x30 -name TiledTerminal
+
+# terminal emulator
+super + shift + Return
+	urxvtcd --geometry 100x30 -name Terminal
 
 # program launcher
 super + @space
@@ -29,7 +33,7 @@ super + shift + {f,i}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}
-  pamixer {-t,-i 1,-d 1}
+  pulsemixer {--toggle-mute,--change-volume +1,--change-volume -1}
 
 # exit
 super + alt + {l,o,s,r,p}
@@ -127,6 +131,7 @@ super + ctrl + {1-9}
 # cancel the preselection for the focused node
 super + ctrl + space
 	bspc node -p cancel
+
 
 # cancel the preselection for the focused desktop
 super + ctrl + shift + space
