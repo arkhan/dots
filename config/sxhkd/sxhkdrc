@@ -27,9 +27,18 @@ super + shift + c
 super + shift + p
   rofi-pass
 
+# MPD
+super + control + p
+  rofi-mpc
+
+# ScreenShot/ScreenCast
+
+Print; {s,c}
+  teiler {--screenshot,--togglecast}
+
 # Cli Apps
-super + shift + {f,i}
-  urxvtcd {-name ranger -e ranger, -name chat -e weechat}
+super + shift + {f,n}
+  urxvtcd {-name ranger -e ranger, -name music -e ncmpcpp}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}

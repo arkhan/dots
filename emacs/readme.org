@@ -19,56 +19,56 @@
 * Config
 ** Straight
 #+begin_src emacs-lisp
-  ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
-  ;;; Commentary:
-  ;; This config start here
+;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
+;;; Commentary:
+;; This config start here
 
-  (defvar cfg--file-name-handler-alist file-name-handler-alist)
-  (setq gc-cons-threshold 402653184
-    gc-cons-percentage 0.6
-    file-name-handler-alist nil)
+(defvar cfg--file-name-handler-alist file-name-handler-alist)
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      file-name-handler-alist nil)
 
-  (defvar conf:cache-dir (concat user-emacs-directory "cache/"))
-  (unless (file-exists-p conf:cache-dir)
-    (make-directory conf:cache-dir))
+(defvar conf:cache-dir (concat user-emacs-directory "cache/"))
+(unless (file-exists-p conf:cache-dir)
+  (make-directory conf:cache-dir))
 
-  (setq nsm-settings-file (concat conf:cache-dir "network-security.data"))
-  (setq network-security-level 'high)
+(setq nsm-settings-file (concat conf:cache-dir "network-security.data"))
+(setq network-security-level 'high)
 
-  (defvar bootstrap-version)
-  (let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 5))
-    (unless (file-exists-p bootstrap-file)
-      (with-current-buffer
-          (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-           'silent 'inhibit-cookies)
-        (goto-char (point-max))
-        (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage))
+(defvar bootstrap-version)
+(let ((bootstrap-file (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-  (setq load-prefer-newer t)
+(setq load-prefer-newer t)
 
-  (setq straight-check-for-modifications '(check-on-save-find-when-checking))
+(setq straight-check-for-modifications '(check-on-save-find-when-checking))
 
-  (straight-use-package 'use-package)
-  (setq straight-enable-use-package-integration t
-        straight-use-package-by-default t)
+(straight-use-package 'use-package)
+(setq straight-enable-use-package-integration t
+      straight-use-package-by-default t)
 
-  (straight-use-package 'el-patch)
-  (setq el-patch-enable-use-package-integration t)
+(straight-use-package 'el-patch)
+(setq el-patch-enable-use-package-integration t)
 
-  (eval-when-compile
-    (require 'use-package))
+(eval-when-compile
+  (require 'use-package))
 
-  (require 'use-package)
+(require 'use-package)
 
-  (use-package bind-key)
-  (use-package diminish)
+(use-package bind-key)
+(use-package diminish)
 
-  (use-package async
-    :defer t
-    :config (setq async-bytecomp-package-mode t))
+(use-package async
+  :defer t
+  :config (setq async-bytecomp-package-mode t))
 #+end_src
 ** async-tangle
 #+begin_src emacs-lisp
@@ -93,18 +93,18 @@
   :config (setq posframe-mouse-banish nil))
 #+end_src
 * abbrev
-#+begin_src emacs-lisp :tangle no
-  (use-package abbrev
-    :straight nil
-    :diminish abbrev-mode
-    :config
-    (abbrev-mode t)
-    (setq abbrev-file-name (concat conf:cache-dir "abbrev.el")
-          save-abbrevs 'silently
-          default-abbrev-mode t
-          save-abbrevs t)
-    (when (file-exists-p abbrev-file-name)
-      (quietly-read-abbrev-file)))
+#+begin_src emacs-lisp
+(use-package abbrev
+  :straight nil
+  :diminish abbrev-mode
+  :config
+  (abbrev-mode t)
+  (setq abbrev-file-name (concat conf:cache-dir "abbrev.el")
+        save-abbrevs 'silently
+        default-abbrev-mode t
+        save-abbrevs t)
+  (when (file-exists-p abbrev-file-name)
+    (quietly-read-abbrev-file)))
 #+end_src
 * alert
 #+begin_src emacs-lisp
@@ -314,19 +314,19 @@
   :diminish company-mode
   :commands (company-complete-common company-manual-begin company-grab-line)
   :init
-  (setq company-minimum-prefix-length 2
+  (setq company-idle-delay 0
+        company-show-numbers t
+        company-minimum-prefix-length 1
         company-tooltip-limit 14
         company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil
         company-dabbrev-code-other-buffers t
         company-tooltip-align-annotations t
         company-require-match 'never
-        company-global-modes
-        '(not erc-mode message-mode help-mode gud-mode eshell-mode)
+        company-global-modes '(not erc-mode message-mode help-mode gud-mode eshell-mode)
         company-backends '(company-capf)
-        company-frontends
-        '(company-pseudo-tooltip-frontend
-          company-echo-metadata-frontend))
+        company-frontends '(company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend))
 
   :config
   (setq company-backends '((company-capf
@@ -517,10 +517,6 @@
                 (append flycheck-disabled-checkers
                         '(json-jsonlist)))
   :hook (after-init . global-flycheck-mode))
-
-(use-package flycheck-posframe
-  :after flycheck
-  :hook (flycheck-mode . flycheck-posframe-mode))
 #+end_src
 * Flymake
 #+begin_src emacs-lisp :tangle no
@@ -607,7 +603,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Roboto Mono:pixelsize=15")
+(set-face-attribute 'default nil :font "Code New Roman:pixelsize=17")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -620,6 +616,10 @@
 #+begin_src emacs-lisp
   (setq-default frame-title-format
                 (list (user-login-name) "@" (system-name) " %b [%m]"))
+#+end_src
+* Frog
+#+begin_src emacs-lisp
+(use-package frog-jump-buffer)
 #+end_src
 * Git
 #+begin_src emacs-lisp
@@ -1012,8 +1012,8 @@
   (use-package logview
     :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+end_src
-* LSP Mode
-#+begin_src emacs-lisp :tangle no
+* COMMENT LSP Mode
+#+begin_src emacs-lisp
 (use-package lsp
   :straight lsp-mode
   :commands lsp
@@ -1059,12 +1059,7 @@
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-(use-package company-lsp
-  :defer t
-  :commands company-lsp
-  :config
-  (setq company-lsp-async t)
-  (push '(company-lsp :with company-yasnippet) company-backends))
+(use-package company-lsp)
 #+end_src
 * Makefile
 #+begin_src emacs-lisp
@@ -1957,11 +1952,7 @@
   (add-hook 'prog-mode-hook
             (lambda ()
               (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                    '(("in" . ?\u2208)
-                      ("IN" . ?\u2208)
-                      ("not in" . ?\u2209)
-                      ("NOT IN" . ?\u2209)
-                      ("not" . ?\u00AC)
+                    '(("not" . ?\u00AC)
                       ("NOT" . ?\u00AC)
                       ("==" . ?\u2261)
                       ("!=" . ?\u2260)
@@ -1977,12 +1968,13 @@
 #+end_src
 * Proced
 #+begin_src emacs-lisp
-  (use-package proced
-    :bind ("C-x p" . proced)
-    :if (or (string-equal system-type "gnu/linux")
-            (string-equal system-type "gnu/kfreebsd"))
-    :config
-    (add-hook 'proced-mode-hook (lambda () (setq proced-tree-flag t))))
+(use-package proced
+  :bind ("C-x p" . proced)
+  :if (or (string-equal system-type "gnu/linux")
+          (string-equal system-type "gnu/kfreebsd"))
+  :init
+  (setq proced-tree-flag t
+        proced-auto-update-flag t))
 #+end_src
 * Projectile
 #+begin_src emacs-lisp
@@ -2114,8 +2106,8 @@
   (add-hook 'python-mode-hook (lambda ()
                                 (run-hooks 'prelude-python-mode-hook))))
 #+end_src
-** lsp-python
-#+begin_src emacs-lisp :tangle no
+** COMMENT lsp-python
+#+begin_src emacs-lisp
 (use-package python
   :config
   (setq python-shell-interpreter "python"
@@ -2128,6 +2120,11 @@
 #+begin_src emacs-lisp
 (use-package auto-virtualenv
   :hook (elpy-mode . auto-virtualenv-set-virtualenv))
+#+end_src
+** COMMENT Pyenv
+#+begin_src emacs-lisp
+(use-package pyenv-mode :init (pyenv-mode))
+(use-package pyenv-mode-auto)
 #+end_src
 ** PEP8
 #+begin_src emacs-lisp
@@ -2147,6 +2144,54 @@
 
 (use-package pip-requirements)
 #+end_src
+* Polymode
+#+begin_src emacs-lisp
+(use-package polymode
+  :config
+  (setq polymode-prefix-key (kbd "C-c n"))
+  (define-hostmode poly-python-hostmode :mode 'python-mode)
+
+  (define-innermode poly-sql-expr-python-innermode
+    :mode 'sql-mode
+    :head-matcher (rx "r" (= 3 (char "\"'")) (* (any space)))
+    :tail-matcher (rx (= 3 (char "\"'")))
+    :head-mode 'host
+    :tail-mode 'host)
+
+  (defun poly-python-sql-eval-chunk (beg end msg)
+    "Calls out to `sql-send-region' with the polymode chunk region"
+    (sql-send-region beg end))
+
+  (define-polymode poly-python-sql-mode
+    :hostmode 'poly-python-hostmode
+    :innermodes '(poly-sql-expr-python-innermode)
+    (setq polymode-eval-region-function #'poly-python-sql-eval-chunk)
+    (define-key poly-python-sql-mode-map (kbd "C-c C-c") 'polymode-eval-chunk))
+
+:hook (python-mode . poly-python-sql-mode))
+
+  ;; ;; Bug? Fix polymode kill chunk so it works.
+  ;; (defun polymode-kill-chunk ()
+  ;;   "Kill current chunk."
+  ;;   (interactive)
+  ;;   (pcase (pm-innermost-span)
+  ;;     (`(,(or `nil `host) ,beg ,end ,_) (delete-region beg end))
+  ;;     (`(body ,beg ,_ ,_)
+  ;;      (goto-char beg)
+  ;;      (pm--kill-span '(body))
+  ;;      ;; (pm--kill-span '(head tail))
+  ;;      ;; (pm--kill-span '(head tail))
+  ;;      )
+  ;;     (`(tail ,beg ,end ,_)
+  ;;      (if (eq beg (point-min))
+  ;;          (delete-region beg end)
+  ;;        (goto-char (1- beg))
+  ;;        (polymode-kill-chunk)))
+  ;;     (`(head ,_ ,end ,_)
+  ;;      (goto-char end)
+  ;;      (polymode-kill-chunk))
+  ;;     (_ (error "Canoot find chunk to kill")))))
+#+end_src
 * Rainbow
 #+begin_src emacs-lisp
   (use-package rainbow-mode
@@ -2157,16 +2202,18 @@
 #+end_src
 * recentf
 #+begin_src emacs-lisp
-  (use-package recentf
-    :straight nil
-    :config
-    (setq recentf-save-file (concat conf:cache-dir "recentf")
-          recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:" "/scpx:" "/ssh:" "/media/data/org/" "conf:cache-dir" "~/.mail")
-          recentf-max-saved-items 15
-          recentf-max-menu-items 15
-          recentf-keep '(file-remote-p file-readable-p)
-          recentf-auto-cleanup 'never)
-    (recentf-mode +1))
+(use-package recentf
+  :straight nil
+  :config
+  (setq recentf-save-file (concat conf:cache-dir "recentf")
+        recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:"
+                          "/scpx:" "/ssh:" "/media/data/org/"
+                          "conf:cache-dir" "/media/data/mail/Maildir")
+        recentf-max-saved-items 15
+        recentf-max-menu-items 15
+        recentf-keep '(file-remote-p file-readable-p)
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1))
 #+end_src
 * region
 #+begin_src emacs-lisp :tangle no
@@ -2200,14 +2247,14 @@
 #+end_src
 * Scroll
 #+begin_src emacs-lisp
-  (setq scroll-step 1
-        scroll-conservatively 10000)
+(setq-default hscroll-margin 2
+      hscroll-step 1
+      scroll-conservatively 1001
+      scroll-margin 0
+      scroll-preserve-screen-position t)
 
-  (setq scroll-margin 80
-        scroll-conservatively 3000)
-
-  (use-package smooth-scrolling
-    :config (setq smooth-scroll-margin 5))
+(use-package smooth-scrolling
+  :config (setq smooth-scroll-margin 5))
 #+end_src
 * Semantic
 #+begin_src emacs-lisp
@@ -2410,14 +2457,20 @@
 (setq line-number-mode t
       column-number-mode t)
 
-(use-package smart-mode-line
+(use-package doom-modeline
   :config
-  (setq sml/mode-width 'full
-        sml/no-confirm-load-theme t
-        sml/theme 'respectful
-        sml/shorten-modes t)
-  (sml/setup)
-  :hook (after-init . smart-mode-line-enable))
+  (defun conf:doom-modeline--make-xpm-filter-args (args)
+    "Force function to use `doom-modeline-height'.
+     Instead of the calculation done in `doom-modeline-refresh-bars'.
+     The minimum height is set to `frame-char-height' + 2."
+    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+
+  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+
+  (setq doom-modeline-height 12
+        doom-modeline-icon nil
+        doom-modeline-env-enable-python nil)
+  :hook (after-init . doom-modeline-mode))
 #+end_src
 * Sudo
 #+begin_src emacs-lisp
@@ -2606,15 +2659,15 @@
 #+end_src
 * xrdb
 #+begin_src emacs-lisp
-  (use-package xrdb-mode
-    :straight (xrdb-mode :type git :host github :repo "arkhan/xrdb-mode")
-    :mode (("\\.Xdefaults$" . xrdb-mode)
-           ("\\.Xenvironment$" . xrdb-mode)
-           ("\\.Xresources$" . xrdb-mode)
-           (".*\\.ad$" . xrdb-mode)
-           (".*\\.x?rdb$" . xrdb-mode))
-    :config
-    (add-hook 'xrdb-mode-hook (lambda () (setq comment-start "! "))))
+(use-package xrdb-mode
+  :straight (xrdb-mode :type git :host github :repo "arkhan/xrdb-mode")
+  :mode (("\\.Xdefaults$" . xrdb-mode)
+         ("\\.Xenvironment$" . xrdb-mode)
+         ("\\$Xresources$" . xrdb-mode)
+         (".*\\.ad$" . xrdb-mode)
+         (".*\\.x?rdb$" . xrdb-mode))
+  :config
+  (add-hook 'xrdb-mode-hook (lambda () (setq comment-start "! "))))
 #+end_src
 * Yaml
 #+begin_src emacs-lisp

@@ -13,7 +13,7 @@
        (company +auto
                 +childframe)
        (ivy +childframe
-            +icons)
+            +fuzzy)
 
        :ui
        doom-dashboard
@@ -75,7 +75,6 @@
             +present
             +protocol
             +rest)
-       (python +pyenv)
        rest
        (sh +zsh)
 
@@ -176,7 +175,7 @@
 ** Ivy
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! ivy-explorer)
+;;(package! ivy-explorer)
 (package! ivy-prescient)
 #+END_SRC
 *** ivy-prescient
@@ -196,7 +195,7 @@
         ivy-posframe-border-width 0))
 #+END_SRC
 *** ivy-explorer
-#+BEGIN_SRC emacs-lisp :tangle config.el
+#+BEGIN_SRC emacs-lisp :tangle no
 (def-package! ivy-explorer
   :config
   (if (display-graphic-p)
@@ -218,13 +217,19 @@
 (setq display-line-numbers-type nil)
 #+END_SRC
 ** Modeline
-#+BEGIN_SRC emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! doom-modeline
   :config
+  (defun conf:doom-modeline--make-xpm-filter-args (args)
+    "Force function to use `doom-modeline-height'.
+     Instead of the calculation done in `doom-modeline-refresh-bars'.
+     The minimum height is set to `frame-char-height' + 2."
+    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+
+  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+
   (setq doom-modeline-icon nil
-        doom-modeline-height 12)
-  (defsubst fake-font-height () 0)
-  (advice-add #'doom-modeline--font-height :override #'fake-font-height))
+        doom-modeline-height 12))
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -300,30 +305,92 @@
 #+END_SRC
 * Lang
 ** Python
-*** Disable Packages
+*** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-;;(package! anaconda-mode :disable t)
-;;(package! conda :disable t)
-;;(package! company-anaconda :disable t)
-(package! pipenv :disable t)
+(package! elpy)
+(package! auto-virtualenv)
 #+END_SRC
-*** lsp-python
-#+BEGIN_SRC emacs-lisp :tangle no
-(add-hook! python-mode
-  (setq python-shell-interpreter "python"
-        lsp-pyls-configuration-sources ["flake8"]
-        lsp-pyls-plugins-pylint-enabled nil))
-
-(add-hook 'python-mode-hook 'lsp)
-#+END_SRC
-*** pyenv
-**** packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! pyenv-mode-auto)
-#+END_SRC
-**** config
+*** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! pyenv-mode-auto)
+(def-package! elpy
+  :diminish elpy-mode
+  :init (elpy-enable)
+  :config
+  (setq elpy-rpc-backend "jedi"
+        elpy-shell-echo-input nil)
+
+  (add-to-list 'company-backends 'elpy-company-backend)
+  (require 'smartparens-python)
+  (require 'electric)
+
+  (when (require 'flycheck nil t)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+  (defun prelude-python--encoding-comment-required-p ()
+    (re-search-forward "[^\0-\177]" nil t))
+
+  (defun prelude-python--detect-encoding ()
+    (let ((coding-system
+           (or save-buffer-coding-system
+               buffer-file-coding-system)))
+      (if coding-system
+          (symbol-name
+           (or (coding-system-get coding-system 'mime-charset)
+               (coding-system-change-eol-conversion coding-system nil)))
+        "ascii-8bit")))
+
+  (defun prelude-python--insert-coding-comment (encoding)
+    (let ((newlines (if (looking-at "^\\s *$") "\n" "\n\n")))
+      (insert (format "# coding: %s" encoding) newlines)))
+
+  (defun prelude-python-mode-set-encoding ()
+    "Insert a magic comment header with the proper encoding if necessary."
+    (save-excursion
+      (widen)
+      (goto-char (point-min))
+      (when (prelude-python--encoding-comment-required-p)
+        (goto-char (point-min))
+        (let ((coding-system (prelude-python--detect-encoding)))
+          (when coding-system
+            (if (looking-at "^#!") (beginning-of-line 2))
+            (cond ((looking-at "\\s *#\\s *.*\\(en\\)?coding\\s *:\\s *\\([-a-z0-9_]*\\)")
+                   ;; update existing encoding comment if necessary
+                   (unless (string= (match-string 2) coding-system)
+                     (goto-char (match-beginning 2))
+                     (delete-region (point) (match-end 2))
+                     (insert coding-system)))
+                  ((looking-at "\\s *#.*coding\\s *[:=]"))
+                  (t (prelude-python--insert-coding-comment coding-system)))
+            (when (buffer-modified-p)
+              (basic-save-buffer-1)))))))
+
+  (when (fboundp 'exec-path-from-shell-copy-env)
+    (exec-path-from-shell-copy-env "PYTHONPATH"))
+
+  (defun prelude-python-mode-defaults ()
+    "Defaults for Python programming."
+    (subword-mode +1)
+    (eldoc-mode 1)
+    (setq-local electric-layout-rules
+                '((?: . (lambda ()
+                          (and (zerop (first (syntax-ppss)))
+                               (python-info-statement-starts-block-p)
+                               'after)))))
+    (when (fboundp #'python-imenu-create-flat-index)
+      (setq-local imenu-create-index-function
+                  #'python-imenu-create-flat-index))
+    (add-hook 'post-self-insert-hook
+              #'electric-layout-post-self-insert-function nil 'local)
+    (add-hook 'after-save-hook 'prelude-python-mode-set-encoding nil 'local))
+
+  (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
+
+  (add-hook 'python-mode-hook (lambda () (run-hooks 'prelude-python-mode-hook))))
+
+
+(def-package! auto-virtualenv
+  :hook (elpy-mode . auto-virtualenv-set-virtualenv))
 #+END_SRC
 ** PO
 #+BEGIN_SRC emacs-lisp :tangle config.el

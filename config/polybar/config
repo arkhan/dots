@@ -40,11 +40,11 @@ underline-color = ${colors.bg_urgent}
 
 locale = es_EC.UTF-8
 
-font-0 = xos4 Terminus:size=14;0
+font-0 = xos4 Terminus:size=12;0
 font-1 = Siji:size=14;1
 font-2 = FontAwesome:size=10;1
 
-modules-left = bsp mpd
+modules-left = bsp
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
 
@@ -91,64 +91,6 @@ label-urgent-padding = 1
 label-urgent-underline = ${colors.fg_urgent}
 
 label-empty =
-
-[module/i3]
-type = internal/i3
-pin-workspaces = true
-
-ws-icon-default = 
-ws-icon-0 = 0;
-ws-icon-1 = 1;
-ws-icon-2 = 2;
-ws-icon-3 = 3;
-ws-icon-4 = 4;
-ws-icon-5 = 5;
-ws-icon-6 = 6;
-ws-icon-7 = 7;
-ws-icon-8 = 8;
-ws-icon-9 = 9;
-
-label-dimmed = %icon%
-label-dimmed-padding = 1
-label-dimmed-foreground = ${colors.fg_normal}
-label-dimmed-underline = ${colors.fg_normal}
-
-label-focused = %icon%
-label-focused-foreground = ${colors.fg_focus}
-label-focused-background = ${colors.bg_normal}
-label-focused-underline = ${colors.fg_underline}
-label-focused-padding = 1
-
-label-occupied = %icon%
-label-occupied-padding = 1
-
-label-unfocused = %icon%
-label-unfocused-padding = 1
-label-unfocused-foreground = ${colors.fg_normal}
-label-unfocused-underline = ${colors.fg_normal}
-
-label-visible = %icon%
-label-visible-underline = ${colors.fg_normal}
-label-visible-padding = 1
-
-label-urgent = %icon%
-label-urgent-foreground = ${colors.fg_urgent}
-label-urgent-background = ${colors.bg_normal}
-label-urgent-underline = ${colors.fg_urgent}
-label-urgent-padding = 1
-
-label-empty =
-
-[module/mpd]
-type = internal/mpd
-host = 127.0.0.1
-port = 6600
-interval = 1
-
-format-online = <label-song> <label-time>
-label-song = %artist% - %album% - %title%
-
-label-offline =
 
 [module/battery]
 type = internal/battery

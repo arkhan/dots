@@ -29,7 +29,6 @@ bspc rule -a 'Firefox Developer Edition:Navigator' follow=on desktop=^1
 bspc rule -a Qutebrowser follow=on desktop=^1
 bspc rule -a Iceweasel follow=on desktop=^1
 bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
-bspc rule -a URxvt:chat follow=on desktop=^2 state=tiled
 bspc rule -a Thunderbird follow=on desktop=^3
 bspc rule -a Icedove follow=on desktop=^3
 bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
@@ -38,6 +37,7 @@ bspc rule -a Lxappearance follow=on desktop=^6 state=floating
 bspc rule -a Anydesk follow=on desktop=^6 state=tiled
 bspc rule -a Remmina follow=on desktop=^6 state=tiled
 bspc rule -a qt5ct follow=on desktop=^6 state=floating
+bspc rule -a URxvt:music follow=on desktop=^7 state=tiled
 bspc rule -a mpv follow=on desktop=^7 state=tiled
 bspc rule -a obs follow=on desktop=^7 state=tiled
 bspc rule -a cantata follow=on desktop=^7 state=tiled
