@@ -72,25 +72,31 @@
 #+end_src
 ** async-tangle
 #+begin_src emacs-lisp
-  (defun tangle-init-async ()
-    "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
-    (when (or
-           (equal (buffer-file-name)
-                  (expand-file-name (concat user-emacs-directory "readme.org")))
-           (equal (buffer-file-name)
-                  (expand-file-name "~/.dots/emacs/readme.org")))
-      (let ((prog-mode-hook nil))
-        (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
-  (add-hook 'after-save-hook 'tangle-init-async)
+(defun tangle-init-async ()
+  "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
+  (when (or
+         (equal (buffer-file-name)
+                (expand-file-name (concat user-emacs-directory "readme.org")))
+         (equal (buffer-file-name)
+                (expand-file-name "~/.dots/emacs/readme.org")))
+    (let ((prog-mode-hook nil))
+      (async-shell-command "sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+(add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 ** Maximized
 #+begin_src emacs-lisp
 (set-frame-parameter nil 'fullscreen 'maximized)
 #+end_src
-** Posframe
-#+begin_src emacs-lisp :tangle no
-(use-package posframe
-  :config (setq posframe-mouse-banish nil))
+** Load Path
+#+begin_src emacs-lisp
+(let ((base "/usr/share/emacs/site-lisp"))
+  (add-to-list 'load-path base)
+  (dolist (f (directory-files base))
+    (let ((name (concat base "/" f)))
+      (when (and (file-directory-p name)
+                 (not (equal f ".."))
+                 (not (equal f ".")))
+        (add-to-list 'load-path name)))))
 #+end_src
 * abbrev
 #+begin_src emacs-lisp
@@ -603,7 +609,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Code New Roman:pixelsize=17")
+(set-face-attribute 'default nil :font "DejaVu Sans Mono:pixelsize=15")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -1012,7 +1018,7 @@
   (use-package logview
     :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+end_src
-* COMMENT LSP Mode
+* LSP Mode
 #+begin_src emacs-lisp
 (use-package lsp
   :straight lsp-mode
@@ -1059,7 +1065,12 @@
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-(use-package company-lsp)
+(use-package company-lsp
+  :defer t
+  :commands company-lsp
+  :config
+  (setq company-lsp-async t)
+  (push '(company-lsp :with company-yasnippet) company-backends))
 #+end_src
 * Makefile
 #+begin_src emacs-lisp
@@ -1952,7 +1963,11 @@
   (add-hook 'prog-mode-hook
             (lambda ()
               (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                    '(("not" . ?\u00AC)
+                    '(("in" . ?\u2208)
+                      ("IN" . ?\u2208)
+                      ("not in" . ?\u2209)
+                      ("NOT IN" . ?\u2209)
+                      ("not" . ?\u00AC)
                       ("NOT" . ?\u00AC)
                       ("==" . ?\u2261)
                       ("!=" . ?\u2260)
@@ -2027,7 +2042,7 @@
              (when (empty-buffer?) (python-template))))
 
 #+end_src
-** Elpy
+** COMMENT Elpy
 #+begin_src emacs-lisp
 (use-package elpy
   :diminish elpy-mode
@@ -2106,20 +2121,18 @@
   (add-hook 'python-mode-hook (lambda ()
                                 (run-hooks 'prelude-python-mode-hook))))
 #+end_src
-** COMMENT lsp-python
+** lsp-python
 #+begin_src emacs-lisp
-(use-package python
-  :config
-  (setq python-shell-interpreter "python"
-        lsp-pyls-configuration-sources ["flake8"]
-        lsp-pyls-plugins-pylint-enabled nil
-        lsp-pyls-plugins-pyflakes-enable nil)
-  (add-hook 'python-mode-hook 'lsp))
+(use-package lsp-python-ms
+  :demand
+  :config (setq python-shell-interpreter "python")
+  :hook (python-mode . lsp))
 #+end_src
 ** Virtualenv
 #+begin_src emacs-lisp
+(use-package pyvenv)
 (use-package auto-virtualenv
-  :hook (elpy-mode . auto-virtualenv-set-virtualenv))
+  :hook (python-mode . auto-virtualenv-set-virtualenv))
 #+end_src
 ** COMMENT Pyenv
 #+begin_src emacs-lisp
@@ -2168,29 +2181,29 @@
     (setq polymode-eval-region-function #'poly-python-sql-eval-chunk)
     (define-key poly-python-sql-mode-map (kbd "C-c C-c") 'polymode-eval-chunk))
 
-:hook (python-mode . poly-python-sql-mode))
+  ;; Bug? Fix polymode kill chunk so it works.
+  (defun polymode-kill-chunk ()
+    "Kill current chunk."
+    (interactive)
+    (pcase (pm-innermost-span)
+      (`(,(or `nil `host) ,beg ,end ,_) (delete-region beg end))
+      (`(body ,beg ,_ ,_)
+       (goto-char beg)
+       (pm--kill-span '(body))
+       ;; (pm--kill-span '(head tail))
+       ;; (pm--kill-span '(head tail))
+       )
+      (`(tail ,beg ,end ,_)
+       (if (eq beg (point-min))
+           (delete-region beg end)
+         (goto-char (1- beg))
+         (polymode-kill-chunk)))
+      (`(head ,_ ,end ,_)
+       (goto-char end)
+       (polymode-kill-chunk))
+      (_ (error "Canoot find chunk to kill"))))
 
-  ;; ;; Bug? Fix polymode kill chunk so it works.
-  ;; (defun polymode-kill-chunk ()
-  ;;   "Kill current chunk."
-  ;;   (interactive)
-  ;;   (pcase (pm-innermost-span)
-  ;;     (`(,(or `nil `host) ,beg ,end ,_) (delete-region beg end))
-  ;;     (`(body ,beg ,_ ,_)
-  ;;      (goto-char beg)
-  ;;      (pm--kill-span '(body))
-  ;;      ;; (pm--kill-span '(head tail))
-  ;;      ;; (pm--kill-span '(head tail))
-  ;;      )
-  ;;     (`(tail ,beg ,end ,_)
-  ;;      (if (eq beg (point-min))
-  ;;          (delete-region beg end)
-  ;;        (goto-char (1- beg))
-  ;;        (polymode-kill-chunk)))
-  ;;     (`(head ,_ ,end ,_)
-  ;;      (goto-char end)
-  ;;      (polymode-kill-chunk))
-  ;;     (_ (error "Canoot find chunk to kill")))))
+  :hook (python-mode . poly-python-sql-mode))
 #+end_src
 * Rainbow
 #+begin_src emacs-lisp

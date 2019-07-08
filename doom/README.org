@@ -13,7 +13,8 @@
        (company +auto
                 +childframe)
        (ivy +childframe
-            +fuzzy)
+            +prescient
+            +icons)
 
        :ui
        doom-dashboard
@@ -170,47 +171,17 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Code New Roman" :size 17))
+(setq doom-font (font-spec :family "MonacoB" :size 15))
 #+END_SRC
 ** Ivy
-*** Packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-;;(package! ivy-explorer)
-(package! ivy-prescient)
-#+END_SRC
-*** ivy-prescient
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! ivy-prescient
-  :after ivy
-  :init (ivy-prescient-mode))
-#+END_SRC
-*** ivy-posframe
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! ivy-posframe
-  :config
-  (setq ivy-posframe-parameters nil
-        ivy-display-function #'ivy-posframe-display-at-frame-bottom-left
-        ivy-posframe-hide-minibuffer nil
-        ivy-posframe-width (frame-width)
-        ivy-posframe-border-width 0))
-#+END_SRC
-*** ivy-explorer
-#+BEGIN_SRC emacs-lisp :tangle no
-(def-package! ivy-explorer
-  :config
-  (if (display-graphic-p)
-      (setq ivy-explorer-message-function #'ivy-explorer--posframe))
-  (ivy-explorer-mode 1))
-#+END_SRC
-*** Swiper
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! swiper
-  :bind* (("C-s" . swiper)
-          ("C-r" . swiper)
-          ("C-M-s" . swiper-all))
-  :bind
-  (:map read-expression-map
-    ("C-r" . counsel-minibuffer-history)))
+(after! ivy-posframe
+  (setq ivy-posframe-hide-minibuffer nil
+        ivy-fixed-height-minibuffer nil
+        ivy-posframe-parameters `((min-width . ,(window-width))
+                                  (min-height . ,ivy-height)
+                                  (internal-border-width . 1))
+        ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left))))
 #+END_SRC
 ** Line Numbers
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -259,7 +230,7 @@
 
  (advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry))
 #+END_SRC
-** Pretty Code
+** COMMENT Pretty Code
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (setq +pretty-code-symbols
       '(:name "»"
@@ -307,90 +278,19 @@
 ** Python
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! elpy)
+(package! lsp-python-ms)
+(package! pyvenv)
 (package! auto-virtualenv)
-#+END_SRC
+#+End_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! elpy
-  :diminish elpy-mode
-  :init (elpy-enable)
-  :config
-  (setq elpy-rpc-backend "jedi"
-        elpy-shell-echo-input nil)
+(def-package! lsp-python-ms
+  :demand
+  :hook (python-mode . lsp))
 
-  (add-to-list 'company-backends 'elpy-company-backend)
-  (require 'smartparens-python)
-  (require 'electric)
-
-  (when (require 'flycheck nil t)
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'flycheck-mode))
-
-  (defun prelude-python--encoding-comment-required-p ()
-    (re-search-forward "[^\0-\177]" nil t))
-
-  (defun prelude-python--detect-encoding ()
-    (let ((coding-system
-           (or save-buffer-coding-system
-               buffer-file-coding-system)))
-      (if coding-system
-          (symbol-name
-           (or (coding-system-get coding-system 'mime-charset)
-               (coding-system-change-eol-conversion coding-system nil)))
-        "ascii-8bit")))
-
-  (defun prelude-python--insert-coding-comment (encoding)
-    (let ((newlines (if (looking-at "^\\s *$") "\n" "\n\n")))
-      (insert (format "# coding: %s" encoding) newlines)))
-
-  (defun prelude-python-mode-set-encoding ()
-    "Insert a magic comment header with the proper encoding if necessary."
-    (save-excursion
-      (widen)
-      (goto-char (point-min))
-      (when (prelude-python--encoding-comment-required-p)
-        (goto-char (point-min))
-        (let ((coding-system (prelude-python--detect-encoding)))
-          (when coding-system
-            (if (looking-at "^#!") (beginning-of-line 2))
-            (cond ((looking-at "\\s *#\\s *.*\\(en\\)?coding\\s *:\\s *\\([-a-z0-9_]*\\)")
-                   ;; update existing encoding comment if necessary
-                   (unless (string= (match-string 2) coding-system)
-                     (goto-char (match-beginning 2))
-                     (delete-region (point) (match-end 2))
-                     (insert coding-system)))
-                  ((looking-at "\\s *#.*coding\\s *[:=]"))
-                  (t (prelude-python--insert-coding-comment coding-system)))
-            (when (buffer-modified-p)
-              (basic-save-buffer-1)))))))
-
-  (when (fboundp 'exec-path-from-shell-copy-env)
-    (exec-path-from-shell-copy-env "PYTHONPATH"))
-
-  (defun prelude-python-mode-defaults ()
-    "Defaults for Python programming."
-    (subword-mode +1)
-    (eldoc-mode 1)
-    (setq-local electric-layout-rules
-                '((?: . (lambda ()
-                          (and (zerop (first (syntax-ppss)))
-                               (python-info-statement-starts-block-p)
-                               'after)))))
-    (when (fboundp #'python-imenu-create-flat-index)
-      (setq-local imenu-create-index-function
-                  #'python-imenu-create-flat-index))
-    (add-hook 'post-self-insert-hook
-              #'electric-layout-post-self-insert-function nil 'local)
-    (add-hook 'after-save-hook 'prelude-python-mode-set-encoding nil 'local))
-
-  (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
-
-  (add-hook 'python-mode-hook (lambda () (run-hooks 'prelude-python-mode-hook))))
-
-
+(def-package! pyvenv)
 (def-package! auto-virtualenv
-  :hook (elpy-mode . auto-virtualenv-set-virtualenv))
+  :hook (python-mode . auto-virtualenv-set-virtualenv))
 #+END_SRC
 ** PO
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -441,7 +341,92 @@
             (turn-on-flyspell)
             (flyspell-buffer))))))
 #+END_SRC
-** Org
+** Polymode
+*** Packges
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! polymode)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! polymode
+  :config
+  (setq polymode-prefix-key (kbd "C-c n"))
+  (define-hostmode poly-python-hostmode :mode 'python-mode)
+
+  (define-innermode poly-sql-expr-python-innermode
+    :mode 'sql-mode
+    :head-matcher (rx "r" (= 3 (char "\"'")) (* (any space)))
+    :tail-matcher (rx (= 3 (char "\"'")))
+    :head-mode 'host
+    :tail-mode 'host)
+
+  (defun poly-python-sql-eval-chunk (beg end msg)
+    "Calls out to `sql-send-region' with the polymode chunk region"
+    (sql-send-region beg end))
+
+  (define-polymode poly-python-sql-mode
+    :hostmode 'poly-python-hostmode
+    :innermodes '(poly-sql-expr-python-innermode)
+    (setq polymode-eval-region-function #'poly-python-sql-eval-chunk)
+    (define-key poly-python-sql-mode-map (kbd "C-c C-c") 'polymode-eval-chunk))
+
+  ;; Bug? Fix polymode kill chunk so it works.
+  (defun polymode-kill-chunk ()
+    "Kill current chunk."
+    (interactive)
+    (pcase (pm-innermost-span)
+      (`(,(or `nil `host) ,beg ,end ,_) (delete-region beg end))
+      (`(body ,beg ,_ ,_)
+       (goto-char beg)
+       (pm--kill-span '(body)))
+       ;; (pm--kill-span '(head tail))
+       ;; (pm--kill-span '(head tail))
+
+      (`(tail ,beg ,end ,_)
+       (if (eq beg (point-min))
+           (delete-region beg end)
+         (goto-char (1- beg))
+         (polymode-kill-chunk)))
+      (`(head ,_ ,end ,_)
+       (goto-char end)
+       (polymode-kill-chunk))
+      (_ (error "Canoot find chunk to kill"))))
+
+  :hook (python-mode . poly-python-sql-mode))
+#+END_SRC
+** SQL
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! edbi-database-url)
+(package! edbi-minor-mode)
+(package! company-edbi)
+(package! sqlup-mode)
+(package! sql-indent)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! edbi-database-url)
+
+(def-package! edbi-minor-mode
+  :hook (sql-mode . edbi-minor-mode))
+
+(def-package! company-edbi
+  :init
+  (defun cfg:edbi-mode-hook()
+    (add-to-list 'company-backends 'company-edbi))
+  (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
+
+(def-package! sqlup-mode
+  :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
+  :init
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+
+(def-package! sql-indent
+  :after sql
+  :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer))))
+#+END_SRC
 ** Xml
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (defun nxml-template ()
@@ -606,6 +591,65 @@
            ("C-<f6>" . terminal-here-project-launch))
     :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+END_SRC
+** LSP
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! lsp-mode)
+(package! lsp-ui)
+(package! company-lsp)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! lsp-mode
+  :commands lsp
+  :defer t
+  :config
+  (require 'lsp-clients)
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+  :init
+  (setq lsp-eldoc-render-all nil
+        lsp-print-io nil
+        lsp-inhibit-message t
+        lsp-message-project-root-warning t
+        lsp-auto-guess-root t
+        lsp-prefer-flymake nil
+        lsp-session-file (concat doom-cache-dir "lsp-session")))
+
+;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
+(defvar-local conf:lsp-on-change-exist nil
+  "indica si la función `lsp-on-change' estaba insertada en `after-change-functions'")
+
+(defun conf:lsp-on-change-modify-hook ()
+  "Remueve o agrega `lsp-on-change' de `after-change-functions'"
+  (if (not conf:lsp-on-change-exist)
+      ;; quita la función, solamente si estaba insertada desde un principio
+      (when (memq 'lsp-on-change after-change-functions)
+        (setq conf:lsp-on-change-exist t)
+        (remove-hook 'after-change-functions 'lsp-on-change t))
+    ;; agrega la función
+    (add-hook 'after-change-functions #'lsp-on-change nil t)
+    (setq conf:lsp-on-change-exist nil)))
+
+(def-package! lsp-ui
+  :after lsp
+  :commands lsp-ui-mode
+  :init
+  (setq lsp-ui-sideline-enable t
+        lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-sideline-show-hover nil
+        lsp-ui-doc-enable nil)
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(def-package! company-lsp
+  :defer t
+  :commands company-lsp
+  :config
+  (setq company-lsp-async t)
+  (push '(company-lsp :with company-yasnippet) company-backends))
+#+END_SRC
 ** mu4e
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
@@ -618,11 +662,17 @@
   :bind (("C-c l o" . link-hint-open-link)
          ("C-c l c" . link-hint-copy-link)))
 
-(def-package! mu4e
-  :init
-  (setq mu4e-context-policy nil
+(after! mu4e
+  (setq mu4e-context-policy 'pick-first
         mu4e-compose-context-policy 'ask
-        mu4e-view-use-gnus nil)
+        mu4e-view-use-gnus nil
+        mu4e-view-prefer-html t
+        mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
+
+  (set-popup-rule! "^ ?\\*Mailboxes*"
+    :side neo-window-position
+    :size neo-window-width
+    :quit 'current :select t)
 
   (defadvice mu4e-quit (after mu4e-close-and-push activate)
     "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
