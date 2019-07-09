@@ -13,13 +13,11 @@
        (company +auto
                 +childframe)
        (ivy +childframe
-            +prescient
-            +icons)
+            +prescient)
 
        :ui
        doom-dashboard
        doom-quit
-       fill-column
        hl-todo
        indent-guides
        modeline
@@ -55,6 +53,7 @@
        flycheck
        (flyspell +hunspell)
        (lookup +docsets)
+       lsp
        magit
        make
        pass
@@ -108,15 +107,25 @@
 #+END_SRC
 * Editor
 ** Company
-*** Packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! company-prescient)
-#+END_SRC
-*** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
- (def-package! company-prescient
-   :after company
-   :init (company-prescient-mode))
+ (after! company
+   (setq company-idle-delay 0
+        company-show-numbers t
+        company-minimum-prefix-length 1
+        company-tooltip-limit 14
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-code-other-buffers t
+        company-tooltip-align-annotations t
+        company-require-match 'never
+        company-global-modes '(not erc-mode message-mode help-mode gud-mode eshell-mode)
+        company-backends '(company-capf)
+        company-frontends '(company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend)))
+#+END_SRC
+** Highlight
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! hl-line :disable t)
 #+END_SRC
 ** Move-dup
 *** Packages
@@ -171,7 +180,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "MonacoB" :size 15))
+(setq doom-font (font-spec :family "Fira Code Retina" :size 15))
 #+END_SRC
 ** Ivy
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -206,9 +215,8 @@
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (def-package! shrink-path)
 
-(def-package! neotree
-  :config
-  (setq neo-theme 'icons
+(after! neotree
+  (setq neo-theme 'ascii
         neo-vc-integration nil
         neo-window-width 36
         neo-create-file-auto-open t
@@ -230,24 +238,33 @@
 
  (advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry))
 #+END_SRC
-** COMMENT Pretty Code
+** Pretty Code
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq +pretty-code-symbols
-      '(:name "»"
-        :src_block "»"
-        :src_block_end "«"
-        :lambda "λ"
-        :not "￢"
-        :in "∈"
-        :not-in "∉"
-        :and "∧"
-        :or "∨"))
+;; (setq +pretty-code-symbols
+;;       '(:name "»"
+;;         :src_block "»"
+;;         :src_block_end "«"
+;;         :lambda "λ"
+;;         :not "￢"
+;;         :in "∈"
+;;         :not-in "∉"
+;;         :and "∧"
+;;         :or "∨"))
 
 (defvar +pretty-code-extra-ligatures
-  '(("==" . ?\u2261)
+  '(("in" . ?\u2208)
+    ("IN" . ?\u2208)
+    ("not in" . ?\u2209)
+    ("NOT IN" . ?\u2209)
+    ("not" . ?\u00AC)
+    ("NOT" . ?\u00AC)
+    ("==" . ?\u2261)
     ("!=" . ?\u2260)
     (">=" . ?\u2265)
-    ("<=" . ?\u2264)))
+    ("<=" . ?\u2264)
+    ("lambda" . ?\u03BB)
+    ("and" . ?\u2227)
+    ("or" . ?\u2228)))
 
 (setq-default prettify-symbols-alist
               (append prettify-symbols-alist
@@ -275,6 +292,11 @@
    (which-key-posframe-mode))
 #+END_SRC
 * Lang
+** Empty
+#+begin_src emacs-lisp :tangle config.el
+(defun empty-buffer? ()
+  (= (buffer-end 1) (buffer-end -1)))
+#+end_src
 ** Python
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
@@ -544,6 +566,16 @@
 
 (def-package! calfw-org)
 #+END_SRC
+** Docker
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! docker-compose-mode)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! docker-compose-mode
+  :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
+#+END_SRC
 ** Flyspell
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (add-hook! flyspell
@@ -592,63 +624,15 @@
     :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+END_SRC
 ** LSP
-*** Packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! lsp-mode)
-(package! lsp-ui)
-(package! company-lsp)
-#+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! lsp-mode
-  :commands lsp
-  :defer t
-  :config
-  (require 'lsp-clients)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-  :init
+(after! lsp-mode
   (setq lsp-eldoc-render-all nil
         lsp-print-io nil
         lsp-inhibit-message t
         lsp-message-project-root-warning t
         lsp-auto-guess-root t
-        lsp-prefer-flymake nil
-        lsp-session-file (concat doom-cache-dir "lsp-session")))
-
-;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
-(defvar-local conf:lsp-on-change-exist nil
-  "indica si la función `lsp-on-change' estaba insertada en `after-change-functions'")
-
-(defun conf:lsp-on-change-modify-hook ()
-  "Remueve o agrega `lsp-on-change' de `after-change-functions'"
-  (if (not conf:lsp-on-change-exist)
-      ;; quita la función, solamente si estaba insertada desde un principio
-      (when (memq 'lsp-on-change after-change-functions)
-        (setq conf:lsp-on-change-exist t)
-        (remove-hook 'after-change-functions 'lsp-on-change t))
-    ;; agrega la función
-    (add-hook 'after-change-functions #'lsp-on-change nil t)
-    (setq conf:lsp-on-change-exist nil)))
-
-(def-package! lsp-ui
-  :after lsp
-  :commands lsp-ui-mode
-  :init
-  (setq lsp-ui-sideline-enable t
-        lsp-ui-sideline-ignore-duplicate t
-        lsp-ui-sideline-show-hover nil
-        lsp-ui-doc-enable nil)
-  :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-
-(def-package! company-lsp
-  :defer t
-  :commands company-lsp
-  :config
-  (setq company-lsp-async t)
-  (push '(company-lsp :with company-yasnippet) company-backends))
+        lsp-prefer-flymake nil))
 #+END_SRC
 ** mu4e
 *** Packages
@@ -669,10 +653,10 @@
         mu4e-view-prefer-html t
         mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
 
-  (set-popup-rule! "^ ?\\*Mailboxes*"
-    :side neo-window-position
-    :size neo-window-width
-    :quit 'current :select t)
+;;  (set-popup-rule! "^ ?\\*Mailboxes*"
+;;    :side neo-window-position
+;;    :size neo-window-width
+;;    :quit 'current :select t)
 
   (defadvice mu4e-quit (after mu4e-close-and-push activate)
     "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
@@ -756,6 +740,16 @@
 (def-package! vlf-setup
   :init (setq vlf-application 'dont-ask))
 #+END_SRC
+** Tramp
+#+begin_src emacs-lisp :tangle config.el
+(after! tramp
+  (setq tramp-default-method "scp"
+        tramp-debug-buffer t
+        tramp-verbose 10
+        tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
+  (tramp-set-completion-function "ssh" '((tramp-parse-sconfig "/etc/ssh_config")
+                                         (tramp-parse-sconfig "~/.ssh/config"))))
+#+end_src
 ** xrdb
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el

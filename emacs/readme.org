@@ -609,7 +609,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "DejaVu Sans Mono:pixelsize=15")
+(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
