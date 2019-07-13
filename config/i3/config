@@ -3,7 +3,7 @@
 set $bin $HOME/.bin
 
 # Terminal
-set $term ~/.bin/urxvtcd --geometry 100x30
+set $term urxvtcd --geometry 100x30
 
 # Display
 set $edp1 eDP1
@@ -260,7 +260,7 @@ exec --no-startup-id xrdb $HOME/.Xresources
 # Wallpaper
 exec --no-startup-id feh --bg-fill $HOME/.dots/walls/03.jpg
 # i3lock Fancy
-exec --no-startup-id xss-lock -- i3lock-fancy -p
+exec --no-startup-id xss-lock -- i3lock-fancy-dualmonitor -p
 # Clipboard
 exec --no-startup-id $bin/clipboard
 # udiskie
@@ -305,6 +305,6 @@ floating_minimum_size -1 x -1
 floating_maximum_size -1 x -1
 
 # i3-gaps
-#smart_borders on
-#gaps inner 2
-#gaps outer 2
+smart_borders on
+gaps inner 2
+gaps outer 2

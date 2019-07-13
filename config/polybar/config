@@ -44,17 +44,12 @@ font-0 = xos4 Terminus:size=12;0
 font-1 = Siji:size=14;1
 font-2 = FontAwesome:size=10;1
 
-modules-left = bsp
+modules-left = i3
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
 
-wm-restack = bspwm
-
-[module/bsp]
-type = internal/bspwm
-inline-mode = false
-fuzzy-match = true
-
+[module/i3]
+type = internal/i3
 pin-workspaces = true
 
 ws-icon-default = 
@@ -69,26 +64,34 @@ ws-icon-7 = 7;
 ws-icon-8 = 8;
 ws-icon-9 = 9;
 
-format = <label-state> <label-mode>
-
+label-dimmed = %icon%
+label-dimmed-padding = 1
+label-dimmed-foreground = ${colors.fg_normal}
 label-dimmed-underline = ${colors.fg_normal}
 
 label-focused = %icon%
-label-focused-background = ${colors.bg_focus}
 label-focused-foreground = ${colors.fg_focus}
-label-focused-padding = 1
+label-focused-background = ${colors.bg_normal}
 label-focused-underline = ${colors.fg_underline}
+label-focused-padding = 1
 
 label-occupied = %icon%
-label-occupied-foreground = ${colors.fg_normal}
 label-occupied-padding = 1
-label-occupied-underline = ${colors.fg_normal}
+
+label-unfocused = %icon%
+label-unfocused-padding = 1
+label-unfocused-foreground = ${colors.fg_normal}
+label-unfocused-underline = ${colors.fg_normal}
+
+label-visible = %icon%
+label-visible-underline = ${colors.fg_normal}
+label-visible-padding = 1
 
 label-urgent = %icon%
-label-urgent-background = ${colors.bg_normal}
 label-urgent-foreground = ${colors.fg_urgent}
-label-urgent-padding = 1
+label-urgent-background = ${colors.bg_normal}
 label-urgent-underline = ${colors.fg_urgent}
+label-urgent-padding = 1
 
 label-empty =
 

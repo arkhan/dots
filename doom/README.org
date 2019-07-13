@@ -45,6 +45,9 @@
        electric
        vc
 
+       :term
+       eshell
+
        :tools
        ansible
        docker
@@ -56,7 +59,7 @@
        lsp
        magit
        make
-       pass
+       (pass +auth)
        pdf
        rgb
        terraform
@@ -66,13 +69,13 @@
        :lang
        data
        emacs-lisp
+       (javascript +lsp)
        latex
        (org +attach
             +babel
             +capture
             +export
             +habit
-            +present
             +protocol
             +rest)
        rest
@@ -96,7 +99,7 @@
   (when (or (equal (buffer-file-name) (expand-file-name (concat doom-private-dir "README.org")))
             (equal (buffer-file-name) (expand-file-name "~/.dots/doom/README.org")))
     (let ((prog-mode-hook nil))
-      (async-shell-command "sh -c \"~/.emacs.d/bin/org-tangle ~/.doom.d/README.org\""))))
+      (async-shell-command "sh -c \"~/.emacs.d/bin/org-tangle ~/.doom.d/README.org\"" "*Messages*"))))
 
 (add-hook 'after-save-hook 'tangle-init-async)
 #+END_SRC
@@ -105,6 +108,17 @@
 (setq current-language-environment "Spanish"
       org-export-default-language "es")
 #+END_SRC
+** Extra Load Path
+#+begin_src emacs-lisp
+(let ((base "/usr/share/emacs/site-lisp"))
+  (add-to-list 'load-path base)
+  (dolist (f (directory-files base))
+    (let ((name (concat base "/" f)))
+      (when (and (file-directory-p name)
+                 (not (equal f ".."))
+                 (not (equal f ".")))
+        (add-to-list 'load-path name)))))
+#+end_src
 * Editor
 ** Company
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -158,16 +172,15 @@
 * UI
 ** Cursor
 #+BEGIN_SRC emacs-lisp :tangle config.el
-  (setq-default cursor-type '(hbar . 2))
-  (setq x-stretch-cursor t)
+(setq-default cursor-type '(hbar . 2))
+(setq x-stretch-cursor t)
 
-  (def-package! frame
-    :config
-    (defun set-cursor-hook (frame)
-      (modify-frame-parameters
-       frame (list (cons 'cursor-color "white"))))
-
-    (add-hook 'after-make-frame-functions 'set-cursor-hook))
+(def-package! frame
+  :config
+  (defun set-cursor-hook (frame)
+    (modify-frame-parameters
+     frame (list (cons 'cursor-color "white"))))
+  (add-hook 'after-make-frame-functions 'set-cursor-hook))
 
 (add-to-list 'default-frame-alist
              '(ns-transparent-titlebar . t))
@@ -180,7 +193,22 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Fira Code Retina" :size 15))
+(setq doom-font (font-spec :family "mononoki" :size 15))
+#+END_SRC
+** Imenu
+*** Package
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! imenu-list)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! imenu-list
+  :init
+  (set-popup-rule! "^\\*Ilist"
+    :slot -1 :vslot -1 :size 35 :side 'left :ttl 0)
+  (setq imenu-list-focus-after-activation t))
+
+(map! :leader "o i" #'imenu-list-smart-toggle)
 #+END_SRC
 ** Ivy
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -198,8 +226,7 @@
 #+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! doom-modeline
-  :config
+(after! doom-modeline
   (defun conf:doom-modeline--make-xpm-filter-args (args)
     "Force function to use `doom-modeline-height'.
      Instead of the calculation done in `doom-modeline-refresh-bars'.
@@ -209,7 +236,8 @@
   (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
 
   (setq doom-modeline-icon nil
-        doom-modeline-height 12))
+        doom-modeline-height 12
+        doom-modeline-env-enable-python nil))
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -240,31 +268,34 @@
 #+END_SRC
 ** Pretty Code
 #+BEGIN_SRC emacs-lisp :tangle config.el
-;; (setq +pretty-code-symbols
-;;       '(:name "»"
-;;         :src_block "»"
-;;         :src_block_end "«"
-;;         :lambda "λ"
-;;         :not "￢"
-;;         :in "∈"
-;;         :not-in "∉"
-;;         :and "∧"
-;;         :or "∨"))
+(setq +pretty-code-symbols
+      '(:name "»"
+        :src_block "»"
+        :src_block_end "«"
+        :lambda "λ"
+        :not "￢"
+        :in "∈"
+        :not-in "∉"
+        :and "∧"
+        :or "∨"))
 
 (defvar +pretty-code-extra-ligatures
-  '(("in" . ?\u2208)
-    ("IN" . ?\u2208)
-    ("not in" . ?\u2209)
-    ("NOT IN" . ?\u2209)
-    ("not" . ?\u00AC)
-    ("NOT" . ?\u00AC)
+  '(;;("in" . ?\u2208)
+    ;;("IN" . ?\u2208)
+    ;;("not in" . ?\u2209)
+    ;;("NOT IN" . ?\u2209)
+    ;;("not" . ?\u00AC)
+    ;;("NOT" . ?\u00AC)
     ("==" . ?\u2261)
     ("!=" . ?\u2260)
     (">=" . ?\u2265)
     ("<=" . ?\u2264)
-    ("lambda" . ?\u03BB)
-    ("and" . ?\u2227)
-    ("or" . ?\u2228)))
+    ;;("lambda" . ?\u03BB)
+    ;;("AND" . ?\u2227)
+    ;;("and" . ?\u2227)
+    ;;("OR" . ?\u2228)
+    ;;("or" . ?\u2228)))
+    ))
 
 (setq-default prettify-symbols-alist
               (append prettify-symbols-alist
@@ -303,6 +334,8 @@
 (package! lsp-python-ms)
 (package! pyvenv)
 (package! auto-virtualenv)
+(package! isortify)
+(package! pip-requirements)
 #+End_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -313,6 +346,107 @@
 (def-package! pyvenv)
 (def-package! auto-virtualenv
   :hook (python-mode . auto-virtualenv-set-virtualenv))
+
+(def-package! isortify
+  :hook (python-mode . isortify-mode))
+
+(def-package! pip-requirements
+  :hook (pip-requirements-mode . pip-requirements-auto-complete-setup))
+#+END_SRC
+** Org
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! org-tree-slide)
+(package! writeroom-mode)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(after! org
+  (set-popup-rule! "^ \\*Agenda"
+    :slot -1 :vslot -1 :size #'+popup-shrink-to-fit :side 'right :ttl 0)
+
+(setq org-capture-templates
+      '(("w" "Work TODO" entry (file+olp "~/org/work.org" "Tasks") "* TODO %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+        ("o" "Work Overtime" entry (file+olp "~/org/work.org" "COMMENT Overtime") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CREATED: %U\n:END:")
+        ("m" "Work Meetings" entry (file+olp "~/org/work.org" "Meetings") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+        ("t" "Work Training's" entry (file+olp "~/org/work.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")
+        ("S" "Stuff TODO" entry (file+olp "~/org/stuff.org" "Tasks") "* TODO %? \n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+        ("M" "Stuff Meetings" entry (file+olp "~/org/stuff.org" "Meetings") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+        ("T" "Stuff Training's" entry (file+olp "~/org/stuff.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:"))))
+
+;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
+(def-package! org-tree-slide
+  :config
+  (setq org-tree-slide--lighter " Slide")
+
+  (defvar conf:org-tree-slide-text-scale 5
+    "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
+
+  (defun conf:org-tree-slide-set-profile ()
+    "Customize org-tree-slide variables."
+    (interactive)
+    (setq org-tree-slide-header t
+          org-tree-slide-slide-in-effect nil
+          org-tree-slide-heading-emphasis t
+          org-tree-slide-cursor-init t ;Move cursor to the head of buffer
+          org-tree-slide-modeline-display 'lighter
+          org-tree-slide-skip-done nil
+          org-tree-slide-skip-comments t
+          org-tree-slide-activate-message (concat "Starting Org presentation. "
+                                                  "Use arrow keys to navigate the slides.")
+          org-tree-slide-deactivate-message "Ended presentation.")
+    (message "Custom `org-tree-slide' profile: ON"))
+
+  (conf:org-tree-slide-set-profile)
+
+  (defvar conf:writegood-mode-state nil
+    "Variable to store the state of `writegood-mode'.")
+
+  (defun conf:org-tree-slide-start ()
+    "Set up the frame for the slideshow."
+    (interactive)
+    (internal-show-cursor (selected-window) nil)
+    (org-display-inline-images)
+    (toggle-read-only)
+    (writeroom-mode 1)
+    (text-scale-set conf:org-tree-slide-text-scale))
+  (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
+
+  (defun conf:org-tree-slide-stop()
+    "Undo the frame setup for the slideshow."
+    (interactive)
+      (internal-show-cursor (selected-window) t)
+    (toggle-read-only)
+    (writeroom-mode -1)
+    (text-scale-set 0))
+  (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
+
+  (defun conf:org-tree-slide-text-scale-reset ()
+    "Reset time scale to `modi/org-tree-slide-text-scale'."
+    (interactive)
+    (text-scale-set conf:org-tree-slide-text-scale))
+
+  (defun conf:org-tree-slide-text-scale-inc1 ()
+    "Increase text scale by 1."
+    (interactive)
+    (text-scale-increase 1))
+
+  (defun conf:org-tree-slide-text-scale-dec1 ()
+    "Decrease text scale by 1."
+    (interactive)
+    (text-scale-decrease 1))
+
+  (bind-keys
+   :map org-tree-slide-mode-map
+   ("C-b" . org-tree-slide-move-previous-tree)
+   ("C-f" . org-tree-slide-move-next-tree)
+   ("C-0" . conf:org-tree-slide-text-scale-reset)
+   ("C-+" . conf:org-tree-slide-text-scale-inc1)
+   ("C--" . conf:org-tree-slide-text-scale-dec1)
+   ("C-1" . org-tree-slide-content)
+   ("C-2" . conf:org-tree-slide-set-profile)
+   ("C-3" . org-tree-slide-simple-profile)
+   ("C-4" . org-tree-slide-presentation-profile)))
 #+END_SRC
 ** PO
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -512,6 +646,35 @@
   (define-key nxml-mode-map (kbd "C-x f") 'pretty-print-xml-buffer))
 #+END_SRC
 * Tools
+** Anzu
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(def-package! anzu
+  :defer t
+  :bind (("M-%" . anzu-query-replace)
+         ("C-M-%" . anzu-query-replace-regexp))
+  :config
+  (set-face-attribute 'anzu-mode-line nil :foreground "yellow" :weight 'bold)
+
+  (defun cfg:anzu-update-func (here total)
+   (when anzu--state
+     (let ((status (cl-case anzu--state)))
+       (search (format "[%d/%d Seek]" here total))
+       (replace-query (format "(%d Replaces)" total))
+       (replace (format "[%d/%d Replaces]" here total))
+       (propertize status 'face 'anzu-mode-line))))
+
+  (setq anzu-cons-mode-line-p nil
+        anzu-mode-lighter ""
+        anzu-deactivate-region t
+        anzu-search-threshold 1000
+        anzu-replace-threshold 50
+        anzu-replace-to-string-separator " => "
+        anzu-mode-line-update-function #'cfg:anzu-update-func)
+
+  (add-to-list 'minor-mode-alist
+               '(:eval (when anzu--state)
+                       (concat " " (anzu--update-mode-line)))))
+#+END_SRC
 ** BugHunter
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
@@ -558,11 +721,11 @@
 
 
 (def-package! calfw
-  :bind ("C-c f" . cfw:open-org-calendar)
   :config
   (setq cfw:org-overwrite-default-keybinding t
         cfw:display-calendar-holidays nil
-        calendar-week-start-day 1))
+        calendar-week-start-day 1)
+  (map! :leader "o f" #'cfw:open-org-calendar))
 
 (def-package! calfw-org)
 #+END_SRC
@@ -618,10 +781,10 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
- (def-package! terminal-here
-    :bind (("C-<f5>" . terminal-here-launch)
-           ("C-<f6>" . terminal-here-project-launch))
-    :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
+(def-package! terminal-here
+  :bind (("C-<f5>" . terminal-here-launch)
+         ("C-<f6>" . terminal-here-project-launch))
+  :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+END_SRC
 ** LSP
 *** Config
@@ -652,11 +815,6 @@
         mu4e-view-use-gnus nil
         mu4e-view-prefer-html t
         mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
-
-;;  (set-popup-rule! "^ ?\\*Mailboxes*"
-;;    :side neo-window-position
-;;    :size neo-window-width
-;;    :quit 'current :select t)
 
   (defadvice mu4e-quit (after mu4e-close-and-push activate)
     "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
@@ -713,12 +871,17 @@
     (mu4e-alert-enable-mode-line-display))
   (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
   (mu4e-alert-set-default-style 'libnotify))
+
+(set-popup-rule! "^ ?\\*mu4e-main*"
+  :side 'left
+  :size 36
+  :quit 'current :select t)
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el
-  (def-package! auth-source
-    :init (setq auth-source-debug t
-                auth-source-do-cache nil))
+(def-package! auth-source
+  :init (setq auth-source-debug t
+              auth-source-do-cache nil))
 #+END_SRC
 ** PKGBUILD
 *** Packages
