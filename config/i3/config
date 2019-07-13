@@ -16,7 +16,7 @@ set $mod4 Mod4
 set $mod1 Mod1
 
 # Font for window titles.
-font pango:Terminus 12
+font pango:xos4 Terminus 12
 
 # Use Mouse+$mod4 to drag floating windows to their wanted position
 floating_modifier $mod4
