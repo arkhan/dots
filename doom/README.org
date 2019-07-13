@@ -800,7 +800,8 @@
 ** mu4e
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! mu4e-alert)
+(when (executable-find "mu")
+  (package! mu4e-alert))
 (package! link-hint)
 #+END_SRC
 *** Config
@@ -809,73 +810,74 @@
   :bind (("C-c l o" . link-hint-open-link)
          ("C-c l c" . link-hint-copy-link)))
 
-(after! mu4e
-  (setq mu4e-context-policy 'pick-first
-        mu4e-compose-context-policy 'ask
-        mu4e-view-use-gnus nil
-        mu4e-view-prefer-html t
-        mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
+(when (executable-find "mu")
+  (after! mu4e
+    (setq mu4e-context-policy 'pick-first
+          mu4e-compose-context-policy 'ask
+          mu4e-view-use-gnus nil
+          mu4e-view-prefer-html t
+          mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
 
-  (defadvice mu4e-quit (after mu4e-close-and-push activate)
-    "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
-    (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
-    (when (get-register :mu4e-fullscreen)
-      (jump-to-register :mu4e-fullscreen)))
+    (defadvice mu4e-quit (after mu4e-close-and-push activate)
+      "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
+      (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
+      (when (get-register :mu4e-fullscreen)
+        (jump-to-register :mu4e-fullscreen)))
 
-  (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
+    (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
 
-  (set-email-account! "Work"
-                      '((mu4e-sent-folder       . "/Work/Sent")
-                        (mu4e-drafts-folder     . "/Work/Drafts")
-                        (mu4e-trash-folder      . "/Work/Trash")
-                        (mu4e-refile-folder     . "/Work/Archive")
-                        (smtpmail-smtp-user     . "edison@disroot.org")
-                        (user-mail-address      . "edison@disroot.org")
-                        (user-full-name         . "Edison Ibáñez")
-                        (mu4e-compose-signature . "\nEdison Ibáñez"))
-                      t)
+    (set-email-account! "Work"
+                        '((mu4e-sent-folder       . "/Work/Sent")
+                          (mu4e-drafts-folder     . "/Work/Drafts")
+                          (mu4e-trash-folder      . "/Work/Trash")
+                          (mu4e-refile-folder     . "/Work/Archive")
+                          (smtpmail-smtp-user     . "edison@disroot.org")
+                          (user-mail-address      . "edison@disroot.org")
+                          (user-full-name         . "Edison Ibáñez")
+                          (mu4e-compose-signature . "\nEdison Ibáñez"))
+                        t)
 
-  (set-email-account! "Personal"
-                      '((mu4e-sent-folder       . "/Personal/Sent")
-                        (mu4e-drafts-folder     . "/Personal/Drafts")
-                        (mu4e-trash-folder      . "/Personal/Trash")
-                        (mu4e-refile-folder     . "/Personal/Archive")
-                        (smtpmail-smtp-user     . "arkhan@disroot.org")
-                        (user-mail-address      . "arkhan@disroot.org")
-                        (user-full-name         . "Edison Ibáñez")
-                        (mu4e-compose-signature . "\nEdison Ibáñez"))
-                      t)
+    (set-email-account! "Personal"
+                        '((mu4e-sent-folder       . "/Personal/Sent")
+                          (mu4e-drafts-folder     . "/Personal/Drafts")
+                          (mu4e-trash-folder      . "/Personal/Trash")
+                          (mu4e-refile-folder     . "/Personal/Archive")
+                          (smtpmail-smtp-user     . "arkhan@disroot.org")
+                          (user-mail-address      . "arkhan@disroot.org")
+                          (user-full-name         . "Edison Ibáñez")
+                          (mu4e-compose-signature . "\nEdison Ibáñez"))
+                        t)
 
-  (set-email-account! "Gmail"
-                      '((mu4e-sent-folder       . "/Gmail/Sent Items")
-                        (mu4e-drafts-folder     . "/Gmail/Drafts")
-                        (mu4e-trash-folder      . "/Gmail/Deleted Items")
-                        (mu4e-refile-folder     . "/Gmail/Archive")
-                        (smtpmail-smtp-user     . "arkhan.xxx@gmail.com")
-                        (user-mail-address      . "arkhan.xxx@gmail.com")
-                        (user-full-name         . "Edison Ibáñez")
-                        (mu4e-compose-signature . "\nEdison Ibáñez"))
-                      t))
+    (set-email-account! "Gmail"
+                        '((mu4e-sent-folder       . "/Gmail/Sent Items")
+                          (mu4e-drafts-folder     . "/Gmail/Drafts")
+                          (mu4e-trash-folder      . "/Gmail/Deleted Items")
+                          (mu4e-refile-folder     . "/Gmail/Archive")
+                          (smtpmail-smtp-user     . "arkhan.xxx@gmail.com")
+                          (user-mail-address      . "arkhan.xxx@gmail.com")
+                          (user-full-name         . "Edison Ibáñez")
+                          (mu4e-compose-signature . "\nEdison Ibáñez"))
+                        t))
 
-(def-package! mu4e-alert
-  :init
-  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
-  (setq mu4e-compose-forward-as-attachment t
-        mu4e-index-update-in-background t
-        mu4e-alert-email-notification-types '(subjects))
-  :config
-  (defun conf:refresh-mu4e-alert-mode-line ()
-    (interactive)
-    (mu4e~proc-kill)
-    (mu4e-alert-enable-mode-line-display))
-  (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
-  (mu4e-alert-set-default-style 'libnotify))
+  (def-package! mu4e-alert
+    :init
+    (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
+    (setq mu4e-compose-forward-as-attachment t
+          mu4e-index-update-in-background t
+          mu4e-alert-email-notification-types '(subjects))
+    :config
+    (defun conf:refresh-mu4e-alert-mode-line ()
+      (interactive)
+      (mu4e~proc-kill)
+      (mu4e-alert-enable-mode-line-display))
+    (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
+    (mu4e-alert-set-default-style 'libnotify))
 
-(set-popup-rule! "^ ?\\*mu4e-main*"
-  :side 'left
-  :size 36
-  :quit 'current :select t)
+  (set-popup-rule! "^ ?\\*mu4e-main*"
+    :side 'left
+    :size 36
+    :quit 'current :select t))
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el
