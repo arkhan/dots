@@ -120,7 +120,7 @@ c.colors.completion.item.selected.fg = "#ffffff"
 # Type: QssColor
 c.colors.completion.item.selected.bg = "#191919"
 
-# Top border color of the completion widget category headers.
+# Top border color of the selected completion item.
 # Type: QssColor
 c.colors.completion.item.selected.border.top = "#191919"
 
@@ -132,10 +132,30 @@ c.colors.completion.item.selected.border.bottom = "#191919"
 # Type: QtColor
 c.colors.completion.match.fg = "#ffcc00"
 
+# Foreground color of unselected odd tabs.
+# Type: QtColor
+c.colors.tabs.odd.fg = "grey"
+
+# Background color of unselected odd tabs.
+# Type: QtColor
+c.colors.tabs.odd.bg = "black"
+
+# Foreground color of unselected even tabs.
+# Type: QtColor
+c.colors.tabs.even.fg = "darkgrey"
+
+# Background color of unselected even tabs.
+# Type: QtColor
+c.colors.tabs.even.bg = "black"
+
+# Background color of selected odd tabs.
+# Type: QtColor
+c.colors.tabs.selected.odd.bg = "black"
+
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "mononoki"
+c.fonts.monospace = "Fira Code Retina"
 
 # Bindings for normal mode
 config.bind("/", None)

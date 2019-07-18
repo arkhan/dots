@@ -7,8 +7,6 @@
 ** init.el
 *** init.el
 #+BEGIN_SRC emacs-lisp :tangle init.el
-;;; init.el -*- lexical-binding: t; -*-
-
 (doom! :completion
        (company +auto
                 +childframe)
@@ -109,7 +107,7 @@
       org-export-default-language "es")
 #+END_SRC
 ** Extra Load Path
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle config.el
 (let ((base "/usr/share/emacs/site-lisp"))
   (add-to-list 'load-path base)
   (dolist (f (directory-files base))
@@ -193,7 +191,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "mononoki" :size 15))
+(setq doom-font (font-spec :family "Fira Code Retina" :size 15))
 #+END_SRC
 ** Imenu
 *** Package
@@ -268,34 +266,11 @@
 #+END_SRC
 ** Pretty Code
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq +pretty-code-symbols
-      '(:name "»"
-        :src_block "»"
-        :src_block_end "«"
-        :lambda "λ"
-        :not "￢"
-        :in "∈"
-        :not-in "∉"
-        :and "∧"
-        :or "∨"))
-
 (defvar +pretty-code-extra-ligatures
-  '(;;("in" . ?\u2208)
-    ;;("IN" . ?\u2208)
-    ;;("not in" . ?\u2209)
-    ;;("NOT IN" . ?\u2209)
-    ;;("not" . ?\u00AC)
-    ;;("NOT" . ?\u00AC)
-    ("==" . ?\u2261)
+  '(("==" . ?\u2261)
     ("!=" . ?\u2260)
     (">=" . ?\u2265)
-    ("<=" . ?\u2264)
-    ;;("lambda" . ?\u03BB)
-    ;;("AND" . ?\u2227)
-    ;;("and" . ?\u2227)
-    ;;("OR" . ?\u2228)
-    ;;("or" . ?\u2228)))
-    ))
+    ("<=" . ?\u2264)))
 
 (setq-default prettify-symbols-alist
               (append prettify-symbols-alist
@@ -328,36 +303,35 @@
 (defun empty-buffer? ()
   (= (buffer-end 1) (buffer-end -1)))
 #+end_src
-** Python
-*** Packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! lsp-python-ms)
-(package! pyvenv)
-(package! auto-virtualenv)
-(package! isortify)
-(package! pip-requirements)
-#+End_SRC
+** LSP
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! lsp-python-ms
-  :demand
-  :hook (python-mode . lsp))
-
-(def-package! pyvenv)
-(def-package! auto-virtualenv
-  :hook (python-mode . auto-virtualenv-set-virtualenv))
-
-(def-package! isortify
-  :hook (python-mode . isortify-mode))
-
-(def-package! pip-requirements
-  :hook (pip-requirements-mode . pip-requirements-auto-complete-setup))
+(after! lsp-mode
+  (setq lsp-eldoc-render-all nil
+        lsp-print-io nil
+        lsp-inhibit-message t
+        lsp-message-project-root-warning t
+        lsp-auto-guess-root t
+        lsp-prefer-flymake nil))
 #+END_SRC
+** Nginx
+*** Packages
+#+begin_src emacs-lisp :tangle packages.el
+(package! nginx-mode)
+;;(package! company-nginx)
+#+end_src
+*** Config
+#+begin_src emacs-lisp :tangle config.el
+(def-package! nginx-mode
+  :mode ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
+
+;;(def-package! company-nginx
+;;  :hook (nginx-mode . company-nginx-keywords))
+#+end_src
 ** Org
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! org-tree-slide)
-(package! writeroom-mode)
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -365,21 +339,23 @@
   (set-popup-rule! "^ \\*Agenda"
     :slot -1 :vslot -1 :size #'+popup-shrink-to-fit :side 'right :ttl 0)
 
-(setq org-capture-templates
-      '(("w" "Work TODO" entry (file+olp "~/org/work.org" "Tasks") "* TODO %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
-        ("o" "Work Overtime" entry (file+olp "~/org/work.org" "COMMENT Overtime") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CREATED: %U\n:END:")
-        ("m" "Work Meetings" entry (file+olp "~/org/work.org" "Meetings") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
-        ("t" "Work Training's" entry (file+olp "~/org/work.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")
-        ("S" "Stuff TODO" entry (file+olp "~/org/stuff.org" "Tasks") "* TODO %? \n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
-        ("M" "Stuff Meetings" entry (file+olp "~/org/stuff.org" "Meetings") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
-        ("T" "Stuff Training's" entry (file+olp "~/org/stuff.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:"))))
+  (setq org-capture-templates
+        '(("w" "Work TODO" entry (file+olp "~/org/work.org" "Tasks") "* TODO %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+          ("o" "Work Overtime" entry (file+olp "~/org/work.org" "COMMENT Overtime") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CREATED: %U\n:END:")
+          ("m" "Work Meetings" entry (file+olp "~/org/work.org" "Meetings") "* %? \nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+          ("t" "Work Training's" entry (file+olp "~/org/work.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")
+          ("S" "Stuff TODO" entry (file+olp "~/org/stuff.org" "Tasks") "* TODO %? \n:PROPERTIES:\n:CATEGORY: TASKS\n:CREATED: %U\n:END:")
+          ("M" "Stuff Meetings" entry (file+olp "~/org/stuff.org" "Meetings") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: MEETINGS\n:CREATED: %U\n:END:")
+          ("T" "Stuff Training's" entry (file+olp "~/org/stuff.org" "Training's") "* %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n:PROPERTIES:\n:CATEGORY: TRAINING'S\n:CREATED: %U\n:END:")))
+
+  (setq org-image-actual-width nil))
 
 ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
 (def-package! org-tree-slide
   :config
   (setq org-tree-slide--lighter " Slide")
 
-  (defvar conf:org-tree-slide-text-scale 5
+  (defvar conf:org-tree-slide-text-scale 4
     "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
 
   (defun conf:org-tree-slide-set-profile ()
@@ -406,18 +382,19 @@
     "Set up the frame for the slideshow."
     (interactive)
     (internal-show-cursor (selected-window) nil)
-    (org-display-inline-images)
     (toggle-read-only)
-    (writeroom-mode 1)
+    (org-toggle-inline-images)
+    (hide-mode-line-mode 1)
     (text-scale-set conf:org-tree-slide-text-scale))
   (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
 
   (defun conf:org-tree-slide-stop()
     "Undo the frame setup for the slideshow."
     (interactive)
-      (internal-show-cursor (selected-window) t)
+    (internal-show-cursor (selected-window) t)
     (toggle-read-only)
-    (writeroom-mode -1)
+    (org-toggle-inline-images)
+    (hide-mode-line-mode -1)
     (text-scale-set 0))
   (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
 
@@ -447,6 +424,38 @@
    ("C-2" . conf:org-tree-slide-set-profile)
    ("C-3" . org-tree-slide-simple-profile)
    ("C-4" . org-tree-slide-presentation-profile)))
+#+END_SRC
+** Python
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! lsp-python-ms)
+(package! pyvenv)
+(package! auto-virtualenv)
+(package! isortify)
+(package! pip-requirements)
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(set-pretty-symbols! 'python-mode
+  :lambda "lambda"
+  :not "not"
+  :in "in"
+  :not-in "not in"
+  :and "and" :or "or")
+
+(def-package! lsp-python-ms
+  :demand
+  :hook (python-mode . lsp))
+
+(def-package! pyvenv)
+(def-package! auto-virtualenv
+  :hook (python-mode . auto-virtualenv-set-virtualenv))
+
+(def-package! isortify
+  :hook (python-mode . isortify-mode))
+
+(def-package! pip-requirements
+  :hook (pip-requirements-mode . pip-requirements-auto-complete-setup))
 #+END_SRC
 ** PO
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -786,22 +795,12 @@
          ("C-<f6>" . terminal-here-project-launch))
   :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+END_SRC
-** LSP
-*** Config
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(after! lsp-mode
-  (setq lsp-eldoc-render-all nil
-        lsp-print-io nil
-        lsp-inhibit-message t
-        lsp-message-project-root-warning t
-        lsp-auto-guess-root t
-        lsp-prefer-flymake nil))
-#+END_SRC
 ** mu4e
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (when (executable-find "mu")
-  (package! mu4e-alert))
+  (package! mu4e-alert)
+  (package! org-mu4e :disable t))
 (package! link-hint)
 #+END_SRC
 *** Config
@@ -814,6 +813,8 @@
   (after! mu4e
     (setq mu4e-context-policy 'pick-first
           mu4e-compose-context-policy 'ask
+          message-send-mail-function 'message-send-mail-with-sendmail
+          sendmail-program "msmtp"
           mu4e-view-use-gnus nil
           mu4e-view-prefer-html t
           mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
@@ -857,7 +858,31 @@
                           (user-mail-address      . "arkhan.xxx@gmail.com")
                           (user-full-name         . "Edison Ibáñez")
                           (mu4e-compose-signature . "\nEdison Ibáñez"))
-                        t))
+                        t)
+
+    (defun mu4e-message-maildir-matches (msg rx)
+      (when rx
+        (if (listp rx)
+            ;; If rx is a list, try each one for a match
+            (or (mu4e-message-maildir-matches msg (car rx))
+                (mu4e-message-maildir-matches msg (cdr rx)))
+          ;; Not a list, check rx
+          (string-match rx (mu4e-message-field msg :maildir)))))
+
+    (defun choose-msmtp-account ()
+      (if (message-mail-p)
+          (save-excursion
+            (let*
+                ((from (save-restriction
+                         (message-narrow-to-headers)
+                         (message-fetch-field "from")))
+                 (account
+                  (cond
+                   ((string-match "arkhan@disroot.org" from) "Personal")
+                   ((string-match "edison@disroot.org" from) "Work")
+                   ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
+              (setq message-sendmail-extra-arguments (list '"-a" account))))))
+    (add-hook 'message-send-mail-hook 'choose-msmtp-account))
 
   (def-package! mu4e-alert
     :init
@@ -872,12 +897,7 @@
       (mu4e~proc-kill)
       (mu4e-alert-enable-mode-line-display))
     (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
-    (mu4e-alert-set-default-style 'libnotify))
-
-  (set-popup-rule! "^ ?\\*mu4e-main*"
-    :side 'left
-    :size 36
-    :quit 'current :select t))
+    (mu4e-alert-set-default-style 'libnotify)))
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -910,8 +930,7 @@
 (after! tramp
   (setq tramp-default-method "scp"
         tramp-debug-buffer t
-        tramp-verbose 10
-        tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
+        tramp-verbose 10)
   (tramp-set-completion-function "ssh" '((tramp-parse-sconfig "/etc/ssh_config")
                                          (tramp-parse-sconfig "~/.ssh/config"))))
 #+end_src
