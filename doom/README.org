@@ -1,11 +1,9 @@
 #+TITLE:   Configuración de Emacs usando Doom Emacs
 #+DATE:    mayo 13, 2019
 #+SINCE:   {replace with next tagged release version}
-#+STARTUP: inlineimages
 
 * Config
 ** init.el
-*** init.el
 #+BEGIN_SRC emacs-lisp :tangle init.el
 (doom! :completion
        (company +auto
@@ -90,8 +88,8 @@
        :config
        (default +bindings +smartparens))
 #+END_SRC
-*** Auto Tangle
-#+BEGIN_SRC emacs-lisp :tangle init.el
+** Auto Tangle
+#+BEGIN_SRC emacs-lisp :tangle config.el
 (defun tangle-init-async ()
   "If the current buffer is 'README.org' the code-blocks are tangled."
   (when (or (equal (buffer-file-name) (expand-file-name (concat doom-private-dir "README.org")))
@@ -106,17 +104,6 @@
 (setq current-language-environment "Spanish"
       org-export-default-language "es")
 #+END_SRC
-** Extra Load Path
-#+begin_src emacs-lisp :tangle config.el
-(let ((base "/usr/share/emacs/site-lisp"))
-  (add-to-list 'load-path base)
-  (dolist (f (directory-files base))
-    (let ((name (concat base "/" f)))
-      (when (and (file-directory-p name)
-                 (not (equal f ".."))
-                 (not (equal f ".")))
-        (add-to-list 'load-path name)))))
-#+end_src
 * Editor
 ** Company
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -222,6 +209,10 @@
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (setq display-line-numbers-type nil)
 #+END_SRC
+** Maximized
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(set-frame-parameter nil 'fullscreen 'maximized)
+#+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (after! doom-modeline
@@ -278,13 +269,12 @@
 #+END_SRC
 ** Theme
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! vibrant-ink-theme :recipe (:fetcher github :repo "arkhan/vibrant-ink-theme"))
+(package! vibrant-ink-theme :recipe (:host github :repo "arkhan/vibrant-ink-theme"))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! vibrant-ink-theme
-  :config (add-hook 'after-init-hook
-                    (lambda ()
-                      (load-theme 'vibrant-ink t))))
+(add-hook 'after-init-hook
+          (lambda ()
+            (load-theme 'vibrant-ink t)))
 #+END_SRC
 ** Which-key
 #+BEGIN_SRC emacs-lisp :tangle packages.el
@@ -383,7 +373,7 @@
     (interactive)
     (internal-show-cursor (selected-window) nil)
     (toggle-read-only)
-    (org-toggle-inline-images)
+    (org-display-inline-images)
     (hide-mode-line-mode 1)
     (text-scale-set conf:org-tree-slide-text-scale))
   (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
@@ -393,7 +383,7 @@
     (interactive)
     (internal-show-cursor (selected-window) t)
     (toggle-read-only)
-    (org-toggle-inline-images)
+    (org-remove-inline-images)
     (hide-mode-line-mode -1)
     (text-scale-set 0))
   (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
@@ -431,7 +421,7 @@
 (package! lsp-python-ms)
 (package! pyvenv)
 (package! auto-virtualenv)
-(package! isortify)
+(package! py-isort)
 (package! pip-requirements)
 #+END_SRC
 *** Config
@@ -451,8 +441,9 @@
 (def-package! auto-virtualenv
   :hook (python-mode . auto-virtualenv-set-virtualenv))
 
-(def-package! isortify
-  :hook (python-mode . isortify-mode))
+(def-package! py-isort
+  :config (setq py-isort-options '("--lines=100"))
+  :hook (before-save . py-isort-before-save))
 
 (def-package! pip-requirements
   :hook (pip-requirements-mode . pip-requirements-auto-complete-setup))
@@ -777,7 +768,7 @@
 ** i3wm
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! i3wm-config-mode :recipe (:fetcher github :repo "Alexander-Miller/i3wm-Config-Mode"))
+(package! i3wm-config-mode :recipe (:host github :repo "Alexander-Miller/i3wm-Config-Mode"))
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -937,7 +928,7 @@
 ** xrdb
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! xrdb-mode :recipe (:fetcher github :repo "arkhan/xrdb-mode"))
+(package! xrdb-mode :recipe (:host github :repo "arkhan/xrdb-mode"))
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el

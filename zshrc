@@ -22,6 +22,7 @@ antibody bundle robbyrussell/oh-my-zsh path:plugins/command-not-found
 antibody bundle robbyrussell/oh-my-zsh path:plugins/copydir
 antibody bundle robbyrussell/oh-my-zsh path:plugins/copyfile
 antibody bundle robbyrussell/oh-my-zsh path:plugins/cp
+antibody bundle robbyrussell/oh-my-zsh path:plugins/docker
 antibody bundle robbyrussell/oh-my-zsh path:plugins/docker-compose
 antibody bundle robbyrussell/oh-my-zsh path:plugins/extract
 antibody bundle robbyrussell/oh-my-zsh path:plugins/git

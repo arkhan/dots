@@ -289,7 +289,7 @@ for_window [class="(?i)lxappearance|(?i)qt5ct|(?i)urxvt|(?i)pinentry|(?i)GtkLP"]
 for_window [title="(?i)systemsettings"] floating enable
 
 # Tabbed
-for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable
+for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
 for_window [class="URxvt" instance="Ranger|Weechat|RTorrent|Ncmpcpp"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
 for_window [class="(?i)emacs"] floating disable layout tabbed focus
