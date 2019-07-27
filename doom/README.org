@@ -45,7 +45,6 @@
        eshell
 
        :tools
-       ansible
        docker
        editorconfig
        eval
@@ -58,7 +57,6 @@
        (pass +auth)
        pdf
        rgb
-       terraform
        tmux
        upload
 
@@ -81,7 +79,7 @@
        mu4e
 
        :app
-       (write +langtool)
+       ;(write +langtool)
 
        :collab
 
@@ -104,23 +102,28 @@
 (setq current-language-environment "Spanish"
       org-export-default-language "es")
 #+END_SRC
+** Doom
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(setq doom-projectile-fd-binary "fd"
+      confirm-kill-emacs nil)
+#+END_SRC
 * Editor
 ** Company
 #+BEGIN_SRC emacs-lisp :tangle config.el
  (after! company
    (setq company-idle-delay 0
-        company-show-numbers t
-        company-minimum-prefix-length 1
-        company-tooltip-limit 14
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case nil
-        company-dabbrev-code-other-buffers t
-        company-tooltip-align-annotations t
-        company-require-match 'never
-        company-global-modes '(not erc-mode message-mode help-mode gud-mode eshell-mode)
-        company-backends '(company-capf)
-        company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend)))
+         company-show-numbers t
+         company-minimum-prefix-length 1
+         company-tooltip-limit 14
+         company-dabbrev-downcase nil
+         company-dabbrev-ignore-case nil
+         company-dabbrev-code-other-buffers t
+         company-tooltip-align-annotations t
+         company-require-match 'never
+         company-global-modes '(not erc-mode message-mode help-mode gud-mode eshell-mode)
+         company-backends '(company-capf)
+         company-frontends '(company-pseudo-tooltip-frontend
+                             company-echo-metadata-frontend)))
 #+END_SRC
 ** Highlight
 #+BEGIN_SRC emacs-lisp :tangle packages.el
@@ -133,7 +136,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! move-dup
+(use-package! move-dup
   :defer t
   :diminish move-dup-mode
   :bind (("S-M-<up>" . md/move-lines-up)
@@ -149,7 +152,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! org-sync-snippets
+(use-package! org-sync-snippets
   :init (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets)
   :config (setq org-sync-snippets-snippets-dir +snippets-dir
                 org-sync-snippets-org-snippets-file (concat +snippets-dir "snippets.org")))
@@ -160,7 +163,7 @@
 (setq-default cursor-type '(hbar . 2))
 (setq x-stretch-cursor t)
 
-(def-package! frame
+(use-package! frame
   :config
   (defun set-cursor-hook (frame)
     (modify-frame-parameters
@@ -187,7 +190,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! imenu-list
+(use-package! imenu-list
   :init
   (set-popup-rule! "^\\*Ilist"
     :slot -1 :vslot -1 :size 35 :side 'left :ttl 0)
@@ -204,6 +207,10 @@
                                   (min-height . ,ivy-height)
                                   (internal-border-width . 1))
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left))))
+
+(after! counsel
+  (setq counsel-find-file-at-point t
+        counsel-rg-base-command "rg -uuu -S -g '!/volumes' -g '!/backups' -g '/.git' --no-heading --line-number --color never %s ."))
 #+END_SRC
 ** Line Numbers
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -230,7 +237,7 @@
 #+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! shrink-path)
+(use-package! shrink-path)
 
 (after! neotree
   (setq neo-theme 'ascii
@@ -269,19 +276,21 @@
 #+END_SRC
 ** Theme
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! vibrant-ink-theme :recipe (:host github :repo "arkhan/vibrant-ink-theme"))
+(package! vibrant-ink-theme
+  :recipe (:host github :repo "arkhan/vibrant-ink-theme"))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(add-hook 'after-init-hook
-          (lambda ()
-            (load-theme 'vibrant-ink t)))
+;; (add-hook 'after-init-hook
+;;           (lambda ()
+;;             (load-theme 'vibrant-ink t)))
+(setq doom-theme 'vibrant-ink)
 #+END_SRC
 ** Which-key
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! which-key-posframe)
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :tangle config.el
- (def-package! which-key-posframe
+ (use-package! which-key-posframe
    :config
    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
          which-key-posframe-border-width 0)
@@ -312,16 +321,19 @@
 #+end_src
 *** Config
 #+begin_src emacs-lisp :tangle config.el
-(def-package! nginx-mode
+(use-package! nginx-mode
   :mode ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 
-;;(def-package! company-nginx
+;;(use-package! company-nginx
 ;;  :hook (nginx-mode . company-nginx-keywords))
 #+end_src
 ** Org
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! org-tree-slide)
+(package! org-super-agenda)
+(package! org-sidebar
+  :recipe (:host github :repo "alphapapa/org-sidebar"))
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -341,7 +353,7 @@
   (setq org-image-actual-width nil))
 
 ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
-(def-package! org-tree-slide
+(use-package! org-tree-slide
   :config
   (setq org-tree-slide--lighter " Slide")
 
@@ -371,8 +383,9 @@
   (defun conf:org-tree-slide-start ()
     "Set up the frame for the slideshow."
     (interactive)
-    (internal-show-cursor (selected-window) nil)
-    (toggle-read-only)
+    ;;(internal-show-cursor (selected-window) nil)
+    ;;(toggle-read-only)
+    (toggle-frame-fullscreen)
     (org-display-inline-images)
     (hide-mode-line-mode 1)
     (text-scale-set conf:org-tree-slide-text-scale))
@@ -381,8 +394,9 @@
   (defun conf:org-tree-slide-stop()
     "Undo the frame setup for the slideshow."
     (interactive)
-    (internal-show-cursor (selected-window) t)
-    (toggle-read-only)
+    ;;(internal-show-cursor (selected-window) t)
+    ;;(toggle-read-only)
+    (toggle-frame-fullscreen)
     (org-remove-inline-images)
     (hide-mode-line-mode -1)
     (text-scale-set 0))
@@ -414,6 +428,35 @@
    ("C-2" . conf:org-tree-slide-set-profile)
    ("C-3" . org-tree-slide-simple-profile)
    ("C-4" . org-tree-slide-presentation-profile)))
+
+(use-package! org-super-agenda
+  :config
+  (let ((org-super-agenda-groups
+         '((:auto-group t))))
+    (org-agenda-list)))
+
+(use-package! org-sidebar
+  :config
+  (defun my/org-today-sidebar ()
+    "Show my Org Today Sidebar."
+    (interactive)
+    (org-sidebar
+     :sidebars (make-org-sidebar
+                :name "Today"
+                :description "Today items"
+                :items (org-ql (org-agenda-files)
+                         (and (not (done))
+                              (or (deadline <=)
+                                  (scheduled <=)
+                                  (date = today)))
+                         :action element-with-markers)
+                :super-groups '((:time-grid t)
+                                (:name "Overdue" :scheduled past :deadline past)
+                                (:name "Due today" :scheduled today :deadline today)
+                                (:tag "bills")
+                                (:priority "A")
+                                (:name "Non-tasks"
+                                       :todo nil))))))
 #+END_SRC
 ** Python
 *** Packages
@@ -433,24 +476,24 @@
   :not-in "not in"
   :and "and" :or "or")
 
-(def-package! lsp-python-ms
+(use-package! lsp-python-ms
   :demand
   :hook (python-mode . lsp))
 
-(def-package! pyvenv)
-(def-package! auto-virtualenv
+(use-package! pyvenv)
+(use-package! auto-virtualenv
   :hook (python-mode . auto-virtualenv-set-virtualenv))
 
-(def-package! py-isort
+(use-package! py-isort
   :config (setq py-isort-options '("--lines=100"))
   :hook (before-save . py-isort-before-save))
 
-(def-package! pip-requirements
+(use-package! pip-requirements
   :hook (pip-requirements-mode . pip-requirements-auto-complete-setup))
 #+END_SRC
 ** PO
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! po-mode
+(use-package! po-mode
   :mode ("\\.po\\'" . po-mode)
   :config
   ;; Fuente: https://www.emacswiki.org/emacs/PoMode
@@ -504,7 +547,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! polymode
+(use-package! polymode
   :config
   (setq polymode-prefix-key (kbd "C-c n"))
   (define-hostmode poly-python-hostmode :mode 'python-mode)
@@ -561,25 +604,25 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! edbi-database-url)
+(use-package! edbi-database-url)
 
-(def-package! edbi-minor-mode
+(use-package! edbi-minor-mode
   :hook (sql-mode . edbi-minor-mode))
 
-(def-package! company-edbi
+(use-package! company-edbi
   :init
   (defun cfg:edbi-mode-hook()
     (add-to-list 'company-backends 'company-edbi))
   (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
 
-(def-package! sqlup-mode
+(use-package! sqlup-mode
   :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
   :init
   (add-hook 'sql-mode-hook 'sqlup-mode)
   (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
   (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
 
-(def-package! sql-indent
+(use-package! sql-indent
   :after sql
   :bind (:map sql-mode-map (("C-c \\" . sql-indent-buffer))))
 #+END_SRC
@@ -592,7 +635,7 @@
 (add-hook 'nxml-mode-hook
           '(lambda () (when (empty-buffer?) (nxml-template))))
 
-(def-package! nxml-mode
+(use-package! nxml-mode
   :mode (("\\.plist\\'" . nxml-mode)
          ("\\.rss\\'"   . nxml-mode)
          ("\\.svg\\'"   . nxml-mode)
@@ -648,7 +691,7 @@
 * Tools
 ** Anzu
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! anzu
+(use-package! anzu
   :defer t
   :bind (("M-%" . anzu-query-replace)
          ("C-M-%" . anzu-query-replace-regexp))
@@ -682,7 +725,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! bug-hunter
+(use-package! bug-hunter
   :commands (bug-hunter-file bug-hunter-init-file))
 #+END_SRC
 ** Calendar
@@ -694,7 +737,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! org-caldav
+(use-package! org-caldav
   :bind ("<f6>" . org-caldav-sync)
   :config
   (setq org-icalendar-alarm-time 30
@@ -720,14 +763,14 @@
   (setq org-caldav-backup-file (concat org-caldav-save-directory "caldav-backup.org")))
 
 
-(def-package! calfw
+(use-package! calfw
   :config
   (setq cfw:org-overwrite-default-keybinding t
         cfw:display-calendar-holidays nil
         calendar-week-start-day 1)
   (map! :leader "o f" #'cfw:open-org-calendar))
 
-(def-package! calfw-org)
+(use-package! calfw-org)
 #+END_SRC
 ** Docker
 *** Packages
@@ -736,7 +779,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! docker-compose-mode
+(use-package! docker-compose-mode
   :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
 #+END_SRC
 ** Flyspell
@@ -772,7 +815,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-  (def-package! i3wm-config-mode)
+  (use-package! i3wm-config-mode)
 #+END_SRC
 ** Terminal
 *** Packages
@@ -781,7 +824,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! terminal-here
+(use-package! terminal-here
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
   :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
@@ -796,7 +839,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! link-hint
+(use-package! link-hint
   :bind (("C-c l o" . link-hint-open-link)
          ("C-c l c" . link-hint-copy-link)))
 
@@ -875,7 +918,7 @@
               (setq message-sendmail-extra-arguments (list '"-a" account))))))
     (add-hook 'message-send-mail-hook 'choose-msmtp-account))
 
-  (def-package! mu4e-alert
+  (use-package! mu4e-alert
     :init
     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
     (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
@@ -892,7 +935,7 @@
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! auth-source
+(use-package! auth-source
   :init (setq auth-source-debug t
               auth-source-do-cache nil))
 #+END_SRC
@@ -903,8 +946,16 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! pkgbuild-mode
+(use-package! pkgbuild-mode
   :mode "PKGBUILD\\'")
+#+END_SRC
+** Robot
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! robot-mode
+  :recipe (:host github :repo "wingyplus/robot-mode"))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(use-package! robot-mode)
 #+END_SRC
 ** VLF
 *** Packages
@@ -913,7 +964,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(def-package! vlf-setup
+(use-package! vlf-setup
   :init (setq vlf-application 'dont-ask))
 #+END_SRC
 ** Tramp
@@ -932,7 +983,7 @@
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-  (def-package! xrdb-mode
+  (use-package! xrdb-mode
     :mode (("\\.Xdefaults$" . xrdb-mode)
            ("\\Xdefaults$" . xrdb-mode)
            ("\\.Xenvironment$" . xrdb-mode)

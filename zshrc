@@ -59,7 +59,7 @@ ZSH_HIGHLIGHT_STYLES[line]=bold
 #-----------------------------
 # Prompt
 #-----------------------------
-export VIRTUAL_ENV_DISABLE_PROMPT=1
+VIRTUAL_ENV_DISABLE_PROMPT=1
 
 function virtualenv_status() {
   [[ -z "$VIRTUAL_ENV" ]] && return ""

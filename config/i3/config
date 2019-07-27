@@ -305,6 +305,5 @@ floating_minimum_size -1 x -1
 floating_maximum_size -1 x -1
 
 # i3-gaps
-smart_borders on
 gaps inner 2
 gaps outer 2
