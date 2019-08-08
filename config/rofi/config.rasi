@@ -1,7 +1,7 @@
 Configuration {
   width: 30;
   lines: 5;
-  font: "xos4 Terminus 12";
+  font: "Terminus (TTF) 12";
   location: 0;
   fixed-num-lines: false;
   terminal: "urxvtcd -e";

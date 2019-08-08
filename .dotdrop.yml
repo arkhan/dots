@@ -19,7 +19,7 @@ dotfiles:
     dst: ~/.config/bspwm
     link: link
     src: config/bspwm
-  d_doom.d:
+  d_doom:
     dst: ~/.doom.d
     link: link
     src: doom
@@ -27,7 +27,7 @@ dotfiles:
     dst: ~/.config/dunst
     link: link
     src: config/dunst
-  d_emacs.d:
+  d_emacs:
     dst: ~/.emacs.d
     link: link
     src: emacs
@@ -115,7 +115,19 @@ dotfiles:
     dst: ~/.zshrc
     link: link
     src: zshrc
+  f_xonshrc:
+    src: xonshrc
+    dst: ~/.xonshrc
+    link: link
 profiles:
   Pantheon:
     dotfiles:
-    - ALL
+    - d_bin
+    - d_doom
+    - d_dunst
+    - d_i3
+    - d_mpd
+    - d_networkmanager-dmenu
+    - d_polybar
+    - d_qutebrowser
+    - f_xonshrc

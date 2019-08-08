@@ -200,11 +200,11 @@ mypip() {
   curl -s ipinfo.io/ip
 }
 
-export PAGER="eless"
+#export PAGER="eless"
 #export LESS="-iMSx4 -XFR"
-if which lesspipe.sh >/dev/null 2>&1; then
-   export LESSOPEN="| lesspipe.sh %s"
-fi
+# if which lesspipe.sh >/dev/null 2>&1; then
+#    export LESSOPEN="| lesspipe.sh %s"
+# fi
 alias lv="eless"
 
 # term-projectile support

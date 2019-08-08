@@ -17,6 +17,10 @@ config = config  # noqa
 #   - never: Never show a confirmation.
 c.confirm_quit = ["multiple-tabs", "downloads"]
 
+# Always restore open sites when qutebrowser is reopened.
+# Type: Bool
+c.auto_save.session = True
+
 # Enable JavaScript.
 # Type: Bool
 config.set("content.javascript.enabled", True, "file://*")
@@ -40,6 +44,14 @@ c.downloads.location.prompt = False
 #   - top
 #   - bottom
 c.downloads.position = "bottom"
+
+# When to show the scrollbar.
+# Type: String
+# Valid values:
+#   - always: Always show the scrollbar.
+#   - never: Never show the scrollbar.
+#   - when-searching: Show the scrollbar when searching for text in the webpage. With the QtWebKit backend, this is equal to `never`.
+c.scrolling.bar = "never"
 
 # Languages to use for spell checking. You can check for available
 # languages and install dictionaries using scripts/dictcli.py. Run the
@@ -98,7 +110,7 @@ c.spellcheck.languages = ["es-ES"]
 #   - never: Always hide the tab bar.
 #   - multiple: Hide the tab bar if only one tab is open.
 #   - switching: Show the tab bar when switching tabs.
-c.tabs.show = "always"
+c.tabs.show = "never"
 
 # Background color of the completion widget for odd rows.
 # Type: QssColor
@@ -151,6 +163,22 @@ c.colors.tabs.even.bg = "black"
 # Background color of selected odd tabs.
 # Type: QtColor
 c.colors.tabs.selected.odd.bg = "black"
+
+# Foreground color of pinned unselected odd tabs.
+# Type: QtColor
+c.colors.tabs.pinned.odd.fg = "gray"
+
+# Background color of pinned unselected odd tabs.
+# Type: QtColor
+c.colors.tabs.pinned.odd.bg = "black"
+
+# Foreground color of pinned unselected even tabs.
+# Type: QtColor
+c.colors.tabs.pinned.even.fg = "red"
+
+# Background color of pinned unselected even tabs.
+# Type: QtColor
+c.colors.tabs.pinned.even.bg = "black"
 
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.

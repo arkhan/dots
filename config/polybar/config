@@ -159,7 +159,7 @@ animation-packetloss-framerate = 500
 
 [module/wired]
 type = internal/network
-interface = enp60s0
+interface = eth0
 interval = 1.0
 format-connected = <ramp-signal> <label-connected>
 label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}

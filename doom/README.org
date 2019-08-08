@@ -41,9 +41,6 @@
        electric
        vc
 
-       :term
-       eshell
-
        :tools
        docker
        editorconfig
@@ -75,11 +72,8 @@
        rest
        (sh +zsh)
 
-       :email
-       mu4e
-
        :app
-       ;(write +langtool)
+       (write +langtool)
 
        :collab
 
@@ -205,12 +199,12 @@
         ivy-fixed-height-minibuffer nil
         ivy-posframe-parameters `((min-width . ,(window-width))
                                   (min-height . ,ivy-height)
-                                  (internal-border-width . 1))
+                                  (internal-border-width . 0))
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left))))
 
 (after! counsel
   (setq counsel-find-file-at-point t
-        counsel-rg-base-command "rg -uuu -S -g '!/volumes' -g '!/backups' -g '/.git' --no-heading --line-number --color never %s ."))
+        counsel-rg-base-command "rg -uuu -S -g '!/volumes' -g '!/backups' -g '!/.git' --no-heading --line-number --color never %s ."))
 #+END_SRC
 ** Line Numbers
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -280,9 +274,6 @@
   :recipe (:host github :repo "arkhan/vibrant-ink-theme"))
 #+END_SRC
 #+BEGIN_SRC emacs-lisp :tangle config.el
-;; (add-hook 'after-init-hook
-;;           (lambda ()
-;;             (load-theme 'vibrant-ink t)))
 (setq doom-theme 'vibrant-ink)
 #+END_SRC
 ** Which-key
@@ -334,6 +325,7 @@
 (package! org-super-agenda)
 (package! org-sidebar
   :recipe (:host github :repo "alphapapa/org-sidebar"))
+(package! secretaria)
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -431,13 +423,32 @@
 
 (use-package! org-super-agenda
   :config
-  (let ((org-super-agenda-groups
-         '((:auto-group t))))
-    (org-agenda-list)))
+  (let ((org-super-agenda-groups))
+       '((:log t)  ; Automatically named "Log"
+         (:name "Schedule"
+                :time-grid t)
+         (:name "Today"
+                :scheduled today)
+         (:habit t)
+         (:name "Due today"
+                :deadline today)
+         (:name "Overdue"
+                :deadline past)
+         (:name "Due soon"
+                :deadline future)
+         (:name "Unimportant"
+                :todo ("SOMEDAY" "MAYBE" "CHECK" "TO-READ" "TO-WATCH")
+                :order 100)
+         (:name "Waiting..."
+                :todo "WAITING"
+                :order 98)
+         (:name "Scheduled earlier"
+                :scheduled past)))
+  (org-agenda-list))
 
 (use-package! org-sidebar
   :config
-  (defun my/org-today-sidebar ()
+  (defun conf:org-today-sidebar ()
     "Show my Org Today Sidebar."
     (interactive)
     (org-sidebar
@@ -456,12 +467,16 @@
                                 (:tag "bills")
                                 (:priority "A")
                                 (:name "Non-tasks"
-                                       :todo nil))))))
+                                       :todo nil)))))
+  (use-package! secretaria
+    :config
+    (add-hook 'after-init-hook #'secretaria-unknown-time-always-remind-me)))
 #+END_SRC
 ** Python
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! lsp-python-ms)
+(package! lsp-python-ms
+  :recipe (:host github :repo "andrew-christianson/lsp-python-ms"))
 (package! pyvenv)
 (package! auto-virtualenv)
 (package! py-isort)
@@ -782,6 +797,17 @@
 (use-package! docker-compose-mode
   :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
 #+END_SRC
+** COMMENT Format
+*** Packages
+#+BEGIN_SRC emacs-lisp :tangle packages.el
+(package! apheleia
+  :recipe (:host github :repo "raxod502/apheleia"))
+#+END_SRC
+*** Config
+#+BEGIN_SRC emacs-lisp :tangle config.el
+(use-package!  apheleia
+  :init (apheleia-global-mode +1))
+#+END_SRC
 ** Flyspell
 #+BEGIN_SRC emacs-lisp :tangle config.el
 (add-hook! flyspell
@@ -811,7 +837,8 @@
 ** i3wm
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! i3wm-config-mode :recipe (:host github :repo "Alexander-Miller/i3wm-Config-Mode"))
+(package! i3wm-config-mode
+  :recipe (:host github :repo "Alexander-Miller/i3wm-Config-Mode"))
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -828,13 +855,23 @@
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
   :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
+(after! term
+  (custom-set-faces
+   '(term ((t (:inherit default :foreground "#ffffff"))))
+   '(term-color-black ((t (:background "#000000" :foreground "#31363b"))))
+   '(term-color-blue ((t (:background "#2980b9" :foreground "#0099ff"))))
+   '(term-color-green ((t (:background "#218058" :foreground "#27ae60"))))
+   '(term-color-magenta ((t (:background "#8e44ad" :foreground "#af81ff"))))
+   '(term-color-red ((t (:background "#c0392b" :foreground "#f44f4f"))))
+   '(term-color-white ((t (:background "#acada1" :foreground "#cfd0c2"))))
+   '(term-color-yellow ((t (:background "#fdbc4b" :foreground "#fdbc4b"))))))
 #+END_SRC
 ** mu4e
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (when (executable-find "mu")
   (package! mu4e-alert)
-  (package! org-mu4e :disable t))
+  (package! mu4e-maildirs-extension))
 (package! link-hint)
 #+END_SRC
 *** Config
@@ -844,55 +881,48 @@
          ("C-c l c" . link-hint-copy-link)))
 
 (when (executable-find "mu")
-  (after! mu4e
-    (setq mu4e-context-policy 'pick-first
-          mu4e-compose-context-policy 'ask
-          message-send-mail-function 'message-send-mail-with-sendmail
-          sendmail-program "msmtp"
-          mu4e-view-use-gnus nil
-          mu4e-view-prefer-html t
-          mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true")
+  (use-package! mu4e
+    :preface
+    (defadvice mu4e (before mu4e-start activate)
+      "Antes de ejecutar `mu4e' borramos todas las ventanas"
+      (when (> 1 (count-windows))
+        (window-configuration-to-register :mu4e-fullscreen)
+        (delete-other-windows)))
 
     (defadvice mu4e-quit (after mu4e-close-and-push activate)
       "Despues de salir de mu4e ejecutamos un script para subir los cambios al buzon de correo y para también restaurar la disposición de ventanas"
       (start-process "pushmail" "*pushmail-mbsync*" "mbsync" "-a" "--push")
       (when (get-register :mu4e-fullscreen)
         (jump-to-register :mu4e-fullscreen)))
-
-    (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
-
-    (set-email-account! "Work"
-                        '((mu4e-sent-folder       . "/Work/Sent")
-                          (mu4e-drafts-folder     . "/Work/Drafts")
-                          (mu4e-trash-folder      . "/Work/Trash")
-                          (mu4e-refile-folder     . "/Work/Archive")
-                          (smtpmail-smtp-user     . "edison@disroot.org")
-                          (user-mail-address      . "edison@disroot.org")
-                          (user-full-name         . "Edison Ibáñez")
-                          (mu4e-compose-signature . "\nEdison Ibáñez"))
-                        t)
-
-    (set-email-account! "Personal"
-                        '((mu4e-sent-folder       . "/Personal/Sent")
-                          (mu4e-drafts-folder     . "/Personal/Drafts")
-                          (mu4e-trash-folder      . "/Personal/Trash")
-                          (mu4e-refile-folder     . "/Personal/Archive")
-                          (smtpmail-smtp-user     . "arkhan@disroot.org")
-                          (user-mail-address      . "arkhan@disroot.org")
-                          (user-full-name         . "Edison Ibáñez")
-                          (mu4e-compose-signature . "\nEdison Ibáñez"))
-                        t)
-
-    (set-email-account! "Gmail"
-                        '((mu4e-sent-folder       . "/Gmail/Sent Items")
-                          (mu4e-drafts-folder     . "/Gmail/Drafts")
-                          (mu4e-trash-folder      . "/Gmail/Deleted Items")
-                          (mu4e-refile-folder     . "/Gmail/Archive")
-                          (smtpmail-smtp-user     . "arkhan.xxx@gmail.com")
-                          (user-mail-address      . "arkhan.xxx@gmail.com")
-                          (user-full-name         . "Edison Ibáñez")
-                          (mu4e-compose-signature . "\nEdison Ibáñez"))
-                        t)
+    :init
+    (require 'mu4e-contrib)
+    (setq mail-user-agent 'mu4e-user-agent
+          message-citation-line-format "\nEl %A %d de %B del %Y a las %H%M horas, %N escribió:\n"
+          message-citation-line-function 'message-insert-formatted-citation-line
+          message-cite-reply-position 'below
+          message-kill-buffer-on-exit t
+          message-send-mail-function 'message-send-mail-with-sendmail
+          mu4e-attachment-dir  "~/Descargas"
+          mu4e-auto-retrieve-keys t
+          mu4e-compose-context-policy 'ask
+          mu4e-compose-dont-reply-to-self t
+          mu4e-compose-keep-self-cc nil
+          mu4e-context-policy 'pick-first
+          mu4e-headers-date-format "%Y-%m-%d %H:%M"
+          mu4e-headers-include-related t
+          mu4e-headers-auto-update nil
+          mu4e-headers-leave-behavior 'ignore
+          mu4e-headers-visible-lines 8
+          mu4e-headers-fields '((:date . 25)
+                                (:flags . 6)
+                                (:from . 22)
+                                (:subject . nil))
+          mu4e-view-prefer-html t
+          mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
+          mu4e-maildir "~/.mail"
+          mu4e-view-show-images t
+          sendmail-program "msmtp"
+          mu4e-get-mail-command "mbsync -aV")
 
     (defun mu4e-message-maildir-matches (msg rx)
       (when rx
@@ -916,13 +946,66 @@
                    ((string-match "edison@disroot.org" from) "Work")
                    ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
               (setq message-sendmail-extra-arguments (list '"-a" account))))))
-    (add-hook 'message-send-mail-hook 'choose-msmtp-account))
+
+    (when (fboundp 'imagemagick-register-types)
+      (imagemagick-register-types))
+
+    (add-hook 'mu4e-compose-mode-hook 'flyspell-mode)
+
+    (setq mu4e-contexts
+          `( ,(make-mu4e-context
+               :name "Personal"
+               :enter-func (lambda () (mu4e-message "Switch to the Personal context"))
+               :match-func (lambda (msg)
+                             (when msg
+                               (mu4e-message-maildir-matches msg "^/Personal")))
+               :leave-func (lambda () (mu4e-clear-caches))
+               :vars '((user-mail-address     . "arkhan@disroot.org")
+                       (user-full-name        . "Edison Ibáñez")
+                       (mu4e-sent-folder      . "/Personal/Sent")
+                       (mu4e-drafts-folder    . "/Personal/Drafts")
+                       (mu4e-trash-folder     . "/Personal/Trash")
+                       (mu4e-refile-folder    . "/Personal/Archive")))
+             ,(make-mu4e-context
+               :name "Work"
+               :enter-func (lambda () (mu4e-message "Switch to the Work context"))
+               :match-func (lambda (msg)
+                             (when msg
+                               (mu4e-message-maildir-matches msg "^/Work")))
+               :leave-func (lambda () (mu4e-clear-caches))
+               :vars '((user-mail-address     . "edison@disroot.org")
+                       (user-full-name        . "Edison Ibáñez")
+                       (mu4e-sent-folder      . "/Work/Sent")
+                       (mu4e-drafts-folder    . "/Work/Drafts")
+                       (mu4e-trash-folder     . "/Work/Trash")
+                       (mu4e-refile-folder    . "/Work/Archive")))
+             ,(make-mu4e-context
+               :name "Gmail"
+               :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
+               :match-func (lambda (msg)
+                             (when msg
+                               (mu4e-message-maildir-matches msg "^/Gmail")))
+               :leave-func (lambda () (mu4e-clear-caches))
+               :vars '((user-mail-address     . "arkhan.xxx@gmail.com")
+                       (user-full-name        . "Edison Ibáñez")
+                       (mu4e-sent-folder      . "/Gmail/Sent Mail")
+                       (mu4e-trash-folder     . "/Gmail/Trash")
+                       (mu4e-refile-folder    . "/Gmail/All Mail")
+                       (mu4e-drafts-folder    . "/Gmail/Drafts")))))
+
+    (add-hook 'message-send-mail-hook 'choose-msmtp-account)
+    (run-at-time nil (* 60 5) 'mu4e-update-mail-and-index t)
+
+    (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-headers-mode-map)
+    (bind-key "C-c c" 'org-mu4e-store-and-capture mu4e-view-mode-map))
 
   (use-package! mu4e-alert
     :init
     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
     (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
     (setq mu4e-compose-forward-as-attachment t
+          mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
+          mu4e-compose-crypto-reply-plain-policy 'sign
           mu4e-index-update-in-background t
           mu4e-alert-email-notification-types '(subjects))
     :config
@@ -931,7 +1014,15 @@
       (mu4e~proc-kill)
       (mu4e-alert-enable-mode-line-display))
     (run-with-timer 0 60 'conf:refresh-mu4e-alert-mode-line)
-    (mu4e-alert-set-default-style 'libnotify)))
+    (mu4e-alert-set-default-style 'libnotify))
+
+  (use-package! mu4e-maildirs-extension
+    :after mu4e
+    :config (mu4e-maildirs-extension))
+  (map! :leader
+        (:prefix-map ("M" . "mu4e")
+          :desc "Open email app" "M" #'mu4e
+          :desc "Compose email"  "c" #'mu4e-compose-new)))
 #+END_SRC
 ** Pass
 #+BEGIN_SRC emacs-lisp :tangle config.el
@@ -979,7 +1070,8 @@
 ** xrdb
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! xrdb-mode :recipe (:host github :repo "arkhan/xrdb-mode"))
+(package! xrdb-mode
+  :recipe (:host github :repo "arkhan/xrdb-mode"))
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
