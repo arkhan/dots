@@ -100,7 +100,7 @@ type = internal/battery
 full-at = 99
 time-format = %H:%M
 
-battery = BAT1
+battery = ${env:BAT}
 adapter = ACAD
 
 label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
