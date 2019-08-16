@@ -14,3 +14,65 @@ use_udp_trackers = yes
 dht = auto
 peer_exchange = yes
 system.method.set_key = event.download.finished,move_complete,"execute=mv,-u,$d.get_base_path=,~/rtorrent/share/;d.set_directory=~/rtorrent/share/"
+
+#
+# PyroScope SETTINGS
+#
+
+# `system.has` polyfill (the "false=" silences the `catch` command, in rTorrent-PS)
+catch = {"false=", "method.redirect=system.has,false"}
+
+# Set "pyro.extended" to 1 to activate rTorrent-PS features!
+# (the automatic way used here only works with rTorrent-PS builds after 2018-05-30)
+method.insert = pyro.extended, const|value, (system.has, rtorrent-ps)
+
+# Set "pyro.bin_dir" to the "bin" directory where you installed the pyrocore tools!
+# Make sure you end it with a "/"; if this is left empty, then the shell's path is searched.
+method.insert = pyro.bin_dir, string|const,
+
+# Remove the ".default" if you want to change something (else your changes
+# get over-written on update, when you put them into ``*.default`` files).
+#import = ~/.pyroscope/rtorrent-pyro.rc.default
+
+# TORQUE: Daemon watchdog schedule
+# Must be activated by touching the "~/.pyroscope/run/pyrotorque" file!
+# Set the second argument to "-v" or "-q" to change log verbosity.
+schedule = pyro_watchdog,30,300,"pyro.watchdog=~/.pyroscope,"
+
+# Remove the default column
+method.set_key = ui.column.render, (ui.column.spec, 920)
+
+# Add ASCII ratio in percent
+# (1..99 for incomplete; 1c = 1.0; 1m = 10.0; …)
+method.set_key = ui.column.render, "922:3C93/3:R% ", \
+    ((string.replace, ((convert.magnitude, ((math.div, ((d.ratio)), 10)) )), \
+                      {"⋅", "."} ))
+
+# Show traffic of the last hour
+network.history.depth.set = 112
+schedule = network_history_sampling,1,32, network.history.sample=
+method.insert = network.history.auto_scale.toggle, simple|private, \
+    "branch=network.history.auto_scale=, \
+        \"network.history.auto_scale.set=0\", \
+        \"network.history.auto_scale.set=1\""
+method.insert = network.history.auto_scale.ui_toggle, simple|private, \
+    "network.history.auto_scale.toggle= ;network.history.refresh="
+branch=pyro.extended=,"schedule = bind_auto_scale,0,0, \
+    \"ui.bind_key=download_list,=,network.history.auto_scale.ui_toggle=\""
+
+
+# UI/VIEW: Colors
+ui.color.complete.set=41
+ui.color.stopped.set=33
+
+ui.color.footer.set="bright cyan on 20"
+ui.color.even.set="on 234"
+ui.color.odd.set="on 232"
+
+ui.color.progress0.set=196
+ui.color.progress20.set=202
+ui.color.progress40.set=213
+ui.color.progress60.set=214
+ui.color.progress80.set=226
+ui.color.progress100.set=41
+ui.color.progress120.set="bold bright green"

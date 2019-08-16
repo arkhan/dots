@@ -87,7 +87,7 @@ dotfiles:
     dst: ~/.config/ncmpcpp
     link: link
     src: config/ncmpcpp
-  f_rtorrent.rc:
+  f_rtorrent:
     dst: ~/.rtorrent.rc
     link: link
     src: rtorrent.rc
@@ -95,7 +95,7 @@ dotfiles:
     dst: ~/.config/safe-rm
     link: link
     src: config/safe-rm
-  f_tmux.conf:
+  f_tmux:
     dst: ~/.tmux.conf
     link: link
     src: tmux.conf
@@ -126,8 +126,16 @@ profiles:
     - d_doom
     - d_dunst
     - d_i3
+    - f_ncmpcpp
     - d_mpd
     - d_networkmanager-dmenu
     - d_polybar
     - d_qutebrowser
+    - d_ranger
+    - d_rofi
+    - d_rofi-pass
+    - f_tmux
+    - f_xprofile
     - f_xonshrc
+    - f_xresources
+    - f_rtorrent

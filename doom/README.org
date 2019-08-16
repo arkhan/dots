@@ -41,7 +41,11 @@
        electric
        vc
 
+       :term
+       term
+
        :tools
+       ansible
        docker
        editorconfig
        eval
@@ -175,7 +179,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Fira Code Retina" :size 15))
+(setq doom-font (font-spec :family "Ubuntu Mono" :size 15))
 #+END_SRC
 ** Imenu
 *** Package
@@ -477,8 +481,8 @@
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (package! lsp-python-ms
   :recipe (:host github :repo "andrew-christianson/lsp-python-ms"))
-(package! pyvenv)
-(package! auto-virtualenv)
+(package! pyenv-mode)
+(package! pyenv-mode-auto)
 (package! py-isort)
 (package! pip-requirements)
 #+END_SRC
@@ -495,9 +499,9 @@
   :demand
   :hook (python-mode . lsp))
 
-(use-package! pyvenv)
-(use-package! auto-virtualenv
-  :hook (python-mode . auto-virtualenv-set-virtualenv))
+(use-package! pyenv-mode
+  :hook (python-mode . pyenv-mode))
+(use-package! pyenv-mode-auto)
 
 (use-package! py-isort
   :config (setq py-isort-options '("--lines=100"))
