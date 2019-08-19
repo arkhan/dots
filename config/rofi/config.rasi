@@ -1,10 +1,10 @@
 Configuration {
   width: 30;
   lines: 5;
-  font: "Terminus (TTF) 12";
+  font: "Terminus 12";
   location: 0;
   fixed-num-lines: false;
-  terminal: "urxvtcd -e";
+  terminal: "xst -e";
   line-margin: 5;
   separator-style: "dash";
   hide-scrollbar: true;

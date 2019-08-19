@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+
 source-zsh --login True --overwrite-alias "echo loading xonsh foreign shell"
 
 xontrib load readable-traceback
@@ -70,7 +71,7 @@ $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
 $PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR} {BOLD_BLUE}>{NO_COLOR} "
 if 'DISPLAY' in ${...}:
-    $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_BLACK}{short_cwd}{NO_COLOR} "
+    $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 else:
     $RIGHT_PROMPT = "{BOLD_BLACK}{short_cwd}{NO_COLOR} "
 
@@ -126,6 +127,7 @@ aliases['pyc'] = _pyclean
 
 
 def git_pull_current_branch():
+    import os
     from subprocess import call, STDOUT, check_output
     if not call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
         out = check_output(["git", "branch"]).decode("utf8")

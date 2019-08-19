@@ -3,7 +3,7 @@
 set $bin $HOME/.bin
 
 # Terminal
-set $term urxvtcd --geometry 100x30
+set $term xst -g 100x30
 
 # Display
 set $edp1 eDP1
@@ -16,7 +16,7 @@ set $mod4 Mod4
 set $mod1 Mod1
 
 # Font for window titles.
-font pango:Terminus (TTF) 12
+font pango:Terminus 12
 
 # Use Mouse+$mod4 to drag floating windows to their wanted position
 floating_modifier $mod4
@@ -53,13 +53,13 @@ bindsym $mod4+c exec rofi -show calc -modi calc -no-show-match -no-sort
 
 # Programs
 ## Ranger
-bindsym $mod4+Control+t exec $term -name Ranger -e ranger
+bindsym $mod4+Control+t exec $term -n Ranger -e ranger
 ## Weechat
-bindsym $mod4+Control+i exec $term -name Weechat -e weechat
+bindsym $mod4+Control+i exec $term -n Weechat -e weechat
 ## Ncmpcpp
-bindsym $mod4+Control+p exec $term -name Ncmpcpp -e ncmpcpp
+bindsym $mod4+Control+p exec $term -n Ncmpcpp -e ncmpcpp
 ## RTorrent
-bindsym $mod4+Control+d exec $term -name RTorrent -e rtorrent
+bindsym $mod4+Control+d exec $term -n RTorrent -e rtorrent
 ## Emacs
 bindsym $mod4+Control+e exec /usr/bin/emacs
 
@@ -271,11 +271,14 @@ assign [title="Telegram"] $ws2
 assign [class="URxvt" instance="Weechat"] $ws2
 assign [class="(?i)tuxcmd|Spacefm|doublecmd"] $ws4
 assign [class="URxvt" instance="Ranger"] $ws4
+assign [class="(?i)St" instance="Ranger"] $ws4
 assign [class="(?i)thunderbird|(?i)icedove"] $ws3
 assign [class="JDownloader|Syncthing GTK"] $ws5
 assign [class="URxvt" instance="RTorrent"] $ws5
+assign [class="(?i)St" instance="RTorrent"] $ws5
 assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
 assign [class="URxvt" instance="Ncmpcpp"] $ws7
+assign [class="(?i)St" instance="Ncmpcpp"] $ws7
 assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
 assign [class="(?i)lyx"] $ws8
 assign [title="(?i)LibreOffice*"] $ws8
@@ -287,6 +290,7 @@ assign [class="Wine"] $ws6
 # Floating
 for_window [class="(?i)lxappearance|(?i)qt5ct|(?i)urxvt|(?i)pinentry|(?i)GtkLP"] floating enable
 for_window [title="(?i)systemsettings"] floating enable
+for_window [title="(?i)st"] floating enable
 
 # Tabbed
 for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
