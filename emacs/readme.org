@@ -833,9 +833,11 @@
   :diminish ivy-posframe-mode
   :init
   (setq ivy-posframe-hide-minibuffer t
-        ivy-posframe-border-width 0
-        ivy-posframe-width (window-width)
-        ivy-display-function #'ivy-posframe-display-at-window-bottom-left)
+        ivy-fixed-height-minibuffer nil
+        ivy-posframe-parameters `((min-width . ,(window-width))
+                                  (min-height . ,ivy-height)
+                                  (internal-border-width . 0))
+        ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
   :config (ivy-posframe-mode))
 
 (setq confirm-nonexistent-file-or-buffer t)
@@ -859,7 +861,7 @@
          ("M-SPC" . counsel-shell-history))
   :config
   (setq counsel-find-file-at-point t
-        counsel-rg-base-command "rg -uuu -S -g '!/volumes' -g '!/backups' -g '/.git' --no-heading --line-number --color never %s ."))
+        counsel-rg-base-command "rg -uuu -S -g '!/volumes' -g '!/backups' -g '!/.git' --no-heading --line-number --color never %s"))
 
 (use-package ivy-rich
   :config
@@ -2304,7 +2306,7 @@
 #+end_src
 * Yaml
 #+begin_src emacs-lisp
-  (use-package yaml-mode)
+(use-package yaml-mode)
 #+end_src
 * YASnippet
 #+begin_src emacs-lisp
