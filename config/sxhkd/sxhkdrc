@@ -42,7 +42,7 @@ super + shift + {f,n}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}
-  pulsemixer {--toggle-mute,--change-volume +1,--change-volume -1}
+  pulseaudio-ctl {mute, up, down}
 
 # exit
 super + alt + {l,o,s,r,p}

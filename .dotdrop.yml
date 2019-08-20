@@ -123,10 +123,10 @@ profiles:
   Pantheon:
     dotfiles:
     - d_bin
+    - d_bspwm
     - d_doom
     - d_dunst
     - d_i3
-    - f_ncmpcpp
     - d_mpd
     - d_networkmanager-dmenu
     - d_polybar
@@ -134,8 +134,10 @@ profiles:
     - d_ranger
     - d_rofi
     - d_rofi-pass
-    - f_tmux
-    - f_xprofile
-    - f_xonshrc
-    - f_xresources
+    - d_sxhkd
+    - f_ncmpcpp
     - f_rtorrent
+    - f_tmux
+    - f_xonshrc
+    - f_xprofile
+    - f_xresources

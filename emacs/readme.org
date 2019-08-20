@@ -55,9 +55,6 @@
 (setq straight-enable-use-package-integration t
       straight-use-package-by-default t)
 
-(straight-use-package 'el-patch)
-(setq el-patch-enable-use-package-integration t)
-
 (eval-when-compile
   (require 'use-package))
 
@@ -563,7 +560,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
+(set-face-attribute 'default nil :font "Operator Mono:pixelsize=17")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -831,13 +828,6 @@
   :after ivy
   :init (ivy-prescient-mode))
 
-;; (use-package ivy-explorer
-;;   :after ivy
-;;   :init
-;;   (if (display-graphic-p)
-;;       (setq ivy-explorer-message-function #'ivy-explorer--posframe))
-;;   (ivy-explorer-mode 1))
-
 (use-package ivy-posframe
   :after ivy
   :diminish ivy-posframe-mode
@@ -1060,6 +1050,7 @@
                 (cond
                  ((string-match "arkhan@disroot.org" from) "Personal")
                  ((string-match "edison@disroot.org" from) "Work")
+                 ((string-match "edison@saslibre.net" from) "SasLibre")
                  ((string-match "arkhan.xxx@gmail.com" from) "Gmail"))))
             (setq message-sendmail-extra-arguments (list '"-a" account))))))
 
@@ -1095,6 +1086,19 @@
                      (mu4e-drafts-folder    . "/Work/Drafts")
                      (mu4e-trash-folder     . "/Work/Trash")
                      (mu4e-refile-folder    . "/Work/Archive")))
+           ,(make-mu4e-context
+             :name "SasLibre"
+             :enter-func (lambda () (mu4e-message "Switch to the SasLibre context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (mu4e-message-maildir-matches msg "^/SasLibre")))
+             :leave-func (lambda () (mu4e-clear-caches))
+             :vars '((user-mail-address     . "edison@saslibre.net")
+                     (user-full-name        . "Edison Ibáñez")
+                     (mu4e-sent-folder      . "/SasLibre/Sent")
+                     (mu4e-drafts-folder    . "/SasLibre/Drafts")
+                     (mu4e-trash-folder     . "/SasLibre/Trash")
+                     (mu4e-refile-folder    . "/SasLibre/Archive")))
            ,(make-mu4e-context
              :name "Gmail"
              :enter-func (lambda () (mu4e-message "Switch to the Gmail context"))
@@ -2044,7 +2048,7 @@
   (use-package terminal-here
     :bind (("C-<f5>" . terminal-here-launch)
            ("C-<f6>" . terminal-here-project-launch))
-    :config (setq terminal-here-terminal-command (list "xst" "-e" "tmux")))
+    :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+end_src
 * SQL
 #+begin_src emacs-lisp

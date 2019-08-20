@@ -44,9 +44,52 @@ font-0 = Terminus:size=12;0
 font-1 = Siji:size=14;1
 font-2 = FontAwesome:size=10;1
 
-modules-left = i3
+modules-left = ws
 modules-center =
 modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
+
+wm-restack = bspwm
+
+[module/ws]
+type = internal/bspwm
+inline-mode = false
+fuzzy-match = true
+
+pin-workspaces = true
+ws-icon-0 = 0;
+ws-icon-1 = 1;
+ws-icon-2 = 2;
+ws-icon-3 = 3;
+ws-icon-4 = 4;
+ws-icon-5 = 5;
+ws-icon-6 = 6;
+ws-icon-7 = 7;
+ws-icon-8 = 8;
+ws-icon-9 = 9;
+ws-icon-default = 
+
+format = <label-state> <label-mode>
+
+label-dimmed-underline = ${colors.fg_normal}
+
+label-focused = %icon%
+label-focused-background = ${colors.bg_focus}
+label-focused-foreground = ${colors.fg_focus}
+label-focused-padding = 1
+label-focused-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-empty =
 
 [module/i3]
 type = internal/i3
@@ -121,7 +164,6 @@ ramp-capacity-5 = 
 ramp-capacity-6 = 
 ramp-capacity-7 = 
 ramp-capacity-8 = 
-
 
 animation-charging-0 = 
 animation-charging-1 = 

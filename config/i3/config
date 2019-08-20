@@ -3,7 +3,7 @@
 set $bin $HOME/.bin
 
 # Terminal
-set $term xst -g 100x30
+set $term urxvtcd -g 100x30
 
 # Display
 set $edp1 eDP1
@@ -53,13 +53,13 @@ bindsym $mod4+c exec rofi -show calc -modi calc -no-show-match -no-sort
 
 # Programs
 ## Ranger
-bindsym $mod4+Control+t exec $term -n Ranger -e ranger
+bindsym $mod4+Control+t exec $term -name Ranger -e ranger
 ## Weechat
-bindsym $mod4+Control+i exec $term -n Weechat -e weechat
+bindsym $mod4+Control+i exec $term -name Weechat -e weechat
 ## Ncmpcpp
-bindsym $mod4+Control+p exec $term -n Ncmpcpp -e ncmpcpp
+bindsym $mod4+Control+p exec $term -name Ncmpcpp -e ncmpcpp
 ## RTorrent
-bindsym $mod4+Control+d exec $term -n RTorrent -e rtorrent
+bindsym $mod4+Control+d exec $term -name RTorrent -e rtorrent
 ## Emacs
 bindsym $mod4+Control+e exec /usr/bin/emacs
 

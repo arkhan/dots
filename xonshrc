@@ -126,16 +126,28 @@ def _pyclean():
 aliases['pyc'] = _pyclean
 
 
-def git_pull_current_branch():
+def get_branch_name():
     import os
     from subprocess import call, STDOUT, check_output
     if not call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
         out = check_output(["git", "branch"]).decode("utf8")
         current = next(line for line in out.split("\n") if line.startswith("*"))
         branch = current.strip("*").strip()
+    return branch, call
+
+def git_pull_current_branch():
+    branch, call = get_branch_name()
+    if branch:
         call(["git", "pull", "origin", branch])
 
+def git_push_current_branch():
+    branch, call = get_branch_name()
+    if branch:
+        call(["git", "push", "origin", branch])
+
+
 aliases['ggpull'] = git_pull_current_branch
+aliases['ggpush'] = git_push_current_branch
 
 # Docker Compose
 aliases["dco"]='docker-compose'

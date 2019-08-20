@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-DISPLAY1="$(bspc query -M --names | awk -F: '{print $1}' | grep 'eDP-1\|VGA-0')"
+DISPLAY1="$(bspc query -M --names | awk -F: '{print $1}' | grep 'eDP1\|eDP-1\|VGA-0')"
 [[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 && bspc config -m "$DISPLAY1" top_padding 17
 
 [[ -z `pgrep enforce` ]] && ~/.bin/enforce "$DISPLAY1" '^1' &
