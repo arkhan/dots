@@ -5,11 +5,11 @@
 
 # terminal emulator
 super + Return
-	urxvtcd --geometry 100x30 -name TiledTerminal
+	xst -g 100x30 -n TiledTerminal
 
 # terminal emulator
 super + shift + Return
-	urxvtcd --geometry 100x30 -name Terminal
+	xst -g 100x30 -n Terminal
 
 # program launcher
 super + @space
@@ -32,13 +32,12 @@ super + control + p
   rofi-mpc
 
 # ScreenShot/ScreenCast
-
 Print; {s,c}
   teiler {--screenshot,--togglecast}
 
 # Cli Apps
-super + shift + {f,n}
-  urxvtcd {-name ranger -e ranger, -name music -e ncmpcpp}
+super + shift + {f,d,n}
+  xst {-n Ranger -e ranger, -n RTorrent -e rtorrent, -n Ncmpcpp -e ncmpcpp}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}

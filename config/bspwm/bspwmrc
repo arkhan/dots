@@ -32,12 +32,15 @@ bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
 bspc rule -a Thunderbird follow=on desktop=^3
 bspc rule -a Icedove follow=on desktop=^3
 bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
+bspc rule -a *:Ranger follow=on desktop=^4 state=tiled
 bspc rule -a JDownloader follow=off  desktop=^5
+bspc rule -a *:RTorrent follow=off  desktop=^5
 bspc rule -a Lxappearance follow=on desktop=^6 state=floating
 bspc rule -a Anydesk follow=on desktop=^6 state=tiled
 bspc rule -a Remmina follow=on desktop=^6 state=tiled
 bspc rule -a qt5ct follow=on desktop=^6 state=floating
 bspc rule -a URxvt:music follow=on desktop=^7 state=tiled
+bspc rule -a *:Ncmpcpp follow=on desktop=^7 state=tiled
 bspc rule -a mpv follow=on desktop=^7 state=tiled
 bspc rule -a obs follow=on desktop=^7 state=tiled
 bspc rule -a cantata follow=on desktop=^7 state=tiled
@@ -52,6 +55,7 @@ bspc rule -a Wine follow=off desktop=^6 state=tiled
 # Floating apps
 bspc rule -a sxiv follow=off state=floating
 bspc rule -a URxvt:Terminal follow=off state=floating center=on
+bspc rule -a *:Terminal follow=off state=floating center=on
 
 # Xresources
 xrdb ~/.Xresources &
