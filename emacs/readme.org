@@ -99,13 +99,20 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (set-default 'truncate-lines t)
 
+(prefer-coding-system       'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8-auto-unix
+              x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
 (setq auto-save-default nil
       auto-save-list-file-prefix nil
       make-backup-files nil
       create-lockfiles nil
       frame-resize-pixelwise t
-      major-mode 'text-mode
-      current-language-environment "Spanish")
+      major-mode 'text-mode)
+      ;current-language-environment "Spanish")
 
 (setq-default indent-tabs-mode nil
               tab-width 4
@@ -199,6 +206,56 @@
 
   ;; Don't ask for confirmation to delete marked buffers
   (setq ibuffer-expert t))
+#+end_src
+** recentf
+#+begin_src emacs-lisp
+(leaf recentf
+  :config
+  (setq recentf-save-file (concat conf:cache-dir "recentf")
+        recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:"
+                          "/scpx:" "/ssh:" "/media/data/org/"
+                          "conf:cache-dir" "/media/data/mail/Maildir")
+        recentf-max-saved-items 15
+        recentf-max-menu-items 15
+        recentf-keep '(file-remote-p file-readable-p)
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1))
+#+end_src
+** Saveplace
+#+begin_src emacs-lisp
+(leaf saveplace
+  :init (save-place-mode)
+  :config
+  (progn
+    (setq save-place-file (concat conf:cache-dir "saveplace.el"))
+    (setq-default save-place t)))
+#+end_src
+** Semantic
+#+begin_src emacs-lisp
+(leaf semantic
+  :config (semantic-mode 1))
+#+end_src
+** Tramp
+#+begin_src emacs-lisp
+(leaf tramp
+  :config
+  (setq tramp-default-method "scp"
+        tramp-persistency-file-name (concat conf:cache-dir "tramp")
+        tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
+        tramp-debug-buffer t
+        tramp-verbose 10
+        tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
+  (tramp-set-completion-function "ssh" '((tramp-parse-sconfig "/etc/ssh_config")
+                                         (tramp-parse-sconfig "~/.ssh/config"))))
+
+(leaf counsel-tramp
+  :straight t
+  :bind ("C-c s" . counsel-tramp)
+  :config
+  (add-hook 'counsel-tramp-pre-command-hook '(lambda () (projectile-mode 0)
+                                               (editorconfig-mode 0)))
+  (add-hook 'counsel-tramp-quit-hook '(lambda () (projectile-mode 1)
+                                        (editorconfig-mode 1))))
 #+end_src
 * UI
 ** All The Icons
@@ -427,22 +484,23 @@
          ("+" . neotree-create-node)
          ("d" . neotree-delete-node)
          ("r" . neotree-rename-node))
-  :config (setq neo-theme 'ascii
-                neo-vc-integration nil
-                neo-window-width 36
-                neo-create-file-auto-open t
-                neo-smart-open t
-                neo-show-auto-change-root t
-                neo-autorefresh nil
-                neo-banner-message nil
-                neo-mode-line-type 'neotree
-                neo-dont-be-alone t
-                neo-persist-show t
-                neo-show-updir-line nil
-                neo-show-hidden-files nil
-                neo-auto-indent-point t
-                neo-hidden-regexp-list '(".DS_Store" ".idea/" ".pyc" ".tern-port"
-                                         ".git/*" "node_modules/*" ".meteor" "deps"))
+  :config
+  (setq neo-theme 'ascii
+        neo-vc-integration nil
+        neo-window-width 36
+        neo-create-file-auto-open t
+        neo-smart-open t
+        neo-show-auto-change-root t
+        neo-autorefresh nil
+        neo-banner-message nil
+        neo-mode-line-type 'neotree
+        neo-dont-be-alone t
+        neo-persist-show t
+        neo-show-updir-line nil
+        neo-show-hidden-files nil
+        neo-auto-indent-point t
+        neo-hidden-regexp-list '(".DS_Store" ".idea/" ".pyc" ".tern-port"
+                                 ".git/*" "node_modules/*" ".meteor" "deps"))
 
   (defun shrink-root-entry (node)
     "shrink-print pwd in neotree"
@@ -504,6 +562,54 @@
   :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
   :config (load-theme 'vibrant-ink t))
 #+end_src
+** Scroll
+#+begin_src emacs-lisp
+(setq-default hscroll-margin 2
+              hscroll-step 1
+              scroll-conservatively 1001
+              scroll-margin 0
+              scroll-preserve-screen-position t)
+
+;;(leaf smooth-scrolling
+;;  :straight t
+;;  :config (setq smooth-scroll-margin 5))
+
+(leaf sublimity-scroll
+      :straight sublimity
+      :init (sublimity-mode 1))
+#+end_src
+** Shackle
+#+begin_src emacs-lisp
+(leaf shackle
+  :straight t
+  :init (shackle-mode)
+  :config
+  (setq shackle-default-size 0.4)
+  (setq shackle-rules
+        '(("*Calendar*" :select t :size 0.3 :align below)
+          ("*Compile-Log*" :ignore t)
+          ("*Completions*" :size 0.3  :align t)
+          ("*format-all-errors*" :select t :size 0.1 :align below)
+          ("*Help*" :select t :inhibit-window-quit t :other t)
+          ("*Messages*" :select nil :inhibit-window-quit t :other t)
+          ("*Process List*" :select t :size 0.3 :align below)
+          ("*Proced*" :select t :size 0.3 :align below)
+          ("*Python*" :select t :size 0.3 :align bellow)
+          ("*Shell Command Output*" :select nil)
+          ("*Warnings*" :ignore t)
+          ("*el-get bootstrap*" :ignore t)
+          ("*undo-tree*" :size 0.25 :align left)
+          ("\\*Async Shell.*\\*" :regexp t :ignore t)
+          ("\\*[Wo]*Man.*\\*" :regexp t :select t :inhibit-window-quit t :other t)
+          ("\\*poporg.*\\*" :regexp t :select t :other t)
+          ("\\*shell*\\*" :select t :other t)
+          ("\\`\\*ivy.*?\\*\\'" :regexp t :size 0.3 :align t)
+          ("edbi-dbviewer" :regexp t :select t :same t)
+          ("*edbi:query-result" :regexp t :size 0.8 :align bellow)
+          (occur-mode :select nil :align t)
+          (pdf-view-mode :other t)
+          (compilation-mode :select nil))))
+#+end_src
 ** Status Line
 #+begin_src emacs-lisp
 (setq line-number-mode t
@@ -524,6 +630,16 @@
   (setq doom-modeline-height 12
         doom-modeline-icon nil
         doom-modeline-env-enable-python nil))
+#+end_src
+** Switch Windows
+#+begin_src emacs-lisp
+  (leaf switch-window
+    :straight t
+    :bind (("C-x o" . switch-window)
+           ("C-x 1" . switch-window-then-maximize)
+           ("C-x 2" . switch-window-then-split-below)
+           ("C-x 3" . switch-window-then-split-right)
+           ("C-x 0" . switch-window-then-delete)))
 #+end_src
 * Prog
 ** Company
@@ -857,6 +973,144 @@
 
   (add-hook 'python-mode-hook #'poly-python-sql-mode))
 #+end_src
+** Rainbow
+#+begin_src emacs-lisp
+(leaf rainbow-mode
+  :straight t
+  :diminish rainbow-mode
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-mode)
+  (add-hook 'conf-mode-hook 'rainbow-mode))
+#+end_src
+** RestClient
+#+begin_src emacs-lisp
+(leaf restclient  :straight t)
+
+(leaf company-restclient
+  :straight t
+  :after restclient
+  :config (add-to-list 'company-backends 'company-restclient))
+
+(leaf ob-restclient
+  :straight t
+  :commands (org-babel-execute:restclient))
+#+end_src
+** SQL
+#+begin_src emacs-lisp
+(leaf edbi-database-url
+  :straight t)
+
+(leaf edbi-minor-mode
+  :straight t
+  :config
+  (add-hook 'sql-mode-hook 'edbi-minor-mode))
+
+(leaf company-edbi
+  :straight t
+  :init
+  (defun cfg:edbi-mode-hook()
+    (add-to-list 'company-backends 'company-edbi))
+  (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
+
+(leaf sqlup-mode
+  :straight t
+  :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
+  :init
+  (add-hook 'sql-mode-hook 'sqlup-mode)
+  (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+
+(leaf sql-indent
+  :straight t
+  :after sql
+  :bind (sql-mode-map
+         ("C-c \\" . sql-indent-buffer)))
+#+end_src
+** XML
+#+begin_src emacs-lisp
+  (defun nxml-template ()
+    (interactive)
+    (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
+
+  (add-hook 'nxml-mode-hook
+            '(lambda () (when (empty-buffer?) (nxml-template))))
+
+  (leaf nxml-mode
+    :mode (("\\.plist\\'" . nxml-mode)
+           ("\\.rss\\'"   . nxml-mode)
+           ("\\.svg\\'"   . nxml-mode)
+           ("\\.xml\\'"   . nxml-mode)
+           ("\\.xsd\\'"   . nxml-mode)
+           ("\\.xslt\\'"  . nxml-mode)
+           ("\\.pom$"     . nxml-mode))
+    :config
+    (setq nxml-slash-auto-complete-flag t
+                   nxml-auto-insert-xml-declaration-flag t)
+    (add-to-list 'magic-mode-alist '("<\\?xml" . nxml-mode))
+    (mapc
+     (lambda (pair)
+       (if (or (eq (cdr pair) 'xml-mode)
+               (eq (cdr pair) 'sgml-mode))
+           (setcdr pair 'nxml-mode)))
+     auto-mode-alist)
+
+    ;; https://gist.github.com/DinoChiesa/5489021
+    (defun pretty-print-xml-region (begin end)
+      "Pretty format XML markup in region. You need to have nxml-mode
+      http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+      this. The function inserts linebreaks to separate tags that have
+      nothing but whitespace between them. It then indents the markup
+      by using nxml's indentation rules."
+      (interactive "r")
+      (save-excursion
+        (nxml-mode)
+        ;; split <foo><bar> or </foo><bar>, but not <foo></foo>
+        (goto-char begin)
+        (while (search-forward-regexp ">[ \t]*<[^/]" end t)
+          (backward-char 2) (insert "\n") (incf end))
+        ;; split <foo/></foo> and </foo></foo>
+        (goto-char begin)
+        (while (search-forward-regexp "<.*?/.*?>[ \t]*<" end t)
+          (backward-char) (insert "\n") (incf end))
+        ;; put xml namespace decls on newline
+        (goto-char begin)
+        (while (search-forward-regexp "\\(<\\([a-zA-Z][-:A-Za-z0-9]*\\)\\|['\"]\\) \\(xmlns[=:]\\)" end t)
+          (goto-char (match-end 0))
+          (backward-char 6) (insert "\n") (incf end))
+        (indent-region begin end nil)
+        (normal-mode))
+      (message "All indented!"))
+
+
+    (defun pretty-print-xml-buffer ()
+      "pretty print the XML in a buffer."
+      (interactive)
+      (pretty-print-xml-region (point-min) (point-max)))
+
+    (define-key nxml-mode-map (kbd "C-x f") 'pretty-print-xml-buffer))
+
+#+end_src
+** Yaml
+#+begin_src emacs-lisp
+(leaf yaml-mode :straight t)
+#+end_src
+** YASnippet
+#+begin_src emacs-lisp
+  (leaf yasnippet
+    :straight t
+    :diminish yas-minor-mode
+    :config
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+    (yas-global-mode))
+
+  (leaf yasnippet-snippets :straight t)
+
+  (leaf org-sync-snippets
+    :straight t
+    :init
+    (setq org-sync-snippets-org-snippets-file "~/.emacs.d/snippets/snippets.org")
+    (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets))
+#+end_src
 * Tools
 ** alert
 #+begin_src emacs-lisp
@@ -982,15 +1236,19 @@
 ** Flyspell
 #+begin_src emacs-lisp
 (leaf flyspell
+  :require t
   :bind (("C-c t s" . flyspell-mode)
          ("C-c l b" . flyspell-buffer)
+         ("M-i" . switch-dictionary)
          (flyspell-mode-map
+          ("C-\"" . flyspell-add-word-to-dict)
           ("\M-\t" . nil)
           ([down-mouse-2] . nil)
           ([mouse-2] . nil)))
   :init
   (dolist (hook '(TeX-mode-hook LaTeX-mode-hook text-mode-hook message-mode-hook markdown-mode-hook org-mode-hook))
     (add-hook hook 'turn-on-flyspell))
+  :config
   (setq flyspell-use-meta-tab nil
         flyspell-issue-welcome-flag nil
         flyspell-issue-message-flag nil)
@@ -1014,8 +1272,6 @@
   (defun turn-on-spell-check ()
     (flyspell-mode 1))
 
-  (global-set-key (kbd "M-i") 'switch-dictionary)
-
   (defun flyspell-add-word-to-dict ()
     "Add the word at the current location to the private dictionary
        without question."
@@ -1033,7 +1289,6 @@
             (flyspell-do-correct 'save nil word cursor-location start end opoint)))
       (ispell-pdict-save t)))
 
-  (define-key flyspell-mode-map [(control ?\")] 'flyspell-add-word-to-dict)
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 
 (leaf flyspell-correct-popup
@@ -1779,170 +2034,19 @@
   (setq proced-tree-flag t
         proced-auto-update-flag t))
 #+end_src
-** VLF
-#+begin_src emacs-lisp
-  (leaf vlf-setup
-    :straight vlf
-    :init (setq vlf-application 'dont-ask))
-#+end_src
-** Which-key
-#+begin_src emacs-lisp
-  (leaf which-key
-    :straight t
-    :diminish which-key-mode
-    :config
-    (setq which-key-sort-order 'which-key-key-order-alpha)
-    (which-key-mode))
-
-  (leaf which-key-posframe
-    :straight t
-    :config
-    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
-          which-key-posframe-border-width 0)
-    (which-key-posframe-mode))
-#+end_src
-* Rainbow
-#+begin_src emacs-lisp
-(leaf rainbow-mode
-  :straight t
-  :diminish rainbow-mode
-  :config
-  (add-hook 'prog-mode-hook 'rainbow-mode)
-  (add-hook 'conf-mode-hook 'rainbow-mode))
-#+end_src
-* recentf
-#+begin_src emacs-lisp
-(leaf recentf
-  :config
-  (setq recentf-save-file (concat conf:cache-dir "recentf")
-        recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:"
-                          "/scpx:" "/ssh:" "/media/data/org/"
-                          "conf:cache-dir" "/media/data/mail/Maildir")
-        recentf-max-saved-items 15
-        recentf-max-menu-items 15
-        recentf-keep '(file-remote-p file-readable-p)
-        recentf-auto-cleanup 'never)
-  (recentf-mode +1))
-#+end_src
-* RestClient
-#+begin_src emacs-lisp
-(leaf restclient  :straight t)
-
-(leaf company-restclient
-  :straight t
-  :after restclient
-  :config (add-to-list 'company-backends 'company-restclient))
-
-(leaf ob-restclient
-  :straight t
-  :commands (org-babel-execute:restclient))
-#+end_src
-* restart emacs
+** restart emacs
 #+begin_src emacs-lisp
 (leaf restart-emacs  :straight t)
 #+end_src
-* Saveplace
-#+begin_src emacs-lisp
-(leaf saveplace
-  :init (save-place-mode)
-  :config
-  (progn
-    (setq save-place-file (concat conf:cache-dir "saveplace.el"))
-    (setq-default save-place t)))
-#+end_src
-* Scroll
-#+begin_src emacs-lisp
-(setq-default hscroll-margin 2
-              hscroll-step 1
-              scroll-conservatively 1001
-              scroll-margin 0
-              scroll-preserve-screen-position t)
-
-;;(leaf smooth-scrolling
-;;  :straight t
-;;  :config (setq smooth-scroll-margin 5))
-
-(leaf sublimity-scroll
-      :straight sublimity
-      :init (sublimity-mode 1))
-#+end_src
-* Semantic
-#+begin_src emacs-lisp
-(leaf semantic
-  :config (semantic-mode 1))
-#+end_src
-* Shackle
-#+begin_src emacs-lisp
-(leaf shackle
-  :straight t
-  :init (shackle-mode)
-  :config
-  (setq shackle-default-size 0.4)
-  (setq shackle-rules
-        '(("*Calendar*" :select t :size 0.3 :align below)
-          ("*Compile-Log*" :ignore t)
-          ("*Completions*" :size 0.3  :align t)
-          ("*format-all-errors*" :select t :size 0.1 :align below)
-          ("*Help*" :select t :inhibit-window-quit t :other t)
-          ("*Messages*" :select nil :inhibit-window-quit t :other t)
-          ("*Process List*" :select t :size 0.3 :align below)
-          ("*Proced*" :select t :size 0.3 :align below)
-          ("*Python*" :select t :size 0.3 :align bellow)
-          ("*Shell Command Output*" :select nil)
-          ("*Warnings*" :ignore t)
-          ("*el-get bootstrap*" :ignore t)
-          ("*undo-tree*" :size 0.25 :align left)
-          ("\\*Async Shell.*\\*" :regexp t :ignore t)
-          ("\\*[Wo]*Man.*\\*" :regexp t :select t :inhibit-window-quit t :other t)
-          ("\\*poporg.*\\*" :regexp t :select t :other t)
-          ("\\*shell*\\*" :select t :other t)
-          ("\\`\\*ivy.*?\\*\\'" :regexp t :size 0.3 :align t)
-          ("edbi-dbviewer" :regexp t :select t :same t)
-          ("*edbi:query-result" :regexp t :size 0.8 :align bellow)
-          (occur-mode :select nil :align t)
-          (pdf-view-mode :other t)
-          (compilation-mode :select nil))))
-#+end_src
-* Shell
+** Shell
 #+begin_src emacs-lisp
 (leaf terminal-here
-           :straight t
-    :bind (("C-<f5>" . terminal-here-launch)
-           ("C-<f6>" . terminal-here-project-launch))
-    :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
+  :straight t
+  :bind (("C-<f5>" . terminal-here-launch)
+         ("C-<f6>" . terminal-here-project-launch))
+  :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
 #+end_src
-* SQL
-#+begin_src emacs-lisp
-(leaf edbi-database-url
-  :straight t)
-
-(leaf edbi-minor-mode
-  :straight t
-  :config
-  (add-hook 'sql-mode-hook 'edbi-minor-mode))
-
-(leaf company-edbi
-  :straight t
-  :init
-  (defun cfg:edbi-mode-hook()
-    (add-to-list 'company-backends 'company-edbi))
-  (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
-
-(leaf sqlup-mode
-  :straight t
-  :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
-  :init
-  (add-hook 'sql-mode-hook 'sqlup-mode)
-  (add-hook 'edbi:sql-mode-hook 'sqlup-mode)
-  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
-
-(leaf sql-indent
-  :straight t
-  :after sql
-  :bind (sql-mode-map
-         ("C-c \\" . sql-indent-buffer)))
-#+end_src
-* SSH
+** SSH
 #+begin_src emacs-lisp
 (leaf ssh
   :straight t
@@ -1953,44 +2057,12 @@
               (shell-dirtrack-mode t)
               (setq dirtrackp nil))))
 #+end_src
-* Sudo
+** Sudo
 #+begin_src emacs-lisp
 (leaf sudo-edit
   :straight t)
 #+end_src
-* Switch Windows
-#+begin_src emacs-lisp
-  (leaf switch-window
-    :straight t
-    :bind (("C-x o" . switch-window)
-           ("C-x 1" . switch-window-then-maximize)
-           ("C-x 2" . switch-window-then-split-below)
-           ("C-x 3" . switch-window-then-split-right)
-           ("C-x 0" . switch-window-then-delete)))
-#+end_src
-* Tramp
-#+begin_src emacs-lisp
-(leaf tramp
-  :config
-  (setq tramp-default-method "scp"
-        tramp-persistency-file-name (concat conf:cache-dir "tramp")
-        tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
-        tramp-debug-buffer t
-        tramp-verbose 10
-        tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
-  (tramp-set-completion-function "ssh" '((tramp-parse-sconfig "/etc/ssh_config")
-                                         (tramp-parse-sconfig "~/.ssh/config"))))
-
-(leaf counsel-tramp
-  :straight t
-  :bind ("C-c s" . counsel-tramp)
-  :config
-  (add-hook 'counsel-tramp-pre-command-hook '(lambda () (projectile-mode 0)
-                                               (editorconfig-mode 0)))
-  (add-hook 'counsel-tramp-quit-hook '(lambda () (projectile-mode 1)
-                                        (editorconfig-mode 1))))
-#+end_src
-* Undo Tree
+** Undo Tree
 #+begin_src emacs-lisp
   (leaf undo-tree
     :straight t
@@ -2015,80 +2087,29 @@
     (defalias 'redo 'undo-tree-redo)
     (global-undo-tree-mode 1))
 #+end_src
-* UTF-8
+** VLF
 #+begin_src emacs-lisp
-  (prefer-coding-system       'utf-8)
-  (set-default-coding-systems 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (setq-default buffer-file-coding-system 'utf-8-auto-unix
-                x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+  (leaf vlf-setup
+    :straight vlf
+    :init (setq vlf-application 'dont-ask))
 #+end_src
-* XML
+** Which-key
 #+begin_src emacs-lisp
-  (defun nxml-template ()
-    (interactive)
-    (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
-
-  (add-hook 'nxml-mode-hook
-            '(lambda () (when (empty-buffer?) (nxml-template))))
-
-  (leaf nxml-mode
-    :mode (("\\.plist\\'" . nxml-mode)
-           ("\\.rss\\'"   . nxml-mode)
-           ("\\.svg\\'"   . nxml-mode)
-           ("\\.xml\\'"   . nxml-mode)
-           ("\\.xsd\\'"   . nxml-mode)
-           ("\\.xslt\\'"  . nxml-mode)
-           ("\\.pom$"     . nxml-mode))
+  (leaf which-key
+    :straight t
+    :diminish which-key-mode
     :config
-    (setq nxml-slash-auto-complete-flag t
-                   nxml-auto-insert-xml-declaration-flag t)
-    (add-to-list 'magic-mode-alist '("<\\?xml" . nxml-mode))
-    (mapc
-     (lambda (pair)
-       (if (or (eq (cdr pair) 'xml-mode)
-               (eq (cdr pair) 'sgml-mode))
-           (setcdr pair 'nxml-mode)))
-     auto-mode-alist)
+    (setq which-key-sort-order 'which-key-key-order-alpha)
+    (which-key-mode))
 
-    ;; https://gist.github.com/DinoChiesa/5489021
-    (defun pretty-print-xml-region (begin end)
-      "Pretty format XML markup in region. You need to have nxml-mode
-      http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
-      this. The function inserts linebreaks to separate tags that have
-      nothing but whitespace between them. It then indents the markup
-      by using nxml's indentation rules."
-      (interactive "r")
-      (save-excursion
-        (nxml-mode)
-        ;; split <foo><bar> or </foo><bar>, but not <foo></foo>
-        (goto-char begin)
-        (while (search-forward-regexp ">[ \t]*<[^/]" end t)
-          (backward-char 2) (insert "\n") (incf end))
-        ;; split <foo/></foo> and </foo></foo>
-        (goto-char begin)
-        (while (search-forward-regexp "<.*?/.*?>[ \t]*<" end t)
-          (backward-char) (insert "\n") (incf end))
-        ;; put xml namespace decls on newline
-        (goto-char begin)
-        (while (search-forward-regexp "\\(<\\([a-zA-Z][-:A-Za-z0-9]*\\)\\|['\"]\\) \\(xmlns[=:]\\)" end t)
-          (goto-char (match-end 0))
-          (backward-char 6) (insert "\n") (incf end))
-        (indent-region begin end nil)
-        (normal-mode))
-      (message "All indented!"))
-
-
-    (defun pretty-print-xml-buffer ()
-      "pretty print the XML in a buffer."
-      (interactive)
-      (pretty-print-xml-region (point-min) (point-max)))
-
-    (define-key nxml-mode-map (kbd "C-x f") 'pretty-print-xml-buffer))
-
+  (leaf which-key-posframe
+    :straight t
+    :config
+    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
+          which-key-posframe-border-width 0)
+    (which-key-posframe-mode))
 #+end_src
-* xrdb
+** xrdb
 #+begin_src emacs-lisp
 (leaf xrdb-mode
   :straight (xrdb-mode :type git :host github :repo "arkhan/xrdb-mode")
@@ -2100,28 +2121,7 @@
   :config
   (add-hook 'xrdb-mode-hook (lambda () (setq comment-start "! "))))
 #+end_src
-* Yaml
-#+begin_src emacs-lisp
-(leaf yaml-mode :straight t)
-#+end_src
-* YASnippet
-#+begin_src emacs-lisp
-  (leaf yasnippet
-    :straight t
-    :diminish yas-minor-mode
-    :config
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-global-mode))
-
-  (leaf yasnippet-snippets :straight t)
-
-  (leaf org-sync-snippets
-    :straight t
-    :init
-    (setq org-sync-snippets-org-snippets-file "~/.emacs.d/snippets/snippets.org")
-    (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets))
-#+end_src
-* Startup
+** Startup
 #+begin_src emacs-lisp
   ;; Use a hook so the message doesn't get clobbered by other messages.
   (add-hook 'emacs-startup-hook
