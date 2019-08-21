@@ -238,6 +238,7 @@
 ** Tramp
 #+begin_src emacs-lisp
 (leaf tramp
+  :require t
   :config
   (setq tramp-default-method "scp"
         tramp-persistency-file-name (concat conf:cache-dir "tramp")
@@ -921,7 +922,7 @@
 #+end_src
 *** Stuff
 #+begin_src emacs-lisp
-(leaf pyimport :straight t)
+(leaf pyimport :straight t :require t)
 (leaf pip-requirements :straight t)
 #+end_src
 ** Polymode
@@ -1965,6 +1966,7 @@
 
 (leaf auth-source-pass
   :straight t
+  :require t
   :after auth-source
   :init (setq auth-sources '(password-store)))
 #+end_src
@@ -2044,7 +2046,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "urxvtcd" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "xst" "-n" "TMX" "-e" "tmx")))
 #+end_src
 ** SSH
 #+begin_src emacs-lisp
