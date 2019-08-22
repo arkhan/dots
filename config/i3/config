@@ -260,7 +260,7 @@ exec --no-startup-id xrdb $HOME/.Xresources
 # Wallpaper
 exec --no-startup-id feh --bg-fill $HOME/.dots/walls/03.jpg
 # i3lock Fancy
-exec --no-startup-id xss-lock -- i3lock-fancy-dualmonitor -p
+exec --no-startup-id xss-lock -- i3lock-fancy-dualmonitor -p -f 'Operator-Mono-Bold'
 # Clipboard
 exec --no-startup-id $bin/clipboard
 # udiskie

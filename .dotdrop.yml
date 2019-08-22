@@ -107,7 +107,7 @@ dotfiles:
     dst: ~/.Xresources
     link: link
     src: Xresources
-  f_zaturarc:
+  f_zathurarc:
     dst: ~/.config/zathura/zathurarc
     link: link
     src: config/zathura/zathurarc
@@ -141,3 +141,4 @@ profiles:
     - f_xonshrc
     - f_xprofile
     - f_xresources
+    - f_zathurarc

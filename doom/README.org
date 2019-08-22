@@ -179,7 +179,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Ubuntu Mono" :size 15))
+(setq doom-font (font-spec :family "Operator Mono" :size 15))
 #+END_SRC
 ** Imenu
 *** Package

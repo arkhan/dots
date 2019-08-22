@@ -543,7 +543,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Operator Mono:pixelsize=17")
+(set-face-attribute 'default nil :font "Operator Mono:pixelsize=15")
 #+end_src
 * Format-all
 #+begin_src emacs-lisp
@@ -1853,9 +1853,10 @@
 #+begin_src emacs-lisp
 (use-package lsp-python-ms
   :straight (lsp-python-ms :type git :host github :repo "andrew-christianson/lsp-python-ms")
+  :after lsp-clients
   :demand
-  :config (setq python-shell-interpreter "python"
-                lsp-python-ms-dir (concat conf:cache-dir "mspyls/"))
+  :init (setq python-shell-interpreter "python"
+              lsp-python-ms-dir (concat conf:cache-dir "mspyls/"))
   :hook (python-mode . lsp-deferred))
 #+end_src
 ** Pyenv
