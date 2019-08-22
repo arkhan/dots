@@ -598,6 +598,14 @@
   $0
 
 #+END_SRC
+** odooly
+#+BEGIN_SRC snippet :tangle {SNIPPETS-DIR}/python-mode/odooly
+  # name: Odooly
+  # key: odooly
+  # --
+  from odooly import Client
+
+#+END_SRC
 ** wdb.set_trace()
 #+BEGIN_SRC snippet :tangle {SNIPPETS-DIR}/python-mode/w
   # name: wdb.set_trace()
