@@ -49,10 +49,10 @@ seek_time = "1"
 autocenter_mode = "yes"
 centered_cursor = "no"
 
-progressbar_look = "─╼·"
+progressbar_look = "─⊙ "
 default_place_to_search_in = "database" (database/playlist)
 
-user_interface = "alternative" (classic/alternative)
+user_interface = "classic" (classic/alternative)
 
 default_find_mode = "wrapped" (wrapped/normal)
 default_tag_editor_pattern = "%n - %t"
