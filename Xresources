@@ -36,7 +36,8 @@ URxvt.scrollWithBuffer: true
 URxvt.scrollTtyKeypress: true
 URxvt.termName: rxvt-unicode-256color
 URxvt.internalBorder: 0
-URxvt*cutchars: '\"'()*<>[]{|}
+URxvt.externalBorder: 0
+URxvt.cutchars: '\"'()*<>[]{|}
 ! Perl Extentions
 URxvt.perl-ext-common: default,clipboard,tabbedex,resize-font,url-select
 ! Url select

@@ -448,8 +448,6 @@
 
 (use-package ob-async)
 
-(use-package ob-translate)
-
 (use-package org-re-reveal)
 
 (use-package htmlize)
@@ -721,13 +719,20 @@
   :after ivy
   :diminish ivy-posframe-mode
   :init
-  (setq ivy-posframe-hide-minibuffer t
+  (setq ivy-posframe-hide-minibuffer nil
         ivy-fixed-height-minibuffer nil
         ivy-posframe-parameters `((min-width . ,(window-width))
                                   (min-height . ,ivy-height)
                                   (internal-border-width . 0))
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
   :config (ivy-posframe-mode))
+
+(use-package ivy-explorer
+  :after ivy
+  :init
+  (if (display-graphic-p)
+      (setq ivy-explorer-message-function #'ivy-explorer--posframe))
+  (ivy-explorer-mode 1))
 
 (setq confirm-nonexistent-file-or-buffer t)
 
@@ -1266,7 +1271,7 @@
 (use-package terminal-here
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "xst"  "-n"  "Tmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "urxvtcd"  "-name"  "Tmux" "-e" "tmx")))
 #+end_src
 *** yasnippet
 #+begin_src emacs-lisp
@@ -1813,6 +1818,17 @@
               ("<f8>" . gif-screencast-toggle-pause)
               ("<f9>" . gif-screencast-stop))))
 #+end_src
+** google-translate
+#+begin_src emacs-lisp
+(use-package google-translate
+  :commands google-translate-smooth-translate
+  :init
+  (setq-default google-translate-translation-directions-alist
+                '(("es" . "en") ("en" . "es"))
+                google-translate-show-phonetic t))
+
+(use-package ob-translate)
+#+end_src
 ** i3wm
 #+begin_src emacs-lisp
 (use-package i3wm-config-mode
@@ -2074,8 +2090,7 @@
 (use-package restart-emacs)
 #+end_src
 
-
-** SSH
+** ssh
 #+begin_src emacs-lisp
 (use-package ssh
   :init
