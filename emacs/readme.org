@@ -1855,6 +1855,7 @@
 
 (use-package mu4e
   :straight nil
+  :if (executable-find "mu")
   :bind ("<f1>" . mu4e)
   :preface
   (defadvice mu4e (before mu4e-start activate)
@@ -1987,6 +1988,8 @@
          (message-send-mail . choose-msmtp-account)))
 
 (use-package mu4e-alert
+  :if (executable-find "mu")
+  :after mu4e
   :init
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display)
@@ -2004,6 +2007,7 @@
   (mu4e-alert-set-default-style 'libnotify))
 
 (use-package mu4e-maildirs-extension
+  :if (executable-find "mu")
   :after mu4e
   :config (mu4e-maildirs-extension))
 #+end_src
