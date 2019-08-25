@@ -17,7 +17,7 @@
 #+LaTeX_HEADER: \setminted{breaklines}
 
 * Config
-** Base
+** base
 #+begin_src emacs-lisp
 ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
 ;;; Commentary:
@@ -54,14 +54,10 @@
 (straight-use-package 'leaf)
 (straight-use-package 'leaf-keywords)
 
-(eval-when-compile
-  (require 'leaf))
-
-(require 'leaf)
-
 (leaf leaf
   :doc "Symplify your init.el configuration"
   :doc "Initialize leaf dependent packages"
+  :require t
   :config
   (leaf leaf-keywords
     :require t
@@ -71,17 +67,6 @@
   :straight t
   :leaf-defer nil
   :config (setq async-bytecomp-package-mode t))
-
-(defun tangle-init-async ()
-  "If the current buffer is 'emacs-init.org' the code-blocks are tangled."
-  (when (or
-         (equal (buffer-file-name)
-                (expand-file-name (concat user-emacs-directory "readme.org")))
-         (equal (buffer-file-name)
-                (expand-file-name "~/.dots/emacs/readme.org")))
-    (let ((prog-mode-hook nil))
-      (async-shell-command "/usr/bin/sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
-(add-hook 'after-save-hook 'tangle-init-async)
 
 (setq inhibit-startup-screen t
       use-dialog-box nil
@@ -127,6 +112,13 @@
 (global-set-key (kbd "C-x k") 'kill-buffer-and-window)
 
 (set-frame-parameter nil 'fullscreen 'maximized)
+
+(defun tangle-init-async ()
+  "If the current buffer is 'readme.org' the code-blocks are tangled."
+  (when (string= buffer-file-name (file-truename (concat user-emacs-directory "readme.org")))
+    (let ((prog-mode-hook nil))
+      (async-shell-command "/usr/bin/sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+(add-hook 'after-save-hook 'tangle-init-async)
 #+end_src
 ** abbrev
 #+begin_src emacs-lisp
@@ -141,7 +133,7 @@
   (when (file-exists-p abbrev-file-name)
     (quietly-read-abbrev-file)))
 #+end_src
-** Bookmarks
+** bookmarks
 #+begin_src emacs-lisp
 (leaf bookmark
   :config
@@ -157,13 +149,13 @@
     (write-file custom-file)))
 (load custom-file)
 #+end_src
-** Dirs
+** dirs
 #+begin_src emacs-lisp
 (setq-default semanticdb-default-save-directory (concat conf:cache-dir "semanticdb/")
               url-configuration-directory (concat conf:cache-dir "url/")
               eshell-directory-name (concat conf:cache-dir "eshell/" ))
 #+end_src
-** Historial
+** history
 #+begin_src emacs-lisp
 (setq-default history-length 1000)
 (setq savehist-file (concat conf:cache-dir "history")
@@ -175,7 +167,7 @@
         regexp-search-ring))
 (savehist-mode t)
 #+end_src
-** IBuffer
+** ibuffer
 #+begin_src emacs-lisp
 (leaf ibuffer
   :config
@@ -221,7 +213,7 @@
         recentf-auto-cleanup 'never)
   (recentf-mode +1))
 #+end_src
-** Saveplace
+** saveplace
 #+begin_src emacs-lisp
 (leaf saveplace
   :init (save-place-mode)
@@ -230,13 +222,13 @@
     (setq save-place-file (concat conf:cache-dir "saveplace.el"))
     (setq-default save-place t)))
 #+end_src
-** Semantic
+** semantic
 #+begin_src emacs-lisp
 (leaf semantic
   :require t
   :config (semantic-mode 1))
 #+end_src
-** Tramp
+** tramp
 #+begin_src emacs-lisp
 (leaf tramp
   :require t
@@ -260,7 +252,7 @@
                                         (editorconfig-mode 1))))
 #+end_src
 * UI
-** All The Icons
+** all the icons
 #+begin_src emacs-lisp
 (leaf all-the-icons :straight t)
 #+end_src
@@ -271,7 +263,7 @@
   :config
   (setq avy-all-windows t))
 #+end_src
-** Cursor
+** cursor
 #+begin_src emacs-lisp
 (setq-default cursor-type '(hbar . 2))
 (setq x-stretch-cursor t)
@@ -284,7 +276,7 @@
 
   (add-hook 'after-make-frame-functions 'set-cursor-hook))
 #+end_src
-** Dashboard
+** dashboard
 #+begin_src emacs-lisp
 (leaf page-break-lines
   :straight t
@@ -302,13 +294,13 @@
         dashboard-center-content t
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
-        dashboard-items '((recents  . 5)
+        dashboard-items '((recents  . 10)
                           (bookmarks . 5)
                           (projects . 5)
                           (agenda . 5))
         initial-buffer-choice (lambda () (switch-to-buffer "*dashboard*"))))
 #+end_src
-** Font
+** font
 #+begin_src emacs-lisp
 (leaf pcache
   :straight t
@@ -324,17 +316,18 @@
 (global-font-lock-mode 1)
 (set-face-attribute 'default nil :font "Operator Mono:pixelsize=17")
 #+end_src
-** Imenu
+** imenu
 #+begin_src emacs-lisp
 (leaf imenu-list
   :straight t
+  :bind ("M-2" . imenu-list-smart-toggle)
   :config
   (setq imenu-list-size 36
         imenu-list-position 'left
         imenu-list-focus-after-activation t
         imenu-list-after-jump-hook nil))
 #+end_src
-** Ivy, Counsel, Swiper
+** ivy
 #+begin_src emacs-lisp
 (leaf ivy
   :straight
@@ -401,6 +394,14 @@
                                   (internal-border-width . 0))
         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
   :config (ivy-posframe-mode))
+
+(leaf ivy-explorer
+  :straight t
+  :after ivy
+  :init
+  (if (display-graphic-p)
+      (setq ivy-explorer-message-function #'ivy-explorer--posframe))
+  (ivy-explorer-mode 1))
 
 (setq confirm-nonexistent-file-or-buffer t)
 
@@ -473,7 +474,7 @@
   (global-set-key (kbd "C-M-<down>") 'md-duplicate-down)
   (global-move-dup-mode))
 #+end_src
-** Neotree
+** neotree
 #+begin_src emacs-lisp
 (leaf shrink-path :straight t)
 
@@ -531,40 +532,13 @@
               (neotree-find file-name))))))
 (global-set-key (kbd "M-1") 'neotree-project-dir-toggle)
 #+end_src
-** Pretty Symbols
-#+begin_src emacs-lisp
-(leaf prog-mode
-  :config
-  (setq prettify-symbols-unprettify-at-point 'right-edge)
-  (global-prettify-symbols-mode t)
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                    '(("in" . ?\u2208)
-                      ("IN" . ?\u2208)
-                      ("not in" . ?\u2209)
-                      ("NOT IN" . ?\u2209)
-                      ("not" . ?\u00AC)
-                      ("NOT" . ?\u00AC)
-                      ("==" . ?\u2261)
-                      ("!=" . ?\u2260)
-                      (">=" . ?\u2265)
-                      ("<=" . ?\u2264)))))
-  (defun indicate-buffer-boundaries-left ()
-    (setq indicate-buffer-boundaries 'left))
-  (add-hook 'prog-mode-hook #'indicate-buffer-boundaries-left)
-  (add-hook 'prog-common-hook
-            (lambda ()
-              (font-lock-add-keywords nil
-                                      '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t))))))
-#+end_src
-** Theme
+** theme
 #+begin_src emacs-lisp
 (leaf vibrant-ink-theme
   :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
   :config (load-theme 'vibrant-ink t))
 #+end_src
-** Scroll
+** sublimity
 #+begin_src emacs-lisp
 (setq-default hscroll-margin 2
               hscroll-step 1
@@ -572,15 +546,12 @@
               scroll-margin 0
               scroll-preserve-screen-position t)
 
-;;(leaf smooth-scrolling
-;;  :straight t
-;;  :config (setq smooth-scroll-margin 5))
-
 (leaf sublimity-scroll
-      :straight sublimity
-      :init (sublimity-mode 1))
+  :straight sublimity
+  :require t
+  :init (sublimity-mode 1))
 #+end_src
-** Shackle
+** shackle
 #+begin_src emacs-lisp
 (leaf shackle
   :straight t
@@ -612,7 +583,7 @@
           (pdf-view-mode :other t)
           (compilation-mode :select nil))))
 #+end_src
-** Status Line
+** status line
 #+begin_src emacs-lisp
 (setq line-number-mode t
       column-number-mode t)
@@ -633,7 +604,7 @@
         doom-modeline-icon nil
         doom-modeline-env-enable-python nil))
 #+end_src
-** Switch Windows
+** switch windows
 #+begin_src emacs-lisp
   (leaf switch-window
     :straight t
@@ -644,7 +615,7 @@
            ("C-x 0" . switch-window-then-delete)))
 #+end_src
 * Prog
-** Company
+** company
 #+begin_src emacs-lisp
 (leaf company
   :straight t
@@ -737,14 +708,14 @@
               ((facep sym) 'ElispFace)))))
   (add-hook 'company-mode-hook #'company-box-mode))
 #+end_src
-** Csv
+** csv
 #+begin_src emacs-lisp
 (leaf csv-mode
   :leaf-defer nil
   :mode ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
   :config (setq csv-separators '("," ";" "|" " ")))
 #+end_src
-** EditorConfig
+** editorconfig
 #+begin_src emacs-lisp
 (leaf editorconfig
   :straight t
@@ -752,17 +723,17 @@
   :diminish ""
   :config (editorconfig-mode))
 #+end_src
-** Eldoc
+** eldoc
 #+begin_src emacs-lisp
 (leaf eldoc
   :diminish eldoc-mode)
 #+end_src
-** Empty Buffer
+** empty buffer
 #+begin_src emacs-lisp
 (defun empty-buffer? ()
   (= (buffer-end 1) (buffer-end -1)))
 #+end_src
-** Flycheck
+** flycheck
 #+begin_src emacs-lisp
 (leaf flycheck
   :straight t
@@ -772,7 +743,7 @@
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
-** Format-all
+** format-all
 #+begin_src emacs-lisp
 (leaf format-all
   :straight t
@@ -788,23 +759,23 @@
   (setq highlight-indent-guides-method 'character)
   (add-hook 'prog-mode-hook #'highlight-indent-guides-mode))
 #+end_src
-** Jinja
+** jinja
 #+begin_src emacs-lisp
 (leaf jinja2-mode :straight t)
 #+end_src
-** Makefile
+** makefile
 #+begin_src emacs-lisp
 (leaf makefile-runner
   :straight (makefile-runner :type git :host github :repo "danamlund/emacs-makefile-runner")
   :bind ("<C-f11>" . makefile-runner))
 #+end_src
-** Multiplecursors
+** multiple-cursors
 #+begin_src emacs-lisp
 (leaf multiple-cursors
   :straight t
   :leaf-defer nil)
 #+end_src
-** Parents
+** parents
 #+begin_src emacs-lisp
 (electric-pair-mode 1)
 
@@ -830,7 +801,7 @@
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 #+end_src
-** Plantuml
+** plantuml
 #+begin_src emacs-lisp
 (leaf plantuml-mode
   :straight t
@@ -841,7 +812,34 @@
   :after flycheck
   :config (flycheck-plantuml-setup))
 #+end_src
-** Projectile
+** prog-mode
+#+begin_src emacs-lisp
+(leaf prog-mode
+  :config
+  (setq prettify-symbols-unprettify-at-point 'right-edge)
+  (global-prettify-symbols-mode t)
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                    '(("in" . ?\u2208)
+                      ("IN" . ?\u2208)
+                      ("not in" . ?\u2209)
+                      ("NOT IN" . ?\u2209)
+                      ("not" . ?\u00AC)
+                      ("NOT" . ?\u00AC)
+                      ("==" . ?\u2261)
+                      ("!=" . ?\u2260)
+                      (">=" . ?\u2265)
+                      ("<=" . ?\u2264)))))
+  (defun indicate-buffer-boundaries-left ()
+    (setq indicate-buffer-boundaries 'left))
+  (add-hook 'prog-mode-hook #'indicate-buffer-boundaries-left)
+  (add-hook 'prog-common-hook
+            (lambda ()
+              (font-lock-add-keywords nil
+                                      '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t))))))
+#+end_src
+** projectile
 #+begin_src emacs-lisp
   (leaf projectile
     :straight t
@@ -875,7 +873,7 @@
           (ivy-switch-buffer)
         (counsel-projectile-switch-to-buffer))))
 #+end_src
-** Python
+** python
 *** python-template
 #+begin_src emacs-lisp
 (setq ansi-color-for-comint-mode t)
@@ -892,36 +890,37 @@
 #+begin_src emacs-lisp
 (leaf lsp-python-ms
   :straight (lsp-python-ms :type git :host github :repo "andrew-christianson/lsp-python-ms")
+  :require t
   :config
   (setq python-shell-interpreter "python"
         lsp-python-ms-dir (concat conf:cache-dir "mspyls/"))
-  (add-hook 'python-mode-hook (lambda ()
-                                (require 'lsp-python-ms)
-                                (lsp-deferred))))
+  :hook (python-mode . lsp-deferred))
 #+end_src
-*** Pyenv
+*** pyenv
 #+begin_src emacs-lisp
 (leaf pyenv-mode
   :straight t
   :init (pyenv-mode))
-(leaf pyenv-mode-auto :straight t :require t)
+
+(leaf pyenv-mode-auto
+  :straight t
+  :require t)
 #+end_src
-*** PEP8
+*** pep8
 #+begin_src emacs-lisp
 (leaf blacken
   :straight t
   :diminish blacken-mode
-  :config
-  (setq blacken-fast-unsafe t)
-  (add-hook 'python-mode-hook #'blacken-mode))
+  :config (setq blacken-fast-unsafe t)
+  :hook (python-mode . blacken-mode))
 
 (leaf py-isort
   :straight t
   :config
   (setq py-isort-options '("--lines=100"))
-  (add-hook 'before-save-hook 'py-isort-before-save))
+  :hook (before-save . py-isort-before-save))
 #+end_src
-*** Stuff
+*** stuff
 #+begin_src emacs-lisp
 (leaf pyimport :straight t :require t)
 (leaf pip-requirements :straight t)
@@ -1378,28 +1377,32 @@
 (leaf magit-gitflow
   :straight t
   :config
-  (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+  :hook (magit-mode . turn-on-magit-gitflow))
 
-(leaf git-gutter
+(leaf diff-hl
   :straight t
-  :leaf-defer nil
-  :bind (("C-x C-g" . git-gutter)
-         ("C-x v =" . git-gutter:popup-hunk)
-         ("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk)
-         ("C-x v s" . git-gutter:stage-hunk)
-         ("C-x v r" . git-gutter:revert-hunk)
-         ("C-x v SPC" . git-gutter:mark-hunk))
-  :config
-  (if (display-graphic-p)
-      (leaf git-gutter-fringe :straight t :require t))
-  (global-git-gutter-mode t)
-  (setq indicate-empty-lines nil)
-  (setq git-gutter:lighter ""
-        git-gutter:handled-backends '(git hg bzr svn))
-  (set-face-foreground 'git-gutter:modified "purple")
-  (set-face-foreground 'git-gutter:added "green")
-  (set-face-foreground 'git-gutter:deleted "red"))
+  :config (global-diff-hl-mode))
+
+;; (leaf git-gutter
+;;   :straight t
+;;   :leaf-defer nil
+;;   :bind (("C-x C-g" . git-gutter)
+;;          ("C-x v =" . git-gutter:popup-hunk)
+;;          ("C-x p" . git-gutter:previous-hunk)
+;;          ("C-x n" . git-gutter:next-hunk)
+;;          ("C-x v s" . git-gutter:stage-hunk)
+;;          ("C-x v r" . git-gutter:revert-hunk)
+;;          ("C-x v SPC" . git-gutter:mark-hunk))
+;;   :config
+;;   (if (display-graphic-p)
+;;       (leaf git-gutter-fringe :straight t :require t))
+;;   (global-git-gutter-mode t)
+;;   (setq indicate-empty-lines nil)
+;;   (setq git-gutter:lighter ""
+;;         git-gutter:handled-backends '(git hg bzr svn))
+;;   (set-face-foreground 'git-gutter:modified "purple")
+;;   (set-face-foreground 'git-gutter:added "green")
+;;   (set-face-foreground 'git-gutter:deleted "red"))
 
 (leaf gitconfig-mode
   :straight t
@@ -1438,15 +1441,13 @@
   :straight t
   :config (add-hook 'logview-mode-hook 'auto-revert-mode))
 #+end_src
-** LSP Mode
+** lsp
 #+begin_src emacs-lisp
 (leaf lsp
   :straight lsp-mode
   :commands lsp
-  :leaf-defer nil
-  :config
-  (require 'lsp-clients)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+  :require t
+  :config (require 'lsp-clients)
   :init
   (setq lsp-eldoc-render-all nil
         lsp-print-io nil
@@ -1454,7 +1455,8 @@
         lsp-message-project-root-warning t
         lsp-auto-guess-root t
         lsp-prefer-flymake nil
-        lsp-session-file (concat conf:cache-dir "lsp-session")))
+        lsp-session-file (concat conf:cache-dir "lsp-session"))
+  :hook (lsp-after-open . lsp-enable-imenu))
 
 ;; ref: https://gitlab.com/shackra/emacs/commit/b0df30fe744e4483a08731e6a9f6482ab408124c
 (defvar-local conf:lsp-on-change-exist nil
@@ -1483,7 +1485,7 @@
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  :hook (lsp-mode . lsp-ui-mode))
 
 (leaf company-lsp
   :straight t
@@ -2124,17 +2126,19 @@
   :config
   (add-hook 'xrdb-mode-hook (lambda () (setq comment-start "! "))))
 #+end_src
-** Startup
+* End
 #+begin_src emacs-lisp
-  ;; Use a hook so the message doesn't get clobbered by other messages.
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (setq gc-cons-threshold 16777216
-                    gc-cons-percentage 0.1
-                    file-name-handler-alist cfg--file-name-handler-alist)
-              (message "Emacs ready in %s with %d garbage collections."
-                       (format "%.2f seconds"
-                               (float-time
-                                (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold 16777216
+                  gc-cons-percentage 0.1
+                  file-name-handler-alist cfg--file-name-handler-alist)))
+(provide 'init)
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+
+;;; init.el ends here
 #+end_src

@@ -1769,25 +1769,8 @@
 (use-package magit-gitflow
   :hook (magit-mode . turn-on-magit-gitflow))
 
-(use-package git-gutter
-  :defer 1
-  :bind (("C-x C-g" . git-gutter)
-         ("C-x v =" . git-gutter:popup-hunk)
-         ("C-x p" . git-gutter:previous-hunk)
-         ("C-x n" . git-gutter:next-hunk)
-         ("C-x v s" . git-gutter:stage-hunk)
-         ("C-x v r" . git-gutter:revert-hunk)
-         ("C-x v SPC" . git-gutter:mark-hunk))
-  :config
-  (if (display-graphic-p)
-      (use-package git-gutter-fringe))
-  (global-git-gutter-mode t)
-  (setq indicate-empty-lines nil)
-  (setq git-gutter:lighter ""
-        git-gutter:handled-backends '(git hg bzr svn))
-  (set-face-foreground 'git-gutter:modified "purple")
-  (set-face-foreground 'git-gutter:added "green")
-  (set-face-foreground 'git-gutter:deleted "red"))
+(use-package diff-hl
+  :config (global-diff-hl-mode))
 
 (use-package gitconfig-mode
   :defer t
