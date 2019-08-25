@@ -64,8 +64,10 @@ $XONSH_GITSTATUS_BEHIND = "{NO_COLOR}↓"
 $SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
 
 def pyenv_prompt():
+    pyenv_name = ""
     if $(pyenv version-name).replace('\n', '') != 'system':
-        return $(pyenv version-name).replace('\n', '')
+        pyenv_name = $(pyenv version-name).replace('\n', '')
+    return pyenv_name
 
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
