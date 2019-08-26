@@ -375,10 +375,13 @@
 (leaf prescient
   :straight t
   :require t
-  :config (setq prescient-save-file (concat conf:cache-dir "prescient.el")))
+  :config
+  (setq prescient-save-file (concat conf:cache-dir "prescient.el"))
+  (prescient-persist-mode))
 
 (leaf ivy-prescient
   :straight t
+  :require t
   :after ivy
   :init (ivy-prescient-mode))
 
@@ -604,7 +607,7 @@
         doom-modeline-icon nil
         doom-modeline-env-enable-python nil))
 #+end_src
-** switch windows
+** switch-windows
 #+begin_src emacs-lisp
   (leaf switch-window
     :straight t
@@ -645,6 +648,7 @@
 
 (leaf company-prescient
   :straight t
+  :require t
   :after company
   :init (company-prescient-mode))
 
@@ -1822,7 +1826,7 @@
  (leaf ob-translate :straight t)
  (leaf org-re-reveal :straight t)
  (leaf htmlize :straight t)
- (leaf default-text-scale :straight t)
+ (leaf default-text-scale :straight t :require t)
 
  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
  (leaf org-tree-slide
@@ -1841,7 +1845,7 @@
    (progn
      (setq org-tree-slide--lighter " Slide")
 
-     (defvar conf:org-tree-slide-text-scale 4
+     (defvar conf:org-tree-slide-text-scale 120
        "Text scale ratio to default when `org-tree-slide-mode' is enabled.")
 
      (defun conf:org-tree-slide-set-profile ()
@@ -1870,7 +1874,7 @@
          (setq conf:writegood-mode-state writegood-mode)
          (writegood-mode -1))
        (flyspell-mode -1)
-       (text-scale-set conf:org-tree-slide-text-scale))
+       (default-text-scale-increment conf:org-tree-slide-text-scale))
      (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
 
      (defun conf:org-tree-slide-stop()
@@ -1881,7 +1885,7 @@
          (writegood-mode 1)
          (setq conf:writegood-mode-state nil))
        (flyspell-mode 1)
-       (text-scale-set 0))
+       (default-text-scale-reset))
      (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
 
      (defun conf:org-tree-slide-text-scale-reset ()
