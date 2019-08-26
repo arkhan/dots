@@ -1770,7 +1770,13 @@
   :hook (magit-mode . turn-on-magit-gitflow))
 
 (use-package diff-hl
-  :config (global-diff-hl-mode))
+  :config
+  (with-eval-after-load 'magit
+    (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+
+  (setq-default fringes-outside-margins t)
+  :hook ((after-init . global-diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode)))
 
 (use-package gitconfig-mode
   :defer t
