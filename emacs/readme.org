@@ -1767,7 +1767,7 @@
   (with-eval-after-load 'magit
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
 
-  (setq-default fringes-outside-margins t)
+  (diff-hl-margin-mode 1)
   :hook ((after-init . global-diff-hl-mode)
          (dired-mode . diff-hl-dired-mode)))
 
