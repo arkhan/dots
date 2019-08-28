@@ -1469,7 +1469,7 @@
 (leaf magit-gitflow
   :straight t
   :require t
-  :config (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+  :hook (magit-mode-hook . turn-on-magit-gitflow))
 
 (leaf diff-hl
   :straight t
@@ -1861,6 +1861,7 @@
  (leaf org-re-reveal :straight t)
  (leaf htmlize :straight t)
  (leaf default-text-scale :straight t :require t)
+ (leaf hide-mode-line :straight t :require t)
 
  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L1581
  (leaf org-tree-slide
@@ -1908,6 +1909,7 @@
          (setq conf:writegood-mode-state writegood-mode)
          (writegood-mode -1))
        (flyspell-mode -1)
+       (hide-mode-line-mode)
        (default-text-scale-increment conf:org-tree-slide-text-scale))
      (add-hook 'org-tree-slide-play-hook #'conf:org-tree-slide-start)
 
@@ -1919,6 +1921,7 @@
          (writegood-mode 1)
          (setq conf:writegood-mode-state nil))
        (flyspell-mode 1)
+       (hide-mode-line-mode -1)
        (default-text-scale-reset))
      (add-hook 'org-tree-slide-stop-hook #'conf:org-tree-slide-stop)
 
