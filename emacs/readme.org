@@ -1381,11 +1381,15 @@
 
   :hook (prog-mode-hook . flyspell-prog-mode))
 
+(leaf flyspell-correct
+  :straight t
+  :bind ("C-M-'" . flyspell-correct-wrapper))
+
 (leaf flyspell-correct-popup
-  :bind ("C-M-'" . flyspell-correct-wrapper)
-  :init
-  (setq flyspell-correct-interface #'flyspell-correct-popup
-        flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
+  :straight t
+  :require t
+  :init (setq flyspell-correct-interface #'flyspell-correct-popup
+              flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
 #+end_src
 ** frog
 #+begin_src emacs-lisp
@@ -1815,6 +1819,10 @@
 
     ;; refresh images after execution
     (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)))
+
+(leaf secretaria
+  :straight t
+  :hook (after-init-hook . secretaria-unknown-time-always-remind-me))
 
 (leaf ob-sql
   :leaf-defer nil
