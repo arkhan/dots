@@ -405,6 +405,13 @@
       (setq ivy-explorer-message-function #'ivy-explorer--posframe))
   (ivy-explorer-mode 1))
 
+(leaf ivy-xref
+  :straight t
+  :require t
+  :init (if (< emacs-major-version 27)
+            (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
+          (setq xref-show-definitions-function #'ivy-xref-show-defs)))
+
 (setq confirm-nonexistent-file-or-buffer t)
 
 (leaf swiper
@@ -1206,7 +1213,8 @@
 #+begin_src emacs-lisp
 (leaf alert
   :straight t
-  :config
+  :require t
+  :init
   (if (eq system-type 'windows-nt)
       (setq alert-default-style 'message)
     (setq alert-default-style 'libnotify)))
@@ -1822,6 +1830,7 @@
 
 (leaf secretaria
   :straight t
+  :require t
   :hook (after-init-hook . secretaria-unknown-time-always-remind-me))
 
 (leaf ob-sql
