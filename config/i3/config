@@ -282,6 +282,7 @@ assign [class="(?i)St" instance="Ncmpcpp"] $ws7
 assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
 assign [class="(?i)lyx"] $ws8
 assign [title="(?i)LibreOffice*"] $ws8
+assign [title="GanttProject"] $ws9
 assign [class="(?i)emacs"] $ws9
 assign [title="zathura"] $ws8
 assign [title="nomacs"] $ws7
@@ -296,6 +297,7 @@ for_window [title="(?i)st"] floating enable
 for_window [title="Firefox|Iceweasel|qutebrowser|Webmacs"] floating disable layout tabbed
 for_window [class="URxvt" instance="Ranger|Weechat|RTorrent|Ncmpcpp"] floating disable layout tabbed
 for_window [class="(?i)tuxcmd"] floating disable layout tabbed
+for_window [title="GanttProject"] floating disable layout tabbed focus
 for_window [class="(?i)emacs"] floating disable layout tabbed focus
 for_window [title="zathura"] floating disable layout tabbed
 for_window [class="(?i)mpv"] floating disable layout tabbed focus

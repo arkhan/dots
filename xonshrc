@@ -72,10 +72,7 @@ def pyenv_prompt():
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
 $PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} >{NO_COLOR} "
-if 'DISPLAY' in ${...}:
-    $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
-else:
-    $RIGHT_PROMPT = "{BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
+$RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 
 # Aliases (yeah... no shit, kid)
 # Dotdrop
@@ -129,6 +126,7 @@ aliases['pyc'] = _pyclean
 def get_branch_name():
     import os
     from subprocess import call, STDOUT, check_output
+    branch = ""
     if not call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
         out = check_output(["git", "branch"]).decode("utf8")
         current = next(line for line in out.split("\n") if line.startswith("*"))

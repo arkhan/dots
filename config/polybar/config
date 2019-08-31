@@ -12,7 +12,7 @@ fg_warning = #ffa900
 fg_underline = "#00FF65"
 
 [global/wm]
-margin-bottom = 2
+margin-bottom = 1
 
 [bar/top]
 monitor = ${env:MONITOR}

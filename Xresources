@@ -11,7 +11,7 @@ Xft.lcdfilter: lcddefault
 *.saveLines: 4096
 *.scrollBar: false
 ! XTerm
-xterm*faceName: xft:Operator Mono:style=Regular:pixelsize=15
+xterm*faceName: xft:League Mono:style=Regular:pixelsize=15
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -26,10 +26,10 @@ xterm*toolBar: false
 ! URxvt
 URxvt.iso14755: false
 URxvt.iso14755_52: false
-URxvt*font: xft:Operator Mono:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*boldFont: xft:Operator Mono:bold:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*italicFont: xft:Operator Mono:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*boldItalicFont: xft:Operator Mono:bold:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*font: xft:League Mono:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*boldFont: xft:League Mono:bold:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*italicFont: xft:League Mono:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*boldItalicFont: xft:League Mono:bold:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
@@ -81,7 +81,7 @@ st.termname:     st-256color
 ! if you do not set shell, precedence is: -e arg, utmp option, SHELL env var, /etc/passwd shell
 
 ! The following options options can be reloaded via USR1 signal.
-st.font:              Operator Mono:pixelsize=15:antialias=true:autohint=true;
+st.font:              League Mono:pixelsize=15:antialias=true:autohint=true;
 st.borderpx:          0
 ! Available cursor values: 2 4 6 7 = █ _ | ☃ ( 1 3 5 are blinking versions)
 st.cursorshape:       4
