@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import os
+import shlex
+from shutil import which
 
 source-zsh --login True --overwrite-alias "echo loading xonsh foreign shell"
 
@@ -29,7 +31,7 @@ $AUTO_CD = True
 
 # Default
 $BROWSER = "firefox"
-$TERM = "rxvt-unicode-256color"
+$TERM = "st-256color"
 $EDITOR = '/usr/bin/emacs'
 
 # Encoding
@@ -71,42 +73,10 @@ def pyenv_prompt():
 
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
-$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} >{NO_COLOR} "
+$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} %{NO_COLOR} "
 $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 
 # Aliases (yeah... no shit, kid)
-# Dotdrop
-aliases['dt']="dotdrop -c ~/.dotdrop.yml"
-
-aliases['ls'] = 'exa'
-aliases['feh'] = 'feh -. --magick-timeout 1'
-aliases['grep'] = 'grep -i --color=always'
-aliases['mkdir'] = 'mkdir -p'
-aliases['music'] = 'mps'
-aliases['dd'] = 'dcfldd'
-aliases['pyselect'] = 'source pyselect'
-aliases['ping'] = 'ping -4'
-aliases['lookup'] = '/usr/bin/dict'  # collision with Python dict
-
-# dont go boom aliases
-aliases['rm'] = 'safe-rm'
-
-# advcp aliases for progress bars
-aliases['cp'] = 'acp -g'
-aliases['mv'] = 'amv -g'
-
-# git aliases
-aliases['gs'] = 'git status'  # collides with ghostscript but who cares?
-aliases['ga'] = 'git add'
-aliases['gd'] = 'git diff'
-aliases['gch'] = 'git checkout'
-aliases['gc'] = 'git commit -v'
-
-# tryout aliases
-aliases['pyi'] = ['python', 'setup.py', 'install']
-aliases['pyd'] = ['python', 'setup.py', 'develop']
-
-
 def _pyclean():
     from path import Path
     d = Path($PWD)
@@ -120,10 +90,7 @@ def _pyclean():
     return True
 
 
-aliases['pyc'] = _pyclean
-
-
-def get_branch_name():
+def _get_branch_name():
     import os
     from subprocess import call, STDOUT, check_output
     branch = ""
@@ -133,35 +100,62 @@ def get_branch_name():
         branch = current.strip("*").strip()
     return branch, call
 
-def git_pull_current_branch():
-    branch, call = get_branch_name()
+def _git_pull_current_branch():
+    branch, call = _get_branch_name()
     if branch:
         call(["git", "pull", "origin", branch])
 
-def git_push_current_branch():
-    branch, call = get_branch_name()
+def _git_push_current_branch():
+    branch, call = _get_branch_name()
     if branch:
         call(["git", "push", "origin", branch])
 
 
-aliases['ggpull'] = git_pull_current_branch
-aliases['ggpush'] = git_push_current_branch
+custom = {}
 
-# Docker Compose
-aliases["dco"]='docker-compose'
-aliases["dcb"]='docker-compose build'
-aliases["dce"]='docker-compose exec'
-aliases["dcps"]='docker-compose ps'
-aliases["dcrestart"]='docker-compose restart'
-aliases["dcrm"]='docker-compose rm'
-aliases["dcr"]='docker-compose run'
-aliases["dcstop"]='docker-compose stop'
-aliases["dcup"]='docker-compose up'
-aliases["dcupd"]='docker-compose up -d'
-aliases["dcdn"]='docker-compose down'
-aliases["dcl"]='docker-compose logs'
-aliases["dclf"]='docker-compose logs -f'
-aliases["dcpull"]='docker-compose pull'
-aliases["dcstart"]='docker-compose start'
+pairs = (
+    ("dt", "dotdrop -c ~/.dotdrop.yml"),
+    ("ls", "exa"),
+    ("mkdir", "mkdir -p"),
+    ("lookup", '/usr/bin/dict'),
+    ("next", '/usr/bin/next'),
+    ("ping", 'ping -4'),
+    ("rm", "safe-rm"),
+    ('cp', 'acp -g'),
+    ('mv', 'amv -g'),
+    ('pyc', _pyclean),
+    ('pyi', 'python setup.py install'),
+    ('pyd', 'python setup.py develop'),
+    ('pyb', 'python setup.py build'),
+    ('ggpull', _git_pull_current_branch),
+    ('ggpush', _git_push_current_branch),
+    ('dco', 'docker-compose'),
+    ('dcb', 'docker-compose build'),
+    ('dce', 'docker-compose exec'),
+    ('dcps', 'docker-compose ps'),
+    ('dcrestart', 'docker-compose restart'),
+    ('dcrm', 'docker-compose rm'),
+    ('dcr', 'docker-compose run'),
+    ('dcstop', 'docker-compose stop'),
+    ('dcup', 'docker-compose up'),
+    ('dcupd', 'docker-compose up -d'),
+    ('dcdn', 'docker-compose down'),
+    ('dcl', 'docker-compose logs'),
+    ('dclf', 'docker-compose logs -f'),
+    ('dcpull', 'docker-compose pull'),
+    ('dcstart', 'docker-compose start'),
+
+)
+
+for pair in pairs:
+    key, name = pair
+    if callable(name):
+        name.__xonsh__threadable = False
+        name.__xonsh__capturable = False
+
+    if callable(name) or which(shlex.split(name)[0]) is not None:
+        custom[key] = name
+
+aliases.update(custom)
 
 del os

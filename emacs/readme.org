@@ -313,7 +313,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "League Mono:pixelsize=15")
+(set-face-attribute 'default nil :font "Roboto Mono:pixelsize=15")
 #+end_src
 ** imenu
 #+begin_src emacs-lisp
@@ -2081,7 +2081,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "xst" "-n" "Tmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "Tmux" "-e" "tmx")))
 #+end_src
 ** ssh
 #+begin_src emacs-lisp
