@@ -5,11 +5,11 @@
 
 # terminal emulator
 super + Return
-	urxvtcd -g 100x30 -name TiledTerminal
+	xst -g 100x30 -n Terminal
 
 # terminal emulator
 super + shift + Return
-	urxvtcd -g 100x30 -name Terminal -e tmux
+	xst -g 100x30 -n TiledTerminal -e tmux
 
 # program launcher
 super + @space
@@ -37,7 +37,7 @@ Print; {s,c}
 
 # Cli Apps
 super + shift + {f,d,n}
-  urxvtcd {-name Ranger -e ranger, -name RTorrent -e rtorrent, -name Ncmpcpp -e ncmpcpp}
+  xst {-n Ranger -e ranger, -n RTorrent -e rtorrent, -n Ncmpcpp -e ncmpcpp}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}

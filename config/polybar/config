@@ -50,6 +50,51 @@ modules-right = wireless wired volume cpu memory fs-data fs-root datetime batter
 
 wm-restack = bspwm
 
+[module/ewmh]
+type = internal/xworkspaces
+pin-workspaces = true
+enable-click = true
+enable-scroll = true
+
+icon-0 = 0;
+icon-1 = 1;
+icon-2 = 2;
+icon-3 = 3;
+icon-4 = 4;
+icon-5 = 5;
+icon-6 = 6;
+icon-7 = 7;
+icon-8 = 8;
+icon-9 = 9;
+icon-default = 
+
+format = <label-state>
+
+label-monitor = %name%
+
+#label-dimmed-underline = ${colors.fg_normal}
+
+label-active = %icon%
+label-active-background = ${colors.bg_focus}
+label-active-foreground = ${colors.fg_focus}
+label-active-padding = 1
+label-active-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-unfocused = %icon%
+
+label-empty =
+
 [module/ws]
 type = internal/bspwm
 inline-mode = false

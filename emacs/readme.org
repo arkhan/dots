@@ -51,6 +51,8 @@
 
 (setq straight-check-for-modifications '(check-on-save-find-when-checking))
 
+(require 'straight-x)
+
 (straight-use-package 'leaf)
 (straight-use-package 'leaf-keywords)
 
@@ -313,7 +315,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Roboto Mono:pixelsize=15")
+(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
 #+end_src
 ** imenu
 #+begin_src emacs-lisp
@@ -485,7 +487,9 @@
 #+end_src
 ** neotree
 #+begin_src emacs-lisp
-(leaf shrink-path :straight t)
+(leaf shrink-path
+  :straight t
+  :require t)
 
 (leaf neotree
   :straight t
@@ -597,21 +601,25 @@
 (setq line-number-mode t
       column-number-mode t)
 
-(leaf doom-modeline
-  :straight t
-  :init (doom-modeline-mode 1)
-  :config
-  (defun conf:doom-modeline--make-xpm-filter-args (args)
-    "Force function to use `doom-modeline-height'.
-     Instead of the calculation done in `doom-modeline-refresh-bars'.
-     The minimum height is set to `frame-char-height' + 2."
-    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+(leaf good-line
+  :straight (good-line :type git :host github :repo "TatriX/good-line")
+  :config (good-line-mode))
 
-  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+;; (leaf doom-modeline
+;;   :straight t
+;;   :init (doom-modeline-mode 1)
+;;   :config
+;;   (defun conf:doom-modeline--make-xpm-filter-args (args)
+;;     "Force function to use `doom-modeline-height'.
+;;      Instead of the calculation done in `doom-modeline-refresh-bars'.
+;;      The minimum height is set to `frame-char-height' + 2."
+;;     (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
 
-  (setq doom-modeline-height 12
-        doom-modeline-icon nil
-        doom-modeline-env-enable-python nil))
+;;   (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+
+;;   (setq doom-modeline-height 12
+;;         doom-modeline-icon nil
+;;         doom-modeline-env-enable-python nil))
 #+end_src
 ** switch-windows
 #+begin_src emacs-lisp
@@ -1665,7 +1673,28 @@
   :if (executable-find "mu")
   :straight t
   :init
-  (setq mu4e-compose-forward-as-attachment t
+  (defun conf:mu4e-alert-modeline-formatter (mail-count)
+    (when (not (zerop mail-count))
+      (concat ""
+              (propertize
+               "#"
+               'font-lock-face '(:bold t)
+               'help-echo (concat (if (= mail-count 1)
+                                      "You have an unread email"
+                                    (format "You have %s unread emails" mail-count))
+                                  "\nClick here to view "
+                                  (if (= mail-count 1) "it" "them"))
+               'mouse-face 'mode-line-highlight
+               'keymap '(mode-line keymap
+                                   (mouse-1 . mu4e-alert-view-unread-mails)
+                                   (mouse-2 . mu4e-alert-view-unread-mails)
+                                   (mouse-3 . mu4e-alert-view-unread-mails)))
+              (if (zerop mail-count)
+                  ""
+                (format "[%d] " mail-count)))))
+
+  (setq mu4e-alert-modeline-formatter #'conf:mu4e-alert-modeline-formatter
+        mu4e-compose-forward-as-attachment t
         mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
         mu4e-compose-crypto-reply-plain-policy 'sign
         mu4e-index-update-in-background t
@@ -1808,7 +1837,7 @@
                   org-ctrl-k-protect-subtree 'error)
 
     ;; limit images width
-    (setq org-image-actual-width (/ (display-pixel-width) 5))
+    (setq org-image-actual-width nil)
 
     ;; :::::: Org-Babel ::::::
     ;; languages supported
@@ -1916,6 +1945,7 @@
         (writegood-mode -1))
       (flyspell-mode -1)
       (hide-mode-line-mode)
+      (org-toggle-inline-images)
       (default-text-scale-increment conf:org-tree-slide-text-scale))
 
     (defun conf:org-tree-slide-stop()
@@ -1927,6 +1957,7 @@
         (setq conf:writegood-mode-state nil))
       (flyspell-mode 1)
       (hide-mode-line-mode -1)
+      (org-remove-inline-images)
       (default-text-scale-reset))
 
     (defun conf:org-tree-slide-text-scale-reset ()
@@ -2081,7 +2112,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "Tmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "xst" "-n" "Tmux" "-e" "tmx")))
 #+end_src
 ** ssh
 #+begin_src emacs-lisp
