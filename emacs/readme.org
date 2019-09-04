@@ -315,7 +315,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
+(set-face-attribute 'default nil :font "mononoki:pixelsize=15")
 #+end_src
 ** imenu
 #+begin_src emacs-lisp
@@ -601,25 +601,24 @@
 (setq line-number-mode t
       column-number-mode t)
 
-(leaf good-line
-  :straight (good-line :type git :host github :repo "TatriX/good-line")
-  :config (good-line-mode))
+;; (leaf good-line
+;;   :straight (good-line :type git :host github :repo "TatriX/good-line")
+;;   :hook (after-init-hook . good-line-mode))
 
-;; (leaf doom-modeline
-;;   :straight t
-;;   :init (doom-modeline-mode 1)
-;;   :config
-;;   (defun conf:doom-modeline--make-xpm-filter-args (args)
-;;     "Force function to use `doom-modeline-height'.
-;;      Instead of the calculation done in `doom-modeline-refresh-bars'.
-;;      The minimum height is set to `frame-char-height' + 2."
-;;     (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+(leaf doom-modeline
+  :straight t
+  :config
+  (defun conf:doom-modeline--make-xpm-filter-args (args)
+    "Force function to use `doom-modeline-height'.
+     Instead of the calculation done in `doom-modeline-refresh-bars'.
+     The minimum height is set to `frame-char-height' + 2."
+    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
 
-;;   (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
-
-;;   (setq doom-modeline-height 12
-;;         doom-modeline-icon nil
-;;         doom-modeline-env-enable-python nil))
+  (setq doom-modeline-height 12
+        doom-modeline-icon nil
+        doom-modeline-env-enable-python nil)
+  :hook (after-init-hook . doom-modeline-mode))
 #+end_src
 ** switch-windows
 #+begin_src emacs-lisp
@@ -1130,7 +1129,8 @@
   :straight t
   :after sql
   :bind (sql-mode-map
-         ("C-c \\" . sql-indent-buffer)))
+         ("C-c \\" . sql-indent-buffer))
+  :hook (sql-mode-hook . sqlind-minor-mode))
 #+end_src
 ** xml
 #+begin_src emacs-lisp
@@ -1575,12 +1575,13 @@
         mu4e-headers-visible-lines 8
         mu4e-headers-fields '((:date . 25)
                               (:flags . 6)
-                              (:from . 22)
+                              (:from . 30)
                               (:subject . nil))
-        mu4e-view-prefer-html t
         mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
         mu4e-maildir "~/.mail"
         mu4e-view-show-images t
+        mu4e-view-show-addresses t
+        mu4e-view-prefer-html t
         sendmail-program "msmtp"
         mu4e-get-mail-command "mbsync -aV")
 
@@ -1673,28 +1674,7 @@
   :if (executable-find "mu")
   :straight t
   :init
-  (defun conf:mu4e-alert-modeline-formatter (mail-count)
-    (when (not (zerop mail-count))
-      (concat ""
-              (propertize
-               "#"
-               'font-lock-face '(:bold t)
-               'help-echo (concat (if (= mail-count 1)
-                                      "You have an unread email"
-                                    (format "You have %s unread emails" mail-count))
-                                  "\nClick here to view "
-                                  (if (= mail-count 1) "it" "them"))
-               'mouse-face 'mode-line-highlight
-               'keymap '(mode-line keymap
-                                   (mouse-1 . mu4e-alert-view-unread-mails)
-                                   (mouse-2 . mu4e-alert-view-unread-mails)
-                                   (mouse-3 . mu4e-alert-view-unread-mails)))
-              (if (zerop mail-count)
-                  ""
-                (format "[%d] " mail-count)))))
-
-  (setq mu4e-alert-modeline-formatter #'conf:mu4e-alert-modeline-formatter
-        mu4e-compose-forward-as-attachment t
+  (setq mu4e-compose-forward-as-attachment t
         mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
         mu4e-compose-crypto-reply-plain-policy 'sign
         mu4e-index-update-in-background t
@@ -2005,6 +1985,7 @@
 
 (leaf pass
   :straight t
+  :require t
   :commands pass
   :init
   (progn
