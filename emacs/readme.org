@@ -1056,6 +1056,14 @@
 #+begin_src emacs-lisp
 (leaf pyenv-mode
   :straight t
+  :config
+  (defun pyenv-venv-wrapper-act (&optional ARG PRED)
+    (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
+  (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
+
+  (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
+    (setenv "VIRTUAL_ENV"))
+  (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact)
   :init (pyenv-mode))
 
 (leaf pyenv-mode-auto
@@ -1489,11 +1497,28 @@
   :require t
   :hook (magit-mode-hook . turn-on-magit-gitflow))
 
-(leaf diff-hl
+(leaf git-gutter
   :straight t
-  :hook ((after-init-hook . global-diff-hl-mode)
-         (magit-post-refresh-hook . diff-hl-magit-post-refresh)
-         (dired-mode-hook . diff-hl-dired-mode)))
+  :leaf-defer nil
+  :bind (("C-x C-g" . git-gutter)
+         ("C-x v =" . git-gutter:popup-hunk)
+         ("C-x p" . git-gutter:previous-hunk)
+         ("C-x n" . git-gutter:next-hunk)
+         ("C-x v s" . git-gutter:stage-hunk)
+         ("C-x v r" . git-gutter:revert-hunk)
+         ("C-x v SPC" . git-gutter:mark-hunk))
+  :config
+  (if (display-graphic-p)
+      (leaf git-gutter-fringe
+        :straight t
+        :require t))
+  (global-git-gutter-mode t)
+  (setq indicate-empty-lines nil)
+  (setq git-gutter:lighter ""
+        git-gutter:handled-backends '(git hg bzr svn))
+  (set-face-foreground 'git-gutter:modified "purple")
+  (set-face-foreground 'git-gutter:added "green")
+  (set-face-foreground 'git-gutter:deleted "red"))
 
 (leaf gitconfig-mode
   :straight t
@@ -2060,6 +2085,55 @@
 (leaf pkgbuild-mode
   :straight t
   :mode "PKGBUILD\\'")
+#+end_src
+** po-mode
+#+begin_src emacs-lisp
+(leaf po-mode
+  :mode ("\\.po\\'" . po-mode)
+  :config
+  ;; Fuente: https://www.emacswiki.org/emacs/PoMode
+  (defun po-wrap ()
+    "Filter current po-mode buffer through `msgcat' tool to wrap all lines."
+    (interactive)
+    (if (eq major-mode 'po-mode)
+        (let ((tmp-file (make-temp-file "po-wrap."))
+              (tmp-buf (generate-new-buffer "*temp*")))
+          (unwind-protect
+              (progn
+                (write-region (point-min) (point-max) tmp-file nil 1)
+                (if (zerop
+                     (call-process
+                      "msgcat" nil tmp-buf t (shell-quote-argument tmp-file)))
+                    (let ((saved (point))
+                          (inhibit-read-only t))
+                      (delete-region (point-min) (point-max))
+                      (insert-buffer-substring tmp-buf)
+                      (goto-char (min saved (point-max))))
+                  (with-current-buffer tmp-buf
+                    (error (buffer-string)))))
+            (kill-buffer tmp-buf)
+            (delete-file tmp-file)))))
+
+  (defun po-guess-language ()
+    "Return the language related to this PO file."
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward po-any-msgstr-block-regexp)
+      (goto-char (match-beginning 0))
+      (if (re-search-forward
+           "\n\"Language: +\\(.+\\)\\\\n\"$"
+           (match-end 0) t)
+          (po-match-string 1))))
+
+  (defadvice po-edit-string (around setup-spell-checking (string type expand-tabs) activate)
+    "Set up spell checking in subedit buffer."
+    (let ((po-language (po-guess-language)))
+      ad-do-it
+      (if po-language
+          (progn
+            (ispell-change-dictionary po-language)
+            (turn-on-flyspell)
+            (flyspell-buffer))))))
 #+end_src
 ** presentation
 #+begin_src emacs-lisp
