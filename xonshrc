@@ -3,7 +3,7 @@ import os
 import shlex
 from shutil import which
 
-source-zsh --login True --overwrite-alias "echo loading xonsh foreign shell"
+source-foreign bash --login True --overwrite-alias "echo loading xonsh foreign shell"
 
 xontrib load readable-traceback
 
@@ -19,9 +19,9 @@ $SHELL_TYPE = 'prompt_toolkit'
 
 if $(which pyenv):
     $PYENV_ROOT = f'{$HOME}/.pyenv'
-    source-zsh --overwrite-alias $(pyenv init -)
+    source-foreign zsh --overwrite-alias $(pyenv init -)
     if $(which pyenv-virtualenv):
-        source-zsh --overwrite-alias $(pyenv virtualenv-init -)
+        source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
 
 if os.path.exists(f'{$HOME}/.emacs.d/bin'):
     $PATH.insert(0, $HOME + '/.emacs.d/bin')
