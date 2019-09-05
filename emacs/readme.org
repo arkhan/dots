@@ -607,6 +607,7 @@
 
 (leaf doom-modeline
   :straight t
+  :init (doom-modeline-mode)
   :config
   (defun conf:doom-modeline--make-xpm-filter-args (args)
     "Force function to use `doom-modeline-height'.
@@ -617,8 +618,7 @@
 
   (setq doom-modeline-height 12
         doom-modeline-icon nil
-        doom-modeline-env-enable-python nil)
-  :hook (after-init-hook . doom-modeline-mode))
+        doom-modeline-env-enable-python nil))
 #+end_src
 ** switch-windows
 #+begin_src emacs-lisp
