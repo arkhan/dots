@@ -73,12 +73,12 @@ def pyenv_prompt():
 
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
-$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} %{NO_COLOR} "
+$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} >{NO_COLOR} "
 $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 
 # Aliases (yeah... no shit, kid)
 def _pyclean():
-    from path import Path
+    from os.path import Path
     d = Path($PWD)
     bflist = ["c", "o"]
     for b in bflist:

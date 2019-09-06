@@ -206,7 +206,8 @@
   (setq recentf-save-file (concat conf:cache-dir "recentf")
         recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:"
                           "/scpx:" "/ssh:" "/media/data/org/"
-                          "conf:cache-dir" "/media/data/mail/Maildir")
+                          "conf:cache-dir" "/media/data/mail/Maildir/"
+                          "/home/arkhan/.dots/emacs/straight/")
         recentf-max-saved-items 15
         recentf-max-menu-items 15
         recentf-keep '(file-remote-p file-readable-p)
@@ -234,9 +235,10 @@
   :require t
   :config
   (setq tramp-default-method "scp"
+        tramp-encoding-shell "/bin/bash"
         tramp-persistency-file-name (concat conf:cache-dir "tramp")
         tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
-        tramp-debug-buffer t
+        tramp-debug-buffer nil
         tramp-verbose 10
         tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>] *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
   (tramp-set-completion-function "ssh" '((tramp-parse-sconfig "/etc/ssh_config")
@@ -251,6 +253,14 @@
          (counsel-tramp-quit-hook . (lambda ()
                                       (projectile-mode 1)
                                       (editorconfig-mode 1)))))
+#+end_src
+** scratch
+#+begin_src emacs-lisp
+(leaf persistent-scratch
+  :straight t
+  :config
+  (setq persistent-scratch-save-file (concat conf:cache-dir "scratch"))
+  (persistent-scratch-setup-default))
 #+end_src
 * UI
 ** all-the-icons
@@ -414,7 +424,7 @@
             (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
           (setq xref-show-definitions-function #'ivy-xref-show-defs)))
 
-(setq confirm-nonexistent-file-or-buffer t)
+;;(setq confirm-nonexistent-file-or-buffer t)
 
 (leaf swiper
   :straight t
@@ -601,24 +611,24 @@
 (setq line-number-mode t
       column-number-mode t)
 
-;; (leaf good-line
-;;   :straight (good-line :type git :host github :repo "TatriX/good-line")
-;;   :hook (after-init-hook . good-line-mode))
+(leaf good-line
+  :straight (good-line :type git :host github :repo "TatriX/good-line")
+  :init (good-line-mode))
 
-(leaf doom-modeline
-  :straight t
-  :init (doom-modeline-mode)
-  :config
-  (defun conf:doom-modeline--make-xpm-filter-args (args)
-    "Force function to use `doom-modeline-height'.
-     Instead of the calculation done in `doom-modeline-refresh-bars'.
-     The minimum height is set to `frame-char-height' + 2."
-    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
-  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+;; (leaf doom-modeline
+;;   :straight t
+;;   :init (doom-modeline-mode)
+;;   :config
+;;   (defun conf:doom-modeline--make-xpm-filter-args (args)
+;;     "Force function to use `doom-modeline-height'.
+;;      Instead of the calculation done in `doom-modeline-refresh-bars'.
+;;      The minimum height is set to `frame-char-height' + 2."
+;;     (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+;;   (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
 
-  (setq doom-modeline-height 12
-        doom-modeline-icon nil
-        doom-modeline-env-enable-python nil))
+;;   (setq doom-modeline-height 12
+;;         doom-modeline-icon nil
+;;         doom-modeline-env-enable-python nil))
 #+end_src
 ** switch-windows
 #+begin_src emacs-lisp
@@ -1056,14 +1066,14 @@
 #+begin_src emacs-lisp
 (leaf pyenv-mode
   :straight t
-  :config
-  (defun pyenv-venv-wrapper-act (&optional ARG PRED)
-    (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
-  (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
+  ;; :config
+  ;; (defun pyenv-venv-wrapper-act (&optional ARG PRED)
+  ;;   (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
+  ;; (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
 
-  (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
-    (setenv "VIRTUAL_ENV"))
-  (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact)
+  ;; (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
+  ;;   (setenv "VIRTUAL_ENV"))
+  ;; (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact)
   :init (pyenv-mode))
 
 (leaf pyenv-mode-auto
@@ -2167,7 +2177,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "xst" "-n" "Tmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "Tmux" "-e" "tmx")))
 #+end_src
 ** ssh
 #+begin_src emacs-lisp
