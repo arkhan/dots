@@ -311,6 +311,12 @@
                           (agenda . 5))
         initial-buffer-choice (lambda () (switch-to-buffer "*dashboard*"))))
 #+end_src
+** disable-mouse
+#+begin_src emacs-lisp
+(leaf disable-mouse
+  :straight t
+  :init (global-disable-mouse-mode))
+#+end_src
 ** font
 #+begin_src emacs-lisp
 (leaf pcache
@@ -558,7 +564,10 @@
 ** theme
 #+begin_src emacs-lisp
 (leaf vibrant-ink-theme
-  :straight (vibrant-ink-theme :type git :host github :repo "arkhan/vibrant-ink-theme")
+  :straight (vibrant-ink-theme
+             :type git
+             :host github
+             :repo "arkhan/vibrant-ink-theme")
   :config (load-theme 'vibrant-ink t))
 #+end_src
 ** sublimity
@@ -612,7 +621,10 @@
       column-number-mode t)
 
 (leaf good-line
-  :straight (good-line :type git :host github :repo "TatriX/good-line")
+  :straight (good-line
+             :type git
+             :host github
+             :repo "TatriX/good-line")
   :init (good-line-mode))
 
 ;; (leaf doom-modeline
@@ -738,6 +750,7 @@
 ** csv
 #+begin_src emacs-lisp
 (leaf csv-mode
+  :straight t
   :leaf-defer nil
   :mode ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
   :config (setq csv-separators '("," ";" "|" " ")))
@@ -884,7 +897,10 @@
 ** makefile
 #+begin_src emacs-lisp
 (leaf makefile-runner
-  :straight (makefile-runner :type git :host github :repo "danamlund/emacs-makefile-runner")
+  :straight (makefile-runner
+             :type git
+             :host github
+             :repo "danamlund/emacs-makefile-runner")
   :bind ("<C-f11>" . makefile-runner))
 #+end_src
 ** multiple-cursors
@@ -1054,7 +1070,11 @@
 *** lsp-python
 #+begin_src emacs-lisp
 (leaf lsp-python-ms
-  :straight (lsp-python-ms :type git :host github :repo "andrew-christianson/lsp-python-ms")
+  ;; :straight (lsp-python-ms
+  ;;            :type git
+  ;;            :host github
+  ;;            :repo "andrew-christianson/lsp-python-ms")
+  :straight t
   :require t
   :init (setq lsp-python-ms-dir (concat conf:cache-dir "mspyls/")))
 
@@ -1066,14 +1086,14 @@
 #+begin_src emacs-lisp
 (leaf pyenv-mode
   :straight t
-  ;; :config
-  ;; (defun pyenv-venv-wrapper-act (&optional ARG PRED)
-  ;;   (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
-  ;; (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
+  :config
+  (defun pyenv-venv-wrapper-act (&optional ARG PRED)
+    (setenv "VIRTUAL_ENV" (shell-command-to-string "_pyenv_virtualenv_hook; echo -n $VIRTUAL_ENV")))
+  (advice-add 'pyenv-mode-set :after 'pyenv-venv-wrapper-act)
 
-  ;; (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
-  ;;   (setenv "VIRTUAL_ENV"))
-  ;; (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact)
+  (defun pyenv-venv-wrapper-deact (&optional ARG PRED)
+    (setenv "VIRTUAL_ENV"))
+  (advice-add 'pyenv-mode-unset :after 'pyenv-venv-wrapper-deact)
   :init (pyenv-mode))
 
 (leaf pyenv-mode-auto
@@ -1219,20 +1239,28 @@
 #+end_src
 ** yasnippet
 #+begin_src emacs-lisp
-  (leaf yasnippet
-    :straight t
-    :diminish yas-minor-mode
-    :config
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-    (yas-global-mode))
+(leaf yasnippet
+  :straight t
+  :diminish yas-minor-mode
+  :config
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  (yas-global-mode))
 
-  (leaf yasnippet-snippets :straight t)
+(leaf yasnippet-snippets :straight t)
 
-  (leaf org-sync-snippets
-    :straight t
-    :init
-    (setq org-sync-snippets-org-snippets-file "~/.emacs.d/snippets/snippets.org")
-    (add-hook 'yas-after-reload-hook 'org-sync-snippets-org-to-snippets))
+(leaf org-sync-snippets
+  :straight t
+  :require t
+  :init (setq org-sync-snippets-org-snippets-file "~/.emacs.d/snippets/snippets.org")
+  :hook (yas-after-reload-hook . org-sync-snippets-org-to-snippets))
+
+(leaf doom-snippets
+  :straight (doom-snippets
+             :type git
+             :host github
+             :repo "hlissner/doom-snippets"
+             :files ("*.el" "snippets"))
+  :after yasnippet)
 #+end_src
 * Tools
 ** alert
@@ -1559,7 +1587,10 @@
 ** i3wm
 #+begin_src emacs-lisp
 (leaf i3wm-config-mode
-  :straight (i3wm-config-mode :type git :host github :repo "Alexander-Miller/i3wm-Config-Mode"))
+  :straight (i3wm-config-mode
+             :type git
+             :host github
+             :repo "Alexander-Miller/i3wm-Config-Mode"))
 #+end_src
 ** logview
 #+begin_src emacs-lisp
@@ -2243,7 +2274,10 @@
 ** xrdb
 #+begin_src emacs-lisp
 (leaf xrdb-mode
-  :straight (xrdb-mode :type git :host github :repo "arkhan/xrdb-mode")
+  :straight (xrdb-mode
+             :type git
+             :host github
+             :repo "arkhan/xrdb-mode")
   :mode (("\\.Xdefaults$" . xrdb-mode)
          ("\\.Xenvironment$" . xrdb-mode)
          ("\\$Xresources$" . xrdb-mode)
