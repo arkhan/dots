@@ -183,7 +183,7 @@ c.colors.tabs.pinned.even.bg = "black"
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "Operator Mono"
+c.fonts.monospace = "mononoki"
 
 # Bindings for normal mode
 config.bind("/", None)

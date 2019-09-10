@@ -18,7 +18,7 @@
 
 * Config
 ** base
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
 ;;; Commentary:
 ;; This config start here
@@ -121,9 +121,9 @@
     (let ((prog-mode-hook nil))
       (async-shell-command "/usr/bin/sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
 (add-hook 'after-save-hook 'tangle-init-async)
-#+end_src
+#+END_SRC
 ** abbrev
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf abbrev
   :diminish abbrev-mode
   :config
@@ -134,31 +134,31 @@
         save-abbrevs t)
   (when (file-exists-p abbrev-file-name)
     (quietly-read-abbrev-file)))
-#+end_src
+#+END_SRC
 ** bookmarks
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf bookmark
   :config
   (setq bookmark-default-file  (concat conf:cache-dir "bookmarks"))
   (when (file-exists-p bookmark-default-file)
     (bookmark-load bookmark-default-file t)))
-#+end_src
+#+END_SRC
 ** custom.el
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq custom-file (concat conf:cache-dir "custom.el"))
 (unless (file-exists-p custom-file)
   (with-temp-buffer
     (write-file custom-file)))
 (load custom-file)
-#+end_src
+#+END_SRC
 ** dirs
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq-default semanticdb-default-save-directory (concat conf:cache-dir "semanticdb/")
               url-configuration-directory (concat conf:cache-dir "url/")
               eshell-directory-name (concat conf:cache-dir "eshell/" ))
-#+end_src
+#+END_SRC
 ** history
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq-default history-length 1000)
 (setq savehist-file (concat conf:cache-dir "history")
       history-delete-duplicates t
@@ -168,9 +168,9 @@
         search-ring
         regexp-search-ring))
 (savehist-mode t)
-#+end_src
+#+END_SRC
 ** ibuffer
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf ibuffer
   :config
   (setq ibuffer-saved-filter-groups
@@ -198,9 +198,9 @@
 :hook (ibuffer-mode-hook . (lambda ()
                              (ibuffer-auto-mode 1)
                              (ibuffer-switch-to-saved-filter-groups "default"))))
-#+end_src
+#+END_SRC
 ** recentf
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf recentf
   :config
   (setq recentf-save-file (concat conf:cache-dir "recentf")
@@ -213,24 +213,24 @@
         recentf-keep '(file-remote-p file-readable-p)
         recentf-auto-cleanup 'never)
   (recentf-mode +1))
-#+end_src
+#+END_SRC
 ** saveplace
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf saveplace
   :init (save-place-mode)
   :config
   (progn
     (setq save-place-file (concat conf:cache-dir "saveplace.el"))
     (setq-default save-place t)))
-#+end_src
+#+END_SRC
 ** semantic
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf semantic
   :require t
   :config (semantic-mode 1))
-#+end_src
+#+END_SRC
 ** tramp
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf tramp
   :require t
   :config
@@ -253,29 +253,29 @@
          (counsel-tramp-quit-hook . (lambda ()
                                       (projectile-mode 1)
                                       (editorconfig-mode 1)))))
-#+end_src
+#+END_SRC
 ** scratch
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf persistent-scratch
   :straight t
   :config
   (setq persistent-scratch-save-file (concat conf:cache-dir "scratch"))
   (persistent-scratch-setup-default))
-#+end_src
+#+END_SRC
 * UI
 ** all-the-icons
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf all-the-icons :straight t)
-#+end_src
+#+END_SRC
 ** avy
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf avy
   :straight t
   :config
   (setq avy-all-windows t))
-#+end_src
+#+END_SRC
 ** cursor
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq-default cursor-type '(hbar . 2))
 (setq x-stretch-cursor t)
 
@@ -286,9 +286,9 @@
      frame (list (cons 'cursor-color "white"))))
 
   :hook (after-make-frame-functions . set-cursor-hook))
-#+end_src
+#+END_SRC
 ** dashboard
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf page-break-lines
   :straight t
   :diminish page-break-lines-mode
@@ -310,15 +310,15 @@
                           (projects . 5)
                           (agenda . 5))
         initial-buffer-choice (lambda () (switch-to-buffer "*dashboard*"))))
-#+end_src
+#+END_SRC
 ** disable-mouse
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf disable-mouse
   :straight t
   :init (global-disable-mouse-mode))
-#+end_src
+#+END_SRC
 ** font
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf pcache
   :straight t
   :init
@@ -332,9 +332,9 @@
 
 (global-font-lock-mode 1)
 (set-face-attribute 'default nil :font "mononoki:pixelsize=15")
-#+end_src
+#+END_SRC
 ** imenu
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf imenu-list
   :straight t
   :bind ("M-2" . imenu-list-smart-toggle)
@@ -343,9 +343,9 @@
         imenu-list-position 'left
         imenu-list-focus-after-activation t
         imenu-list-after-jump-hook nil))
-#+end_src
+#+END_SRC
 ** ivy
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf ivy
   :straight
   :diminish ivy-mode
@@ -487,9 +487,9 @@
         ivy-virtual-abbreviate 'full
         ivy-rich-path-style 'abbrev)
   (ivy-rich-mode 1))
-#+end_src
+#+END_SRC
 ** move-dup
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf move-dup
   :straight t
   :leaf-defer nil
@@ -500,9 +500,9 @@
   (global-set-key (kbd "C-M-<up>") 'md-duplicate-up)
   (global-set-key (kbd "C-M-<down>") 'md-duplicate-down)
   (global-move-dup-mode))
-#+end_src
+#+END_SRC
 ** neotree
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf shrink-path
   :straight t
   :require t)
@@ -560,18 +560,18 @@
           (if file-name
               (neotree-find file-name))))))
 (global-set-key (kbd "M-1") 'neotree-project-dir-toggle)
-#+end_src
+#+END_SRC
 ** theme
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf vibrant-ink-theme
   :straight (vibrant-ink-theme
              :type git
              :host github
              :repo "arkhan/vibrant-ink-theme")
   :config (load-theme 'vibrant-ink t))
-#+end_src
+#+END_SRC
 ** sublimity
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq-default hscroll-margin 2
               hscroll-step 1
               scroll-conservatively 1001
@@ -582,9 +582,9 @@
   :straight sublimity
   :require t
   :init (sublimity-mode 1))
-#+end_src
+#+END_SRC
 ** shackle
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf shackle
   :straight t
   :init (shackle-mode)
@@ -614,36 +614,41 @@
           (occur-mode :select nil :align t)
           (pdf-view-mode :other t)
           (compilation-mode :select nil))))
-#+end_src
+#+END_SRC
 ** status line
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq line-number-mode t
       column-number-mode t)
 
-(leaf good-line
-  :straight (good-line
-             :type git
-             :host github
-             :repo "TatriX/good-line")
-  :init (good-line-mode))
+;; (leaf good-line
+;;   :straight (good-line
+;;              :type git
+;;              :host github
+;;              :repo "TatriX/good-line")
+;;   :init (good-line-mode))
 
-;; (leaf doom-modeline
+;; (leaf mini-modeline
 ;;   :straight t
-;;   :init (doom-modeline-mode)
-;;   :config
-;;   (defun conf:doom-modeline--make-xpm-filter-args (args)
-;;     "Force function to use `doom-modeline-height'.
-;;      Instead of the calculation done in `doom-modeline-refresh-bars'.
-;;      The minimum height is set to `frame-char-height' + 2."
-;;     (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
-;;   (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+;;   :after (good-line-mode)
+;;   :config (mini-modeline-mode t))
 
-;;   (setq doom-modeline-height 12
-;;         doom-modeline-icon nil
-;;         doom-modeline-env-enable-python nil))
-#+end_src
+(leaf doom-modeline
+  :straight t
+  :init (doom-modeline-mode)
+  :config
+  (defun conf:doom-modeline--make-xpm-filter-args (args)
+    "Force function to use `doom-modeline-height'.
+     Instead of the calculation done in `doom-modeline-refresh-bars'.
+     The minimum height is set to `frame-char-height' + 2."
+    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
+  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+
+  (setq doom-modeline-height 12
+        doom-modeline-icon nil
+        doom-modeline-env-enable-python nil))
+#+END_SRC
 ** switch-windows
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (leaf switch-window
     :straight t
     :bind (("C-x o" . switch-window)
@@ -651,10 +656,10 @@
            ("C-x 2" . switch-window-then-split-below)
            ("C-x 3" . switch-window-then-split-right)
            ("C-x 0" . switch-window-then-delete)))
-#+end_src
+#+END_SRC
 * Prog
 ** company
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf company
   :straight t
   :diminish company-mode
@@ -746,35 +751,35 @@
               ((featurep sym) 'ElispFeature)
               ((facep sym) 'ElispFace)))))
   :hook (company-mode-hook . company-box-mode))
-#+end_src
+#+END_SRC
 ** csv
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf csv-mode
   :straight t
   :leaf-defer nil
   :mode ("\\.[Cc][Ss][Vv]\\'" . csv-mode)
   :config (setq csv-separators '("," ";" "|" " ")))
-#+end_src
+#+END_SRC
 ** editorconfig
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf editorconfig
   :straight t
   :leaf-defer nil
   :diminish ""
   :config (editorconfig-mode))
-#+end_src
+#+END_SRC
 ** eldoc
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf eldoc
   :diminish eldoc-mode)
-#+end_src
+#+END_SRC
 ** empty buffer
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (defun empty-buffer? ()
   (= (buffer-end 1) (buffer-end -1)))
-#+end_src
+#+END_SRC
 ** flycheck
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf flycheck
   :straight t
   :leaf-defer nil
@@ -816,16 +821,16 @@
     :fringe-face 'flycheck-fringe-info)
   (setq flycheck-indication-mode 'right-fringe)
 :hook (after-init . global-flycheck-mode))
-#+end_src
+#+END_SRC
 ** format-all
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf format-all
   :straight t
   :bind (prog-mode-map
          ("<M-f8>" . format-all-buffer)))
-#+end_src
+#+END_SRC
 ** highlight-indent-guides
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf highlight-indent-guides
   :straight t
   :diminish highlight-indent-guides-mode
@@ -835,13 +840,13 @@
                 highlight-indent-guides-auto-even-face-perc 15
                 highlight-indent-guides-auto-character-face-perc 20)
   :hook (prog-mode-hook . highlight-indent-guides-mode))
-#+end_src
+#+END_SRC
 ** jinja
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf jinja2-mode :straight t)
-#+end_src
+#+END_SRC
 ** lsp
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf lsp
   :straight lsp-mode
   :commands (lsp lsp-deferred)
@@ -893,24 +898,24 @@
   :config
   (setq company-lsp-async t)
   (push '(company-lsp :with company-yasnippet) company-backends))
-#+end_src
+#+END_SRC
 ** makefile
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf makefile-runner
   :straight (makefile-runner
              :type git
              :host github
              :repo "danamlund/emacs-makefile-runner")
   :bind ("<C-f11>" . makefile-runner))
-#+end_src
+#+END_SRC
 ** multiple-cursors
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf multiple-cursors
   :straight t
   :leaf-defer nil)
-#+end_src
+#+END_SRC
 ** parents
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (electric-pair-mode 1)
 
 (leaf paren
@@ -933,9 +938,9 @@
 (leaf rainbow-delimiters
   :straight t
   :hook (prog-mode-hook . rainbow-delimiters-mode))
-#+end_src
+#+END_SRC
 ** plantuml
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf plantuml-mode
   :straight t
   :config (setq plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"))
@@ -944,9 +949,9 @@
   :straight t
   :after flycheck
   :config (flycheck-plantuml-setup))
-#+end_src
+#+END_SRC
 ** prog-mode
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf prog-mode
   :config
   (setq prettify-symbols-unprettify-at-point 'right-edge)
@@ -971,9 +976,9 @@
             (lambda ()
               (font-lock-add-keywords nil
                                       '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t))))))
-#+end_src
+#+END_SRC
 ** projectile
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf projectile
   :straight t
   :diminish projectile-mode
@@ -1004,9 +1009,9 @@
       (counsel-projectile-switch-to-buffer)))
   :hook ((text-mode-hook . counsel-projectile-mode)
          (prog-mode-hook . counsel-projectile-mode)))
-#+end_src
+#+END_SRC
 ** polymode
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf polymode
   :straight t
   :config
@@ -1053,10 +1058,10 @@
       (_ (error "Canoot find chunk to kill"))))
 
   :hook (python-mode-hook . poly-python-sql-mode))
-#+end_src
+#+END_SRC
 ** python
 *** python-template
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq ansi-color-for-comint-mode t)
 (defun python-template ()
   (interactive)
@@ -1066,9 +1071,9 @@
           '(lambda ()
              (when (empty-buffer?) (python-template))))
 
-#+end_src
+#+END_SRC
 *** lsp-python
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf lsp-python-ms
   ;; :straight (lsp-python-ms
   ;;            :type git
@@ -1081,9 +1086,9 @@
 (leaf python-mode
   :straight t
   :hook (python-mode-hook . lsp-deferred))
-#+end_src
+#+END_SRC
 *** pyenv
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf pyenv-mode
   :straight t
   :config
@@ -1099,9 +1104,9 @@
 (leaf pyenv-mode-auto
   :straight t
   :require t)
-#+end_src
+#+END_SRC
 *** pep8
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf blacken
   :straight t
   :diminish blacken-mode
@@ -1112,23 +1117,23 @@
   :straight t
   :config (setq py-isort-options '("--lines=100"))
   :hook (before-save-hook . py-isort-before-save))
-#+end_src
+#+END_SRC
 *** stuff
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf pyimport :straight t :require t)
 (leaf pip-requirements :straight t)
-#+end_src
+#+END_SRC
 ** rainbow
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf rainbow-mode
   :straight t
   :diminish rainbow-mode
   :hook ((prog-mode-hook . rainbow-mode)
           (conf-mode-hook . rainbow-mode)
           (xrdb-mode-hook . rainbow-mode)))
-#+end_src
+#+END_SRC
 ** rest
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf restclient  :straight t)
 
 (leaf company-restclient
@@ -1139,9 +1144,9 @@
 (leaf ob-restclient
   :straight t
   :commands (org-babel-execute:restclient))
-#+end_src
+#+END_SRC
 ** sql
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf edbi-database-url
   :straight t)
 
@@ -1169,9 +1174,9 @@
   :bind (sql-mode-map
          ("C-c \\" . sql-indent-buffer))
   :hook (sql-mode-hook . sqlind-minor-mode))
-#+end_src
+#+END_SRC
 ** xml
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun nxml-template ()
     (interactive)
     (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
@@ -1232,13 +1237,13 @@
       "pretty print the XML in a buffer."
       (interactive)
       (pretty-print-xml-region (point-min) (point-max))))
-#+end_src
+#+END_SRC
 ** yaml
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf yaml-mode :straight t)
-#+end_src
+#+END_SRC
 ** yasnippet
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf yasnippet
   :straight t
   :diminish yas-minor-mode
@@ -1261,10 +1266,10 @@
              :repo "hlissner/doom-snippets"
              :files ("*.el" "snippets"))
   :after yasnippet)
-#+end_src
+#+END_SRC
 * Tools
 ** alert
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf alert
   :straight t
   :require t
@@ -1272,9 +1277,9 @@
   (if (eq system-type 'windows-nt)
       (setq alert-default-style 'message)
     (setq alert-default-style 'libnotify)))
-#+end_src
+#+END_SRC
 ** anzu
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf anzu
   :straight t
   :bind (("M-%" . anzu-query-replace)
@@ -1302,22 +1307,22 @@
 		       '(:eval (when anzu--state
 			             (concat " " (anzu--update-mode-line)))))
   (global-anzu-mode +1))
-#+end_src
+#+END_SRC
 ** bughunter
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf bug-hunter
   :straight t
   :commands (bug-hunter-file bug-hunter-init-file))
-#+end_src
+#+END_SRC
 ** autorevert
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf autorever
   :diminish auto-revert-mode
   :config (setq auto-revert-remote-files t
                 auto-revert-interval 1))
-#+end_src
+#+END_SRC
 ** caldav
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf org-caldav
   :straight t
   :bind ("<f6>" . org-caldav-sync)
@@ -1354,16 +1359,16 @@
         calendar-week-start-day 1))
 
 (leaf calfw-org :straight t)
-#+end_src
+#+END_SRC
 ** comment-dwim-2
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf comment-dwim-2
   :straight t
   :leaf-defer nil
   :bind* ("M-;" . comment-dwim-2))
-#+end_src
+#+END_SRC
 ** docker
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf docker :straight t)
 
 (leaf dockerfile-mode
@@ -1373,9 +1378,9 @@
 (leaf docker-compose-mode
   :straight t
   :mode ("docker-compose.*\.yml\\'" . docker-compose-mode))
-#+end_src
+#+END_SRC
 ** dumb-jump
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf dumb-jump
   :straight t
   :bind (("M-g o" . dumb-jump-go-other-window)
@@ -1384,9 +1389,9 @@
          ("M-g x" . dumb-jump-go-prefer-external)
          ("M-g z" . dumb-jump-go-prefer-external-other-window))
   :config (setq dumb-jump-selector 'ivy))
-#+end_src
+#+END_SRC
 ** flyspell
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf flyspell
   :require t
   :bind (("C-c t s" . flyspell-mode)
@@ -1452,24 +1457,24 @@
   :require t
   :init (setq flyspell-correct-interface #'flyspell-correct-popup
               flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
-#+end_src
+#+END_SRC
 ** frog
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf frog-jump-buffer
   :straight t
   :bind ("C-x C-b" . frog-jump-buffer))
-#+end_src
+#+END_SRC
 ** gif-screencast
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf gif-screencast
   :straight t
   :bind (("<f8>" . gif-screencast)
          (gif-screencast-mode-map
           ("<f8>" . gif-screencast-toggle-pause)
           ("<f9>" . gif-screencast-stop))))
-#+end_src
+#+END_SRC
 ** git
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq vc-follows-symlinks t
       auto-revert-check-vc-info t
       find-file-visit-truename t)
@@ -1583,23 +1588,23 @@
   :bind (git-timemachine-mode
          ("c" . git-timemachine-show-current-revision)
          ("b" . git-timemachine-switch-branch)))
-#+end_src
+#+END_SRC
 ** i3wm
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf i3wm-config-mode
   :straight (i3wm-config-mode
              :type git
              :host github
              :repo "Alexander-Miller/i3wm-Config-Mode"))
-#+end_src
+#+END_SRC
 ** logview
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf logview
   :straight t
   :hook (logview-mode-hook . auto-revert-mode))
-#+end_src
+#+END_SRC
 ** mu4e
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf link-hint
   :straight t
   :bind (("C-c l o" . link-hint-open-link)
@@ -1760,15 +1765,15 @@
   :straight t
   :after mu4e
   :config (mu4e-maildirs-extension))
-#+end_src
+#+END_SRC
 ** nginx
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf nginx-mode
   :straight t
   :mode ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
-#+end_src
+#+END_SRC
 ** orgmode
- #+begin_src emacs-lisp
+ #+BEGIN_SRC emacs-lisp
 (leaf org
   :straight org-plus-contrib
   :leaf-defer nil
@@ -2040,9 +2045,9 @@
                                   (:name "Big Outcomes"
                                          :tag "bo")))
   (org-super-agenda-mode))
- #+end_src
+ #+END_SRC
 ** pass
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf password-store
   :straight t
   :config
@@ -2082,9 +2087,9 @@
   :require t
   :after auth-source
   :init (setq auth-sources '(password-store)))
-#+end_src
+#+END_SRC
 ** pdf-tools
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf pdf-tools
   :straight t
   :bind (pdf-view-mode-map
@@ -2120,15 +2125,15 @@
 (leaf org-pdfview
   :straight t
   :after org)
-#+end_src
+#+END_SRC
 ** pkgbuil
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf pkgbuild-mode
   :straight t
   :mode "PKGBUILD\\'")
-#+end_src
+#+END_SRC
 ** po-mode
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf po-mode
   :mode ("\\.po\\'" . po-mode)
   :config
@@ -2175,9 +2180,9 @@
             (ispell-change-dictionary po-language)
             (turn-on-flyspell)
             (flyspell-buffer))))))
-#+end_src
+#+END_SRC
 ** presentation
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf presentation
   :straight t
   :config (global-set-key (kbd "<M-f5>") (lambda ()
@@ -2186,9 +2191,9 @@
                                                (presentation-mode 0)
                                              (presentation-mode 1))
                                            (toggle-frame-fullscreen))))
-#+end_src
+#+END_SRC
 ** proced
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf proced
   :straight t
   :bind ("C-x p" . proced)
@@ -2197,35 +2202,35 @@
   :init
   (setq proced-tree-flag t
         proced-auto-update-flag t))
-#+end_src
+#+END_SRC
 ** restart-emacs
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf restart-emacs  :straight t)
-#+end_src
+#+END_SRC
 ** shell
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf terminal-here
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
   :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "Tmux" "-e" "tmx")))
-#+end_src
+#+END_SRC
 ** ssh
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf ssh
   :straight t
   :hook (ssh-mode-hook . (lambda ()
                            (setq ssh-directory-tracking-mode t)
                            (shell-dirtrack-mode t)
                            (setq dirtrackp nil))))
-#+end_src
+#+END_SRC
 ** sudo
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf sudo-edit
   :straight t)
-#+end_src
+#+END_SRC
 ** undo-tree
-#+begin_src emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
 (leaf undo-tree
   :straight t
   :leaf-defer nil
@@ -2248,15 +2253,15 @@
         undo-tree-auto-save-history t)
   (defalias 'redo 'undo-tree-redo)
   (global-undo-tree-mode 1))
-#+end_src
+#+END_SRC
 ** vlf
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf vlf-setup
   :straight vlf
   :init (setq vlf-application 'dont-ask))
-#+end_src
+#+END_SRC
 ** which-key
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf which-key
   :straight t
   :diminish which-key-mode
@@ -2270,9 +2275,9 @@
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
         which-key-posframe-border-width 0)
   (which-key-posframe-mode))
-#+end_src
+#+END_SRC
 ** xrdb
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf xrdb-mode
   :straight (xrdb-mode
              :type git
@@ -2285,9 +2290,9 @@
          (".*\\.x?rdb$" . xrdb-mode))
   :hook (xrdb-mode-hook . (lambda ()
                             (setq comment-start "! "))))
-#+end_src
+#+END_SRC
 * End
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 ;; Use a hook so the message doesn't get clobbered by other messages.
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -2301,4 +2306,4 @@
 ;; End:
 
 ;;; init.el ends here
-#+end_src
+#+END_SRC
