@@ -55,15 +55,16 @@
 
 (straight-use-package 'leaf)
 (straight-use-package 'leaf-keywords)
+(straight-use-package 'diminish)
 
 (leaf leaf
-  :doc "Symplify your init.el configuration"
-  :doc "Initialize leaf dependent packages"
   :require t
-  :config
+  :init
   (leaf leaf-keywords
     :require t
-    :config (leaf-keywords-init)))
+    :init
+    (require 'diminish)
+    (leaf-keywords-init)))
 
 (leaf async
   :straight t
@@ -314,8 +315,9 @@
 ** disable-mouse
 #+BEGIN_SRC emacs-lisp
 (leaf disable-mouse
-  :straight t
-  :init (global-disable-mouse-mode))
+:straight t
+:diminish disable-mouse-global-mode
+:config (global-disable-mouse-mode))
 #+END_SRC
 ** font
 #+BEGIN_SRC emacs-lisp
@@ -331,7 +333,7 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "mononoki:pixelsize=15")
+(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
 #+END_SRC
 ** imenu
 #+BEGIN_SRC emacs-lisp
@@ -376,17 +378,6 @@
   (add-to-list 'ivy-ignore-buffers "\\*git-gutter:.*")
   (with-eval-after-load "projectile"
     (setf projectile-globally-ignored-buffers ivy-ignore-buffers))
-
-  (defun conf:ivy-format-function-arrow (cands)
-    "Transform CAND-PAIRS into a string for minibuffer."
-    (ivy--format-function-generic
-     (lambda (str)
-       (concat "-> " (ivy--add-face str 'ivy-current-match)))
-     (lambda (str)
-       (concat "   " str))
-     cands
-     "\n"))
-  (setq ivy-format-function 'conf:ivy-format-function-arrow)
   (ivy-mode 1))
 
 (leaf prescient
@@ -417,6 +408,7 @@
 
 (leaf ivy-explorer
   :straight t
+  :diminish ivy-explorer-mode
   :after ivy
   :init
   (if (display-graphic-p)
@@ -601,6 +593,7 @@
           ("*Proced*" :select t :size 0.3 :align below)
           ("*Python*" :select t :size 0.3 :align bellow)
           ("*Shell Command Output*" :select nil)
+          ("\\*TeX.*\\*" :regexp t :autoclose t :align below :size 10)
           ("*Warnings*" :ignore t)
           ("*el-get bootstrap*" :ignore t)
           ("*undo-tree*" :size 0.25 :align left)
@@ -620,32 +613,38 @@
 (setq line-number-mode t
       column-number-mode t)
 
-;; (leaf good-line
-;;   :straight (good-line
-;;              :type git
-;;              :host github
-;;              :repo "TatriX/good-line")
-;;   :init (good-line-mode))
-
-;; (leaf mini-modeline
-;;   :straight t
-;;   :after (good-line-mode)
-;;   :config (mini-modeline-mode t))
-
-(leaf doom-modeline
+(leaf smart-mode-line
   :straight t
-  :init (doom-modeline-mode)
-  :config
-  (defun conf:doom-modeline--make-xpm-filter-args (args)
-    "Force function to use `doom-modeline-height'.
-     Instead of the calculation done in `doom-modeline-refresh-bars'.
-     The minimum height is set to `frame-char-height' + 2."
-    (list (car args) (cadr args) (max (+ (frame-char-height) 2) doom-modeline-height)))
-  (advice-add 'doom-modeline--make-xpm :filter-args #'conf:doom-modeline--make-xpm-filter-args)
+  :config (setq sml/no-confirm-load-theme t
+                sml/theme 'dark
+                sml/name-width 30)
+  :hook (emacs-startup-hook . sml/setup))
 
-  (setq doom-modeline-height 12
-        doom-modeline-icon nil
-        doom-modeline-env-enable-python nil))
+(leaf mini-modeline
+  :straight t
+  :config (setq mini-modeline-truncate-p t
+                mini-modeline-r-format '("%e"
+                                         mode-line-front-space
+                                         mode-line-mule-info
+                                         mode-line-client
+                                         mode-line-modified
+                                         mode-line-remote
+                                         mode-line-frame-identification
+                                         mode-line-buffer-identification
+                                         (vc-mode vc-mode)
+                                         " "
+                                         mode-line-position
+                                         " "
+                                         mode-line-modes
+                                         mode-line-misc-info
+                                         mode-line-end-spaces))
+  :hook (emacs-startup-hook . mini-modeline-mode))
+
+(leaf rich-minority
+  :straight t
+  :config (setq rm-blacklist nil
+                rm-whitelist "FlyC:\\|lsp")
+  :hook (emacs-startup-hook . rich-minority-mode))
 #+END_SRC
 ** switch-windows
 #+BEGIN_SRC emacs-lisp
@@ -695,7 +694,7 @@
 (leaf company-posframe
   :straight t
   :diminish company-posframe-mode
-  :config (company-posframe-mode 1))
+  :config (company-posframe-mode))
 
 (leaf company-box
   :straight t
@@ -765,7 +764,7 @@
 (leaf editorconfig
   :straight t
   :leaf-defer nil
-  :diminish ""
+  :diminish editorconfig-mode
   :config (editorconfig-mode))
 #+END_SRC
 ** eldoc
@@ -893,9 +892,9 @@
 
 (leaf company-lsp
   :straight t
-  :leaf-defer nil
+  :require t
   :commands company-lsp
-  :config
+  :init
   (setq company-lsp-async t)
   (push '(company-lsp :with company-yasnippet) company-backends))
 #+END_SRC
@@ -1056,7 +1055,6 @@
        (goto-char end)
        (polymode-kill-chunk))
       (_ (error "Canoot find chunk to kill"))))
-
   :hook (python-mode-hook . poly-python-sql-mode))
 #+END_SRC
 ** python
@@ -1175,6 +1173,87 @@
          ("C-c \\" . sql-indent-buffer))
   :hook (sql-mode-hook . sqlind-minor-mode))
 #+END_SRC
+** tex
+#+BEGIN_SRC emacs-lisp
+(leaf tex
+  :straight auctex
+  :leaf-defer nil
+  :bind ("C-c c" . TeX-clean)
+  :init
+  (progn
+    (require 'smartparens-latex)
+    (add-hook 'TeX-mode-hook
+              (lambda ()
+                (outline-minor-mode t)
+                (flyspell-mode t)
+                (TeX-PDF-mode t)
+                (TeX-fold-mode t)
+                (switch-dictionary)))
+    (add-hook 'LaTeX-mode-hook
+              (lambda ()
+                (LaTeX-math-mode t)
+                (reftex-mode t)))
+    (setq TeX-auto-save t
+          TeX-parse-self t
+          LaTeX-syntactic-comment t
+          TeX-save-query nil
+          TeX-PDF-mode t
+          TeX-auto-untabify t)
+    (setq-default TeX-engine 'xetex))
+  :config
+  (add-hook 'TeX-mode-hook 'turn-on-auto-fill)
+  (add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
+
+  ;; Use pdf-tools to open PDF files
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-source-correlate-start-server t)
+
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+
+                                        ;(setq TeX-view-program-list '(("zathura" "zathura %o"))
+                                        ;      TeX-view-program-selection '((output-pdf "zathura")))
+
+  ;; set XeTeX mode in TeX/LaTeX
+  (add-hook 'LaTeX-mode-hook
+            (lambda () (push
+                   '("cTeX" "%(ctex_bin) %t " TeX-run-TeX nil t
+                     :help "Compilation with custom script") TeX-command-list)
+              (add-to-list 'TeX-expand-list
+                           '("%(ctex_bin)" (lambda ()
+                                             (concat "~/.bin/" "ctex" ))))
+              (setq TeX-command-default "cTeX"
+                    TeX-save-query nil
+                    TeX-show-compilation t))))
+
+(leaf cdlatex
+  :straight t
+  :hook (LaTeX-mode-hook . turn-on-cdlatex))
+
+(leaf reftex
+  :straight t
+  :commands turn-on-reftex
+  :init
+  (progn
+    (setq reftex-plug-into-AUCTeX t)))
+
+(leaf bibtex
+  :straight t
+  :init
+  (progn
+    (setq bibtex-align-at-equal-sign t)
+    (add-hook 'bibtex-mode-hook
+              (lambda ()
+                (set-fill-column 120)))))
+
+(leaf company-auctex
+  :straight t
+  :config
+  (defun conf:TeX-mode-hook ()
+    (company-auctex-init))
+  (add-hook 'LaTeX-mode-hook 'conf:TeX-mode-hook)
+  (add-hook 'TeX-mode-hook 'conf:TeX-mode-hook))
+#+END_SRC
 ** xml
 #+BEGIN_SRC emacs-lisp
   (defun nxml-template ()
@@ -1247,9 +1326,8 @@
 (leaf yasnippet
   :straight t
   :diminish yas-minor-mode
-  :config
-  (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-  (yas-global-mode))
+  :config (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  :hook (emacs-startup-hook . yas-global-mode))
 
 (leaf yasnippet-snippets :straight t)
 
@@ -1266,6 +1344,18 @@
              :repo "hlissner/doom-snippets"
              :files ("*.el" "snippets"))
   :after yasnippet)
+
+;; http://emacs.stackexchange.com/questions/10431/get-company-to-show-suggestions-for-yasnippet-names
+;; Add yasnippet support for all company backends
+;; https://github.com/syl20bnr/spacemacs/pull/179
+
+(defun company-mode/backend-with-yas (backend)
+  (if (or (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
+(add-hook 'after-init-hook (lambda () (setf company-backends (mapcar #'company-mode/backend-with-yas company-backends))) t)
 #+END_SRC
 * Tools
 ** alert
@@ -1394,6 +1484,7 @@
 #+BEGIN_SRC emacs-lisp
 (leaf flyspell
   :require t
+  :diminish flyspell-mode
   :bind (("C-c t s" . flyspell-mode)
          ("C-c l b" . flyspell-buffer)
          ("M-i" . switch-dictionary)
@@ -1644,10 +1735,11 @@
         mu4e-headers-auto-update nil
         mu4e-headers-leave-behavior 'ignore
         mu4e-headers-visible-lines 8
-        mu4e-headers-fields '((:date . 25)
-                              (:flags . 6)
-                              (:from . 30)
-                              (:subject . nil))
+        mu4e-headers-fields '((:human-date    .   20)
+                              (:flags         .   10)
+                              (:maildir       .   20)
+                              (:from          .   22)
+                              (:subject       .   nil))
         mu4e-html2text-command "w3m -dump -T text/html -cols 72 -o display_link_number=true -o auto_image=false -o display_image=true -o ignore_null_img_alt=true"
         mu4e-maildir "~/.mail"
         mu4e-view-show-images t
@@ -1744,13 +1836,32 @@
 (leaf mu4e-alert
   :if (executable-find "mu")
   :straight t
-  :init
-  (setq mu4e-compose-forward-as-attachment t
+  :config
+  (defun conf:mu4e-alert-default-mode-line-formatter (mail-count)
+    (when (not (zerop mail-count))
+      (concat
+       " "
+       (propertize
+        (format "#%d" mail-count)
+        'face font-lock-keyword-face
+        'help-echo (concat (if (= mail-count 1)
+                               "You have an unread email"
+                             (format "You have %s unread emails" mail-count))
+                           "\nClick here to view "
+                           (if (= mail-count 1) "it" "them"))
+        'mouse-face 'mode-line-highlight
+        'keymap '(mode-line keymap
+                            (mouse-1 . mu4e-alert-view-unread-mails)
+                            (mouse-2 . mu4e-alert-view-unread-mails)
+                            (mouse-3 . mu4e-alert-view-unread-mails))))))
+
+  (setq mu4e-alert-modeline-formatter 'conf:mu4e-alert-default-mode-line-formatter
+        mu4e-compose-forward-as-attachment t
         mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
         mu4e-compose-crypto-reply-plain-policy 'sign
         mu4e-index-update-in-background t
         mu4e-alert-email-notification-types '(subjects))
-  :config
+
   (defun conf:refresh-mu4e-alert-mode-line ()
     (interactive)
     (mu4e~proc-kill)
@@ -1773,12 +1884,13 @@
   :mode ("/nginx/sites-\\(?:available\\|enabled\\)/" . nginx-mode))
 #+END_SRC
 ** orgmode
- #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (leaf org
   :straight org-plus-contrib
   :leaf-defer nil
   :bind (("C-x a" . org-agenda-list)
          ("C-x c" . org-capture))
+  :diminish org-indent-mode
   :config
   (progn
     (add-hook 'org-mode-hook
@@ -2213,7 +2325,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "Tmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "xst" "-n" "ETmux" "-e" "tmx")))
 #+END_SRC
 ** ssh
 #+BEGIN_SRC emacs-lisp
@@ -2223,6 +2335,14 @@
                            (setq ssh-directory-tracking-mode t)
                            (shell-dirtrack-mode t)
                            (setq dirtrackp nil))))
+(leaf ssh-config-mode
+  :straight t
+  :require t
+  :mode (("/\\.ssh/config\\'" . ssh-config-mode)
+         ("/sshd?_config\\'" . ssh-config-mode)
+         ("/known_hosts\\'" . ssh-known-hosts-mode)
+         ("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+  :hook (ssh-config-mode-hook . turn-on-font-lock))
 #+END_SRC
 ** sudo
 #+BEGIN_SRC emacs-lisp
@@ -2265,9 +2385,8 @@
 (leaf which-key
   :straight t
   :diminish which-key-mode
-  :config
-  (setq which-key-sort-order 'which-key-key-order-alpha)
-  (which-key-mode))
+  :config (setq which-key-sort-order 'which-key-key-order-alpha)
+  :hook (emacs-startup-hook . which-key-mode))
 
 (leaf which-key-posframe
   :straight t

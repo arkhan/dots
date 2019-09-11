@@ -11,7 +11,7 @@ Xft.lcdfilter: lcddefault
 *.saveLines: 4096
 *.scrollBar: false
 ! XTerm
-xterm*faceName: xft:mononoki:style=Regular:pixelsize=15
+xterm*faceName: xft:Fira Code Retina:style=Regular:pixelsize=15
 xterm*dynamicColors: true
 xterm*utf8: 2
 xterm*eightBitInput: true
@@ -26,10 +26,10 @@ xterm*toolBar: false
 ! URxvt
 URxvt.iso14755: false
 URxvt.iso14755_52: false
-URxvt*font: xft:mononoki:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*boldFont: xft:mononoki:bold:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*italicFont: xft:mononoki:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
-URxvt*boldItalicFont: xft:mononoki:bold:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*font: xft:Fira Code Retina:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*boldFont: xft:Fira Code Retina:bold:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*italicFont: xft:Fira Code Retina:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
+URxvt*boldItalicFont: xft:Fira Code Retina:bold:italic:autohint=true:pixelsize=15,xft:DejaVuSansMono Nerd Font:pixelsize=15,xft:Everson Mono:pixelsize=15,xft:Symbola:pixelsize=15
 URxvt*cursorUnderline: true
 URxvt.loginShell: true
 URxvt.scrollWithBuffer: true
@@ -81,7 +81,7 @@ st.termname:     st-256color
 ! if you do not set shell, precedence is: -e arg, utmp option, SHELL env var, /etc/passwd shell
 
 ! The following options options can be reloaded via USR1 signal.
-st.font:              mononoki:pixelsize=15:antialias=true:autohint=true;
+st.font:              Fira Code Retina:pixelsize=15:antialias=true:autohint=true;
 st.borderpx:          0
 ! Available cursor values: 2 4 6 7 = █ _ | ☃ ( 1 3 5 are blinking versions)
 st.cursorshape:       4
