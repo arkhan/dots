@@ -22,7 +22,7 @@
        ophints
        (popup +all
               +defaults)
-       pretty-code
+       (pretty-code +fira)
        unicode
        vc-gutter
        window-select
@@ -179,7 +179,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Operator Mono" :size 15))
+(setq doom-font (font-spec :family "Fira Code Retina" :size 15))
 #+END_SRC
 ** Imenu
 *** Package
@@ -261,12 +261,12 @@
  (advice-add #'neo-buffer--insert-root-entry :override #'shrink-root-entry))
 #+END_SRC
 ** Pretty Code
-#+BEGIN_SRC emacs-lisp :tangle config.el
-(defvar +pretty-code-extra-ligatures
-  '(("==" . ?\u2261)
-    ("!=" . ?\u2260)
-    (">=" . ?\u2265)
-    ("<=" . ?\u2264)))
+#+BEGIN_SRC emacs-lisp :tangle config.el :tangle no
+;; (defvar +pretty-code-extra-ligatures
+;;   '(("==" . ?\u2261)
+;;     ("!=" . ?\u2260)
+;;     (">=" . ?\u2265)
+;;     ("<=" . ?\u2264)))
 
 (setq-default prettify-symbols-alist
               (append prettify-symbols-alist

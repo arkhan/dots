@@ -44,9 +44,9 @@ font-0 = Terminus:size=12;0
 font-1 = Siji:size=14;1
 font-2 = FontAwesome:size=10;1
 
-modules-left = ws
+modules-left = ws title
 modules-center =
-modules-right = wireless wired volume cpu memory fs-data fs-root datetime battery
+modules-right = wireless wired volume cpu memory fs datetime battery
 
 wm-restack = bspwm
 
@@ -273,18 +273,12 @@ label-muted = %{F#920}%percentage%M%{F-}
 ramp-volume-0 = 
 ramp-volume-1 = 
 
-[module/fs-root]
+[module/fs]
 type = internal/fs
 interval = 10
 mount-0 = /
+mount-1 = /media/data
 label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
-label-unmounted =
-
-[module/fs-data]
-type = internal/fs
-interval = 10
-mount-0 = /media/data
-label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
 label-unmounted =
 
 [module/memory]
@@ -306,4 +300,4 @@ label = %date% %time%
 
 [module/title]
 type = internal/xwindow
-label = %title:0:35:...%
+label = >_ %title:0:35:...%

@@ -207,7 +207,7 @@
   (setq recentf-save-file (concat conf:cache-dir "recentf")
         recentf-exclude '("/tmp/" "/ssh:" "/sudo:" "/scp:"
                           "/scpx:" "/ssh:" "/media/data/org/"
-                          "conf:cache-dir" "/media/data/mail/Maildir/"
+                          "conf:cache-dir" "/media/data/Mail/Maildir/"
                           "/home/arkhan/.dots/emacs/straight/")
         recentf-max-saved-items 15
         recentf-max-menu-items 15
@@ -302,6 +302,7 @@
   (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version
                                               " kernel " (car (split-string (shell-command-to-string "uname -r") "-"))
                                               " x86_64 " (car (split-string (shell-command-to-string "/usr/bin/sh -c '. /etc/os-release && echo $PRETTY_NAME'") "\n")))
+        dashboard-startup-banner 'logo
         dashboard-set-init-info t
         dashboard-center-content t
         dashboard-set-heading-icons t
@@ -333,7 +334,41 @@
   :init (unicode-fonts-setup))
 
 (global-font-lock-mode 1)
-(set-face-attribute 'default nil :font "Fira Code Retina:pixelsize=15")
+(set-face-attribute 'default nil
+                    :font "Fira Emacs Retina"
+                    :height 115
+                    :slant 'normal
+                    :weight 'normal
+                    :width 'normal)
+
+(defun fira-code-emacs-build (package &rest _)
+    (when (string= package "fira-code")
+      (let ((default-directory (straight--repos-dir "fira-code-emacs")))
+        (straight--get-call "make"))))
+
+(add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
+
+(leaf fira-code
+  :straight (fira-code
+             :type git
+             :host github
+             :repo "johnw42/fira-code-emacs")
+  :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
+  :hook (prog-mode-hook . fira-code-mode))
+
+(leaf prog-mode
+  :config
+  :hook ((prog-mode-hook . (lambda ()
+                             (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                                   '(("in" . ?\u2208)
+                                     ("IN" . ?\u2208)
+                                     ("not in" . ?\u2209)
+                                     ("NOT IN" . ?\u2209)
+                                     ("not" . ?\u00AC)
+                                     ("NOT" . ?\u00AC)))))
+         (prog-common-hook . (lambda ()
+                               (font-lock-add-keywords nil
+                                                       '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))))
 #+END_SRC
 ** imenu
 #+BEGIN_SRC emacs-lisp
@@ -480,6 +515,44 @@
         ivy-rich-path-style 'abbrev)
   (ivy-rich-mode 1))
 #+END_SRC
+** modeline
+#+BEGIN_SRC emacs-lisp
+(setq line-number-mode t
+      column-number-mode t)
+
+(leaf smart-mode-line
+  :straight t
+  :config (setq sml/no-confirm-load-theme t
+                sml/theme 'dark
+                sml/name-width 30)
+  :hook (emacs-startup-hook . sml/setup))
+
+(leaf mini-modeline
+  :straight t
+  :config (setq mini-modeline-truncate-p t
+                mini-modeline-r-format '("%e"
+                                         mode-line-front-space
+                                         mode-line-mule-info
+                                         mode-line-client
+                                         mode-line-modified
+                                         mode-line-remote
+                                         mode-line-frame-identification
+                                         mode-line-buffer-identification
+                                         (vc-mode vc-mode)
+                                         " "
+                                         mode-line-position
+                                         " "
+                                         mode-line-modes
+                                         mode-line-misc-info
+                                         mode-line-end-spaces))
+  :hook (emacs-startup-hook . mini-modeline-mode))
+
+(leaf rich-minority
+  :straight t
+  :config (setq rm-blacklist nil
+                rm-whitelist "FlyC:\\|lsp")
+  :hook (emacs-startup-hook . rich-minority-mode))
+#+END_SRC
 ** move-dup
 #+BEGIN_SRC emacs-lisp
 (leaf move-dup
@@ -608,44 +681,6 @@
           (pdf-view-mode :other t)
           (compilation-mode :select nil))))
 #+END_SRC
-** status line
-#+BEGIN_SRC emacs-lisp
-(setq line-number-mode t
-      column-number-mode t)
-
-(leaf smart-mode-line
-  :straight t
-  :config (setq sml/no-confirm-load-theme t
-                sml/theme 'dark
-                sml/name-width 30)
-  :hook (emacs-startup-hook . sml/setup))
-
-(leaf mini-modeline
-  :straight t
-  :config (setq mini-modeline-truncate-p t
-                mini-modeline-r-format '("%e"
-                                         mode-line-front-space
-                                         mode-line-mule-info
-                                         mode-line-client
-                                         mode-line-modified
-                                         mode-line-remote
-                                         mode-line-frame-identification
-                                         mode-line-buffer-identification
-                                         (vc-mode vc-mode)
-                                         " "
-                                         mode-line-position
-                                         " "
-                                         mode-line-modes
-                                         mode-line-misc-info
-                                         mode-line-end-spaces))
-  :hook (emacs-startup-hook . mini-modeline-mode))
-
-(leaf rich-minority
-  :straight t
-  :config (setq rm-blacklist nil
-                rm-whitelist "FlyC:\\|lsp")
-  :hook (emacs-startup-hook . rich-minority-mode))
-#+END_SRC
 ** switch-windows
 #+BEGIN_SRC emacs-lisp
   (leaf switch-window
@@ -655,6 +690,12 @@
            ("C-x 2" . switch-window-then-split-below)
            ("C-x 3" . switch-window-then-split-right)
            ("C-x 0" . switch-window-then-delete)))
+#+END_SRC
+** vi-tilde-fringe
+#+BEGIN_SRC emacs-lisp
+(leaf vi-tilde-fringe
+  :straight t
+  :hook (emacs-startup-hook . global-vi-tilde-fringe-mode))
 #+END_SRC
 * Prog
 ** company
@@ -821,12 +862,16 @@
   (setq flycheck-indication-mode 'right-fringe)
 :hook (after-init . global-flycheck-mode))
 #+END_SRC
-** format-all
+** format
 #+BEGIN_SRC emacs-lisp
 (leaf format-all
   :straight t
   :bind (prog-mode-map
          ("<M-f8>" . format-all-buffer)))
+
+(leaf reformatter
+  :straight t
+  :require t)
 #+END_SRC
 ** highlight-indent-guides
 #+BEGIN_SRC emacs-lisp
@@ -949,33 +994,6 @@
   :after flycheck
   :config (flycheck-plantuml-setup))
 #+END_SRC
-** prog-mode
-#+BEGIN_SRC emacs-lisp
-(leaf prog-mode
-  :config
-  (setq prettify-symbols-unprettify-at-point 'right-edge)
-  (global-prettify-symbols-mode t)
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                    '(("in" . ?\u2208)
-                      ("IN" . ?\u2208)
-                      ("not in" . ?\u2209)
-                      ("NOT IN" . ?\u2209)
-                      ("not" . ?\u00AC)
-                      ("NOT" . ?\u00AC)
-                      ("==" . ?\u2261)
-                      ("!=" . ?\u2260)
-                      (">=" . ?\u2265)
-                      ("<=" . ?\u2264)))))
-  (defun indicate-buffer-boundaries-left ()
-    (setq indicate-buffer-boundaries 'left))
-  (add-hook 'prog-mode-hook #'indicate-buffer-boundaries-left)
-  (add-hook 'prog-common-hook
-            (lambda ()
-              (font-lock-add-keywords nil
-                                      '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t))))))
-#+END_SRC
 ** projectile
 #+BEGIN_SRC emacs-lisp
 (leaf projectile
@@ -994,13 +1012,13 @@
   :straight t
   :bind* ("C-x b" . conf:switch-to-project-buffer-if-in-project)
   :bind (("C-x r R" . counsel-projectile-rg)
-         ("<C-tab>" . counsel-projectile-switch-project))
+        ("<C-tab>" . counsel-projectile-switch-project))
   :config
   (defun conf:switch-to-project-buffer-if-in-project (arg)
     "Custom switch to buffer.
-    With universal argument ARG or when not in project, rely on
-    `ivy-switch-buffer'.
-    Otherwise, use `counsel-projectile-switch-to-buffer'."
+      With universal argument ARG or when not in project, rely on
+      `ivy-switch-buffer'.
+      Otherwise, use `counsel-projectile-switch-to-buffer'."
     (interactive "P")
     (if (or arg
             (not (projectile-project-p)))
@@ -1068,7 +1086,6 @@
 (add-hook 'python-mode-hook
           '(lambda ()
              (when (empty-buffer?) (python-template))))
-
 #+END_SRC
 *** lsp-python
 #+BEGIN_SRC emacs-lisp
@@ -1085,8 +1102,14 @@
   :straight t
   :hook (python-mode-hook . lsp-deferred))
 #+END_SRC
-*** pyenv
+*** venv
 #+BEGIN_SRC emacs-lisp
+(leaf auto-virtualenv
+  :straight t
+  :hook (python-mode-hook . auto-virtualenv-set-virtualenv))
+#+END_SRC
+*** pyenv
+#+BEGIN_SRC emacs-lisp :tangle no
 (leaf pyenv-mode
   :straight t
   :config
@@ -1923,10 +1946,10 @@
     ;; more sane emphasis regex to export to HTML as substitute of Markdown
     ;;(org-set-emph-re 'org-emphasis-regexp-components
     ;;                 '(" \t({"
-	;;		"- \t.,:!?;)}[:multibyte:]"
-	;;		" \t\r\n,"
-	;;		"."
-	;;		1))
+    ;;		"- \t.,:!?;)}[:multibyte:]"
+    ;;		" \t\r\n,"
+    ;;		"."
+    ;;		1))
 
     ;; highlight code blocks syntax in PDF export
     ;; Include the latex-exporter
@@ -2107,7 +2130,7 @@
         (setq conf:writegood-mode-state writegood-mode)
         (writegood-mode -1))
       (flyspell-mode -1)
-      (hide-mode-line-mode)
+      ;;(hide-mode-line-mode)
       (org-toggle-inline-images)
       (default-text-scale-increment conf:org-tree-slide-text-scale))
 
@@ -2119,7 +2142,7 @@
         (writegood-mode 1)
         (setq conf:writegood-mode-state nil))
       (flyspell-mode 1)
-      (hide-mode-line-mode -1)
+      ;;(hide-mode-line-mode -1)
       (org-remove-inline-images)
       (default-text-scale-reset))
 
@@ -2236,7 +2259,7 @@
 
 (leaf org-pdfview
   :straight t
-  :after org)
+  :require t)
 #+END_SRC
 ** pkgbuil
 #+BEGIN_SRC emacs-lisp
@@ -2325,7 +2348,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "xst" "-n" "ETmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "ETmux" "-e" "tmx")))
 #+END_SRC
 ** ssh
 #+BEGIN_SRC emacs-lisp
@@ -2379,6 +2402,12 @@
 (leaf vlf-setup
   :straight vlf
   :init (setq vlf-application 'dont-ask))
+#+END_SRC
+** vpn
+#+BEGIN_SRC emacs-lisp
+(leaf ovpn-mode
+  :straight t
+  :setq (ovpn-mode-base-directory . "/media/data/Project/vpn"))
 #+END_SRC
 ** which-key
 #+BEGIN_SRC emacs-lisp

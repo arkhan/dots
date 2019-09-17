@@ -24,8 +24,8 @@ bspc config ignore_ewmh_focus true
 bspc config external_rules_command ~/.config/bspwm/external.sh
 
 # Workspaces
-bspc rule -a 'Firefox:Navigator' follow=on desktop=^1
-bspc rule -a 'Firefox Developer Edition:Navigator' follow=on desktop=^1
+bspc rule -a firefox follow=on desktop=^1
+bspc rule -a firefoxdeveloperedition follow=on desktop=^1
 bspc rule -a Qutebrowser follow=on desktop=^1
 bspc rule -a Iceweasel follow=on desktop=^1
 bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
