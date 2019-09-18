@@ -322,53 +322,68 @@
 #+END_SRC
 ** font
 #+BEGIN_SRC emacs-lisp
-(leaf pcache
-  :straight t
-  :init
-  (setq pcache-directory (let ((dir (concat conf:cache-dir "pcache/")))
-                           (make-directory dir t)
-                           dir)))
+  (leaf pcache
+    :straight t
+    :init
+    (setq pcache-directory (let ((dir (concat conf:cache-dir "pcache/")))
+                             (make-directory dir t)
+                             dir)))
 
-(leaf unicode-fonts
-  :straight t
-  :init (unicode-fonts-setup))
+  (leaf unicode-fonts
+    :straight t
+    :init (unicode-fonts-setup))
 
-(global-font-lock-mode 1)
-(set-face-attribute 'default nil
-                    :font "Fira Emacs Retina"
-                    :height 115
-                    :slant 'normal
-                    :weight 'normal
-                    :width 'normal)
+  (global-font-lock-mode 1)
+  (set-face-attribute 'default nil
+                      :font "Fira Code Retina"
+                      :height 115
+                      :slant 'normal
+                      :weight 'normal
+                      :width 'normal)
 
-(defun fira-code-emacs-build (package &rest _)
-    (when (string= package "fira-code")
-      (let ((default-directory (straight--repos-dir "fira-code-emacs")))
-        (straight--get-call "make"))))
+  (defun fira-code-emacs-build (package &rest _)
+      (when (string= package "fira-code")
+        (let ((default-directory (straight--repos-dir "fira-code-emacs")))
+          (straight--get-call "make"))))
 
-(add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
+  (add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
 
-(leaf fira-code
-  :straight (fira-code
-             :type git
-             :host github
-             :repo "johnw42/fira-code-emacs")
-  :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
-  :hook (prog-mode-hook . fira-code-mode))
+  (leaf fira-code
+    :straight (fira-code
+               :type git
+               :host github
+               :repo "johnw42/fira-code-emacs")
+    :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
+    :hook ((prog-mode-hook org-mode-hook) . fira-code-mode))
 
-(leaf prog-mode
-  :config
-  :hook ((prog-mode-hook . (lambda ()
-                             (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                                   '(("in" . ?\u2208)
-                                     ("IN" . ?\u2208)
-                                     ("not in" . ?\u2209)
-                                     ("NOT IN" . ?\u2209)
-                                     ("not" . ?\u00AC)
-                                     ("NOT" . ?\u00AC)))))
-         (prog-common-hook . (lambda ()
-                               (font-lock-add-keywords nil
-                                                       '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))))
+  (add-hook 'org-mode-hook '(lambda ()
+                               (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                                     '(("#+BEGIN_SRC" . "»")
+                                       ("#+END_SRC" . "«")
+                                       ("#+BEGIN_EXAMPLE" . "»")
+                                       ("#+END_EXAMPLE" . "«")
+                                       ("#+BEGIN_QUOTE" . "»")
+                                       ("#+END_QUOTE" . "«")
+                                       ("#+begin_quote" . "»")
+                                       ("#+end_quote" . "«")
+                                       ("#+begin_example" . "»")
+                                       ("#+end_example" . "«")
+                                       ("#+begin_src" . "»")
+                                       ("#+end_src" . "«")))))
+
+  (add-hook 'prog-mode-hook '(lambda ()
+                               (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                                     '(("in" . ?\u2208)
+                                       ("IN" . ?\u2208)
+                                       ("not in" . ?\u2209)
+                                       ("NOT IN" . ?\u2209)
+                                       ("not" . ?\u00AC)
+                                       ("NOT" . ?\u00AC)))))
+  (add-hook 'prog-common-hook '(lambda ()
+                                 (font-lock-add-keywords
+                                  nil
+                                  '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
+(global-prettify-symbols-mode)
 #+END_SRC
 ** imenu
 #+BEGIN_SRC emacs-lisp
@@ -634,6 +649,11 @@
              :host github
              :repo "arkhan/vibrant-ink-theme")
   :config (load-theme 'vibrant-ink t))
+
+;; (leaf theme-magic
+;;   :straight t
+;;   :require t
+;;   :init (theme-magic-export-theme-mode))
 #+END_SRC
 ** sublimity
 #+BEGIN_SRC emacs-lisp
@@ -826,19 +846,19 @@
   :bind (("C-c e n" . flycheck-next-error)
          ("C-c e p" . flycheck-previous-error))
   :init
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-arrow
     (vector #b00000000
             #b00000000
             #b00000000
             #b00000000
             #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b11111111
-            #b11111111
-            #b00000000
-            #b00000000
+            #b00011001
+            #b00110110
+            #b01101100
+            #b11011000
+            #b01101100
+            #b00110110
+            #b00011001
             #b00000000
             #b00000000
             #b00000000
@@ -847,17 +867,17 @@
   (flycheck-define-error-level 'error
     :severity 2
     :overlay-category 'flycheck-error-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-bitmap 'flycheck-fringe-bitmap-arrow
     :fringe-face 'flycheck-fringe-error)
   (flycheck-define-error-level 'warning
     :severity 1
     :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-bitmap 'flycheck-fringe-bitmap-arrow
     :fringe-face 'flycheck-fringe-warning)
   (flycheck-define-error-level 'info
     :severity 0
     :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-bitmap 'flycheck-fringe-bitmap-arrow
     :fringe-face 'flycheck-fringe-info)
   (setq flycheck-indication-mode 'right-fringe)
 :hook (after-init . global-flycheck-mode))
@@ -878,11 +898,7 @@
 (leaf highlight-indent-guides
   :straight t
   :diminish highlight-indent-guides-mode
-  :config (setq highlight-indent-guides-method 'character
-                highlight-indent-guides-responsive 'stack
-                highlight-indent-guides-auto-odd-face-perc 15
-                highlight-indent-guides-auto-even-face-perc 15
-                highlight-indent-guides-auto-character-face-perc 20)
+  :config (setq highlight-indent-guides-method 'character)
   :hook (prog-mode-hook . highlight-indent-guides-mode))
 #+END_SRC
 ** jinja
@@ -1090,10 +1106,6 @@
 *** lsp-python
 #+BEGIN_SRC emacs-lisp
 (leaf lsp-python-ms
-  ;; :straight (lsp-python-ms
-  ;;            :type git
-  ;;            :host github
-  ;;            :repo "andrew-christianson/lsp-python-ms")
   :straight t
   :require t
   :init (setq lsp-python-ms-dir (concat conf:cache-dir "mspyls/")))
@@ -1471,7 +1483,9 @@
         cfw:display-calendar-holidays nil
         calendar-week-start-day 1))
 
-(leaf calfw-org :straight t)
+(leaf calfw-org
+  :straight t
+  :require t)
 #+END_SRC
 ** comment-dwim-2
 #+BEGIN_SRC emacs-lisp
@@ -1668,14 +1682,17 @@
   (if (display-graphic-p)
       (leaf git-gutter-fringe
         :straight t
-        :require t))
+        :require t
+        :config
+        (define-fringe-bitmap 'git-gutter-fr:added [224]
+          nil nil '(center repeated))
+        (define-fringe-bitmap 'git-gutter-fr:modified [224]
+          nil nil '(center repeated))
+        (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240]
+          nil nil 'bottom)))
   (global-git-gutter-mode t)
   (setq indicate-empty-lines nil)
-  (setq git-gutter:lighter ""
-        git-gutter:handled-backends '(git hg bzr svn))
-  (set-face-foreground 'git-gutter:modified "purple")
-  (set-face-foreground 'git-gutter:added "green")
-  (set-face-foreground 'git-gutter:deleted "red"))
+  (setq git-gutter:handled-backends '(git hg bzr svn)))
 
 (leaf gitconfig-mode
   :straight t
