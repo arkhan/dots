@@ -10,6 +10,7 @@ Xft.lcdfilter: lcddefault
 *.charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48,35:48,58:48,63:48,61:48,44:48,38:48,59:48
 *.saveLines: 4096
 *.scrollBar: false
+
 ! XTerm
 xterm*faceName: xft:Fira Code Retina:style=Regular:pixelsize=15
 xterm*dynamicColors: true
@@ -140,23 +141,6 @@ st.imstyle:           root
 ! white
 *.color7: #acada1
 *.color15: #cfd0c2
-
-! *.color0: #282a2e
-! *.color1: #aa0000
-! *.color2: #44aa44
-! *.color3: #aa5500
-! *.color4: #0039aa
-! *.color5: #aa22aa
-! *.color6: #1a92aa
-! *.color7: #aaaaaa
-! *.color8: #373b41
-! *.color9: #ff8787
-! *.color10: #4ce64c
-! *.color11: #ded82c
-! *.color12: #295fcc
-! *.color13: #cc58cc
-! *.color14: #4ccce6
-! *.color15: #ffffff
 
 ! special
 *.foreground: #cfcfc2

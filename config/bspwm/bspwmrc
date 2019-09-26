@@ -62,7 +62,7 @@ xrdb ~/.Xresources &
 # Wallpaper
 [[ -z $(pgrep feh) ]] && feh --bg-fill $HOME/.dots/walls/03.jpg &
 # i3lock Fancy
-[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'Fira-Code-Retina' &
+[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'Fira-Emacs-Retina' &
 # clipboard
 [[ -z $(pgrep clipboard) ]] && ~/.bin/clipboard &
 # panel
