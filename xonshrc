@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os
 import shlex
 from shutil import which
@@ -31,7 +30,7 @@ $AUTO_CD = True
 
 # Default
 $BROWSER = "firefox"
-$TERM = "st-256color"
+$TERM = "screen-256color"
 $EDITOR = '/usr/bin/emacs'
 
 # Encoding

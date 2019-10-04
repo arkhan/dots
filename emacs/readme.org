@@ -327,67 +327,201 @@
 #+END_SRC
 ** font
 #+BEGIN_SRC emacs-lisp
-  (leaf pcache
-    :straight t
-    :init
-    (setq pcache-directory (let ((dir (concat conf:cache-dir "pcache/")))
-                             (make-directory dir t)
-                             dir)))
+(leaf pcache
+  :straight t
+  :init
+  (setq pcache-directory (let ((dir (concat conf:cache-dir "pcache/")))
+                           (make-directory dir t)
+                           dir)))
 
-  (leaf unicode-fonts
-    :straight t
-    :init (unicode-fonts-setup))
+(leaf unicode-fonts
+  :straight t
+  :init (unicode-fonts-setup))
 
-  (global-font-lock-mode 1)
-  (set-face-attribute 'default nil
-                      :font "Fira Emacs Retina"
-                      :height 115
-                      :slant 'normal
-                      :weight 'normal
-                      :width 'normal)
+(global-font-lock-mode 1)
+(set-face-attribute 'default nil
+                    :font "Cascadia Code"
+                    :height 115
+                    :slant 'normal
+                    :weight 'normal
+                    :width 'normal)
 
-  ;; (defun fira-code-emacs-build (package &rest _)
-  ;;   (when (string= package "fira-code")
-  ;;     (let ((default-directory (straight--repos-dir "fira-code-emacs")))
-  ;;       (straight--get-call "make"))))
+;; (defun fira-code-emacs-build (package &rest _)
+;;   (when (string= package "fira-code")
+;;     (let ((default-directory (straight--repos-dir "fira-code-emacs")))
+;;       (straight--get-call "make"))))
 
-  ;; (add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
+;; (add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
 
-  ;; (leaf fira-code
-  ;;   :straight (fira-code
-  ;;              :type git
-  ;;              :host github
-  ;;              :repo "johnw42/fira-code-emacs")
-  ;;   :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
-  ;;   :hook ((prog-mode-hook org-mode-hook) . fira-code-mode))
+;; (leaf fira-code
+;;   :straight (fira-code
+;;              :type git
+;;              :host github
+;;              :repo "johnw42/fira-code-emacs")
+;;   :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
+;;   :hook ((prog-mode-hook org-mode-hook) . fira-code-mode))
 
-  (add-hook 'org-mode-hook '(lambda ()
-                              (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                                    '(("#+BEGIN_SRC" . ?»)
-                                      ("#+END_SRC" . ?«)
-                                      ("#+BEGIN_EXAMPLE" . ?»)
-                                      ("#+END_EXAMPLE" . ?«)
-                                      ("#+BEGIN_QUOTE" . ?»)
-                                      ("#+END_QUOTE" . ?«)
-                                      ("#+begin_quote" . ?»)
-                                      ("#+end_quote" . ?«)
-                                      ("#+begin_example" . ?»)
-                                      ("#+end_example" . ?«)
-                                      ("#+begin_src" . ?»)
-                                      ("#+end_src" . ?«)))))
+;; Fira code
+;; This works when using emacs --daemon + emacsclient
+(add-hook 'after-make-frame-functions (lambda (frame) (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")))
+;; This works when using emacs without server/client
+(set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
+;; I haven't found one statement that makes both of the above situations work, so I use both for now
 
-  (add-hook 'prog-mode-hook '(lambda ()
-                               (mapc (lambda (pair) (push pair prettify-symbols-alist))
-                                     '(("in" . ?\u2208)
-                                       ("IN" . ?\u2208)
-                                       ("not in" . ?\u2209)
-                                       ("NOT IN" . ?\u2209)
-                                       ("not" . ?\u00AC)
-                                       ("NOT" . ?\u00AC)))))
-  (add-hook 'prog-common-hook '(lambda ()
-                                 (font-lock-add-keywords
-                                  nil
-                                  '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
+(defconst fira-code-font-lock-keywords-alist
+  (mapcar (lambda (regex-char-pair)
+            `(,(car regex-char-pair)
+              (0 (prog1 ()
+                   (compose-region (match-beginning 1)
+                                   (match-end 1)
+                                   ;; The first argument to concat is a string containing a literal tab
+                                   ,(concat "	" (list (decode-char 'ucs (cadr regex-char-pair)))))))))
+          '(("\\(www\\)"                   #Xe100)
+            ("[^/]\\(\\*\\*\\)[^/]"        #Xe101)
+            ("\\(\\*\\*\\*\\)"             #Xe102)
+            ("\\(\\*\\*/\\)"               #Xe103)
+            ("\\(\\*>\\)"                  #Xe104)
+            ("[^*]\\(\\*/\\)"              #Xe105)
+            ("\\(\\\\\\\\\\)"              #Xe106)
+            ("\\(\\\\\\\\\\\\\\)"          #Xe107)
+            ("\\({-\\)"                    #Xe108)
+            ("\\(\\[\\]\\)"                #Xe109)
+            ("\\(::\\)"                    #Xe10a)
+            ("\\(:::\\)"                   #Xe10b)
+            ("[^=]\\(:=\\)"                #Xe10c)
+            ("\\(!!\\)"                    #Xe10d)
+            ("\\(!=\\)"                    #Xe10e)
+            ("\\(!==\\)"                   #Xe10f)
+            ("\\(-}\\)"                    #Xe110)
+            ("\\(--\\)"                    #Xe111)
+            ("\\(---\\)"                   #Xe112)
+            ("\\(-->\\)"                   #Xe113)
+            ("[^-]\\(->\\)"                #Xe114)
+            ("\\(->>\\)"                   #Xe115)
+            ("\\(-<\\)"                    #Xe116)
+            ("\\(-<<\\)"                   #Xe117)
+            ("\\(-~\\)"                    #Xe118)
+            ("\\(#{\\)"                    #Xe119)
+            ("\\(#\\[\\)"                  #Xe11a)
+            ("\\(##\\)"                    #Xe11b)
+            ("\\(###\\)"                   #Xe11c)
+            ("\\(####\\)"                  #Xe11d)
+            ("\\(#(\\)"                    #Xe11e)
+            ("\\(#\\?\\)"                  #Xe11f)
+            ("\\(#_\\)"                    #Xe120)
+            ("\\(#_(\\)"                   #Xe121)
+            ("\\(\\.-\\)"                  #Xe122)
+            ("\\(\\.=\\)"                  #Xe123)
+            ("\\(\\.\\.\\)"                #Xe124)
+            ("\\(\\.\\.<\\)"               #Xe125)
+            ("\\(\\.\\.\\.\\)"             #Xe126)
+            ("\\(\\?=\\)"                  #Xe127)
+            ("\\(\\?\\?\\)"                #Xe128)
+            ;; ("\\(;;\\)"                    #Xe892)
+            ;; ("\\(;;\\)"                    #Xe892)
+            ("\\(/\\*\\)"                  #Xe12a)
+            ("\\(/\\*\\*\\)"               #Xe12b)
+            ("\\(/=\\)"                    #Xe12c)
+            ("\\(/==\\)"                   #Xe12d)
+            ("\\(/>\\)"                    #Xe12e)
+            ("\\(//\\)"                    #Xe12f)
+            ("\\(///\\)"                   #Xe130)
+            ("\\(&&\\)"                    #Xe131)
+            ("\\(||\\)"                    #Xe132)
+            ("\\(||=\\)"                   #Xe133)
+            ("[^|]\\(|=\\)"                #Xe134)
+            ("\\(|>\\)"                    #Xe135)
+            ("\\(\\^=\\)"                  #Xe136)
+            ("\\(\\$>\\)"                  #Xe137)
+            ("\\(\\+\\+\\)"                #Xe138)
+            ("\\(\\+\\+\\+\\)"             #Xe139)
+            ("\\(\\+>\\)"                  #Xe13a)
+            ("\\(=:=\\)"                   #Xe13b)
+            ("[^!/]\\(==\\)[^>]"           #Xe13c)
+            ("\\(===\\)"                   #Xe13d)
+            ("\\(==>\\)"                   #Xe13e)
+            ("[^=]\\(=>\\)"                #Xe13f)
+            ("\\(=>>\\)"                   #Xe140)
+            ("\\(<=\\)"                    #Xe141)
+            ("\\(=<<\\)"                   #Xe142)
+            ("\\(=/=\\)"                   #Xe143)
+            ("\\(>-\\)"                    #Xe144)
+            ("\\(>=\\)"                    #Xe145)
+            ("\\(>=>\\)"                   #Xe146)
+            ("[^-=]\\(>>\\)"               #Xe147)
+            ("\\(>>-\\)"                   #Xe148)
+            ("\\(>>=\\)"                   #Xe149)
+            ("\\(>>>\\)"                   #Xe14a)
+            ("\\(<\\*\\)"                  #Xe14b)
+            ("\\(<\\*>\\)"                 #Xe14c)
+            ("\\(<|\\)"                    #Xe14d)
+            ("\\(<|>\\)"                   #Xe14e)
+            ("\\(<\\$\\)"                  #Xe14f)
+            ("\\(<\\$>\\)"                 #Xe150)
+            ("\\(<!--\\)"                  #Xe151)
+            ("\\(<-\\)"                    #Xe152)
+            ("\\(<--\\)"                   #Xe153)
+            ("\\(<->\\)"                   #Xe154)
+            ("\\(<\\+\\)"                  #Xe155)
+            ("\\(<\\+>\\)"                 #Xe156)
+            ("\\(<=\\)"                    #Xe157)
+            ("\\(<==\\)"                   #Xe158)
+            ("\\(<=>\\)"                   #Xe159)
+            ("\\(<=<\\)"                   #Xe15a)
+            ("\\(<>\\)"                    #Xe15b)
+            ("[^-=]\\(<<\\)"               #Xe15c)
+            ("\\(<<-\\)"                   #Xe15d)
+            ("\\(<<=\\)"                   #Xe15e)
+            ("\\(<<<\\)"                   #Xe15f)
+            ("\\(<~\\)"                    #Xe160)
+            ("\\(<~~\\)"                   #Xe161)
+            ("\\(</\\)"                    #Xe162)
+            ("\\(</>\\)"                   #Xe163)
+            ("\\(~@\\)"                    #Xe164)
+            ("\\(~-\\)"                    #Xe165)
+            ("\\(~=\\)"                    #Xe166)
+            ("\\(~>\\)"                    #Xe167)
+            ("[^<]\\(~~\\)"                #Xe168)
+            ("\\(~~>\\)"                   #Xe169)
+            ("\\(%%\\)"                    #Xe16a)
+            ;; ("\\(x\\)"                   #Xe16b) This ended up being hard to do properly so i'm leaving it out.
+            ("[^:=]\\(:\\)[^:=]"           #Xe16c)
+            ("[^\\+<>]\\(\\+\\)[^\\+<>]"   #Xe16d)
+            ("[^\\*/<>]\\(\\*\\)[^\\*/<>]" #Xe16f))))
+
+(defun add-fira-code-symbol-keywords ()
+  (font-lock-add-keywords nil fira-code-font-lock-keywords-alist))
+
+(add-hook 'prog-mode-hook
+          #'add-fira-code-symbol-keywords)
+
+(add-hook 'org-mode-hook '(lambda ()
+                            (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                                  '(("#+BEGIN_SRC" . ?»)
+                                    ("#+END_SRC" . ?«)
+                                    ("#+BEGIN_EXAMPLE" . ?»)
+                                    ("#+END_EXAMPLE" . ?«)
+                                    ("#+BEGIN_QUOTE" . ?»)
+                                    ("#+END_QUOTE" . ?«)
+                                    ("#+begin_quote" . ?»)
+                                    ("#+end_quote" . ?«)
+                                    ("#+begin_example" . ?»)
+                                    ("#+end_example" . ?«)
+                                    ("#+begin_src" . ?»)
+                                    ("#+end_src" . ?«)))))
+
+(add-hook 'prog-mode-hook '(lambda ()
+                             (mapc (lambda (pair) (push pair prettify-symbols-alist))
+                                   '(("in" . ?\u2208)
+                                     ("IN" . ?\u2208)
+                                     ("not in" . ?\u2209)
+                                     ("NOT IN" . ?\u2209)
+                                     ("not" . ?\u00AC)
+                                     ("NOT" . ?\u00AC)))))
+(add-hook 'prog-common-hook '(lambda ()
+                               (font-lock-add-keywords
+                                nil
+                                '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
 (global-prettify-symbols-mode)
 #+END_SRC
 ** imenu
@@ -570,7 +704,7 @@
 (leaf rich-minority
   :straight t
   :config (setq rm-blacklist nil
-                rm-whitelist "FlyC:\\|lsp")
+                rm-whitelist "Flymake\\|lsp")
   :hook (emacs-startup-hook . rich-minority-mode))
 #+END_SRC
 ** move-dup
@@ -838,7 +972,7 @@
   (= (buffer-end 1) (buffer-end -1)))
 #+END_SRC
 ** flycheck
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
 (leaf flycheck
   :straight t
   :leaf-defer nil
@@ -881,6 +1015,21 @@
   (setq flycheck-indication-mode 'right-fringe)
 :hook (after-init . global-flycheck-mode))
 #+END_SRC
+** flymake
+#+BEGIN_SRC emacs-lisp
+(leaf flymake
+  :require t
+  :setq (flymake-fringe-indicator-position . 'right-fringe))
+
+(leaf flymake-diagnostic-at-point
+  :straight (flymake-diagnostic-at-point
+             :type git
+             :host github
+             :repo "waymondo/flymake-diagnostic-at-point")
+  :after flymake
+  :setq (flymake-diagnostic-at-point-display-diagnostic-function . 'flymake-diagnostic-at-point-display-posframe)
+  :hook (flymake-mode-hook . flymake-diagnostic-at-point-mode))
+#+END_SRC
 ** format
 #+BEGIN_SRC emacs-lisp
 (leaf format-all
@@ -917,7 +1066,7 @@
         lsp-inhibit-message t
         lsp-message-project-root-warning t
         lsp-auto-guess-root t
-        lsp-prefer-flymake nil
+        lsp-prefer-flymake t
         lsp-session-file (concat conf:cache-dir "lsp-session"))
   :hook (lsp-after-open-hook . lsp-enable-imenu))
 
@@ -1003,11 +1152,6 @@
 (leaf plantuml-mode
   :straight t
   :config (setq plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"))
-
-(leaf flycheck-plantuml
-  :straight t
-  :after flycheck
-  :config (flycheck-plantuml-setup))
 #+END_SRC
 ** projectile
 #+BEGIN_SRC emacs-lisp
@@ -1021,7 +1165,7 @@
         projectile-indexing-method 'alien
         projectile-enable-caching t
         projectile-completion-system 'ivy)
-  (projectile-mode))
+  (projectile-global-mode))
 
 (leaf counsel-projectile
   :straight t
@@ -1179,25 +1323,10 @@
 #+END_SRC
 ** sql
 #+BEGIN_SRC emacs-lisp
-(leaf edbi-database-url
-  :straight t)
-
-(leaf edbi-minor-mode
-  :straight t
-  :hook (sql-mode-hook . edbi-minor-mode))
-
-(leaf company-edbi
-  :straight t
-  :init
-  (defun cfg:edbi-mode-hook()
-    (add-to-list 'company-backends 'company-edbi))
-  :hook (edbi:sql-mode-hook . cfg:edbi-mode-hook))
-
 (leaf sqlup-mode
   :straight t
   :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
   :hook ((sql-mode-hook . sqlup-mode)
-         (edbi:sql-mode-hook . sqlup-mode)
          (sql-interactive-mode-hook . sqlup-mode)))
 
 (leaf sql-indent
@@ -1290,66 +1419,66 @@
 #+END_SRC
 ** xml
 #+BEGIN_SRC emacs-lisp
-  (defun nxml-template ()
-    (interactive)
-    (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
+(defun nxml-template ()
+  (interactive)
+  (insert "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n"))
 
-  (add-hook 'nxml-mode-hook
-            '(lambda () (when (empty-buffer?) (nxml-template))))
+(add-hook 'nxml-mode-hook
+          '(lambda () (when (empty-buffer?) (nxml-template))))
 
-  (leaf nxml-mode
-    :mode (("\\.plist\\'" . nxml-mode)
-           ("\\.rss\\'"   . nxml-mode)
-           ("\\.svg\\'"   . nxml-mode)
-           ("\\.xml\\'"   . nxml-mode)
-           ("\\.xsd\\'"   . nxml-mode)
-           ("\\.xslt\\'"  . nxml-mode)
-           ("\\.pom$"     . nxml-mode))
-    :bind (nxml-mode-map
-           ("C-x f" . pretty-print-xml-buffer))
-    :config
-    (setq nxml-slash-auto-complete-flag t
-                   nxml-auto-insert-xml-declaration-flag t)
-    (add-to-list 'magic-mode-alist '("<\\?xml" . nxml-mode))
-    (mapc
-     (lambda (pair)
-       (if (or (eq (cdr pair) 'xml-mode)
-               (eq (cdr pair) 'sgml-mode))
-           (setcdr pair 'nxml-mode)))
-     auto-mode-alist)
+(leaf nxml-mode
+  :mode (("\\.plist\\'" . nxml-mode)
+         ("\\.rss\\'"   . nxml-mode)
+         ("\\.svg\\'"   . nxml-mode)
+         ("\\.xml\\'"   . nxml-mode)
+         ("\\.xsd\\'"   . nxml-mode)
+         ("\\.xslt\\'"  . nxml-mode)
+         ("\\.pom$"     . nxml-mode))
+  :bind (nxml-mode-map
+         ("C-x f" . pretty-print-xml-buffer))
+  :config
+  (setq nxml-slash-auto-complete-flag t
+        nxml-auto-insert-xml-declaration-flag t)
+  (add-to-list 'magic-mode-alist '("<\\?xml" . nxml-mode))
+  (mapc
+   (lambda (pair)
+     (if (or (eq (cdr pair) 'xml-mode)
+             (eq (cdr pair) 'sgml-mode))
+         (setcdr pair 'nxml-mode)))
+   auto-mode-alist)
 
-    ;; https://gist.github.com/DinoChiesa/5489021
-    (defun pretty-print-xml-region (begin end)
-      "Pretty format XML markup in region. You need to have nxml-mode
+  ;; https://gist.github.com/DinoChiesa/5489021
+  (defun pretty-print-xml-region (begin end)
+    "Pretty format XML markup in region. You need to have nxml-mode
       http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
       this. The function inserts linebreaks to separate tags that have
       nothing but whitespace between them. It then indents the markup
       by using nxml's indentation rules."
-      (interactive "r")
-      (save-excursion
-        (nxml-mode)
-        ;; split <foo><bar> or </foo><bar>, but not <foo></foo>
-        (goto-char begin)
-        (while (search-forward-regexp ">[ \t]*<[^/]" end t)
-          (backward-char 2) (insert "\n") (incf end))
-        ;; split <foo/></foo> and </foo></foo>
-        (goto-char begin)
-        (while (search-forward-regexp "<.*?/.*?>[ \t]*<" end t)
-          (backward-char) (insert "\n") (incf end))
-        ;; put xml namespace decls on newline
-        (goto-char begin)
-        (while (search-forward-regexp "\\(<\\([a-zA-Z][-:A-Za-z0-9]*\\)\\|['\"]\\) \\(xmlns[=:]\\)" end t)
-          (goto-char (match-end 0))
-          (backward-char 6) (insert "\n") (incf end))
-        (indent-region begin end nil)
-        (normal-mode))
-      (message "All indented!"))
+    (interactive "r")
+    (save-excursion
+      (nxml-mode)
+      ;; split <foo><bar> or </foo><bar>, but not <foo></foo>
+      (goto-char begin)
+      (while (search-forward-regexp ">[ \t]*<[^/]" end t)
+        (backward-char 2) (insert "\n") (incf end))
+      ;; split <foo/></foo> and </foo></foo>
+      (goto-char begin)
+      (while (search-forward-regexp "<.*?/.*?>[ \t]*<" end t)
+        (backward-char) (insert "\n") (incf end))
+      ;; put xml namespace decls on newline
+      (goto-char begin)
+      (while (search-forward-regexp "\\(<\\([a-zA-Z][-:A-Za-z0-9]*\\)\\|['\"]\\) \\(xmlns[=:]\\)" end t)
+        (goto-char (match-end 0))
+        (backward-char 6) (insert "\n") (incf end))
+      (indent-region begin end nil)
+      (normal-mode))
+    (message "All indented!"))
 
 
-    (defun pretty-print-xml-buffer ()
-      "pretty print the XML in a buffer."
-      (interactive)
-      (pretty-print-xml-region (point-min) (point-max))))
+  (defun pretty-print-xml-buffer ()
+    "pretty print the XML in a buffer."
+    (interactive)
+    (pretty-print-xml-region (point-min) (point-max))))
 #+END_SRC
 ** yaml
 #+BEGIN_SRC emacs-lisp
@@ -1480,11 +1609,26 @@
   :config
   (setq cfw:org-overwrite-default-keybinding t
         cfw:display-calendar-holidays nil
-        calendar-week-start-day 1))
+        calendar-week-start-day 1
+        cfw:fchar-junction ?╬
+        cfw:fchar-vertical-line ?║
+        cfw:fchar-horizontal-line ?═
+        cfw:fchar-left-junction ?╠
+        cfw:fchar-right-junction ?╣
+        cfw:fchar-top-junction ?╦
+        cfw:fchar-top-left-corner ?╔
+        cfw:fchar-top-right-corner ?╗))
 
 (leaf calfw-org
   :straight t
   :require t)
+#+END_SRC
+** charmap
+#+BEGIN_SRC emacs-lisp
+(leaf charmap
+  :commands charmap
+  :straight t
+  :setq (charmap-text-scale-adjust . 2))
 #+END_SRC
 ** comment-dwim-2
 #+BEGIN_SRC emacs-lisp
@@ -2368,6 +2512,9 @@
   :require t
   :after auth-source
   :init (setq auth-sources '(password-store)))
+
+(leaf ivy-pass
+  :straight t)
 #+END_SRC
 ** pdf-tools
 #+BEGIN_SRC emacs-lisp
@@ -2416,6 +2563,7 @@
 ** po-mode
 #+BEGIN_SRC emacs-lisp
 (leaf po-mode
+  :straight t
   :mode ("\\.po\\'" . po-mode)
   :config
   ;; Fuente: https://www.emacswiki.org/emacs/PoMode
@@ -2569,6 +2717,15 @@
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
         which-key-posframe-border-width 0)
   (which-key-posframe-mode))
+#+END_SRC
+** xonsh
+#+BEGIN_SRC emacs-lisp
+(leaf xonsh-mode
+  :straight (xonsh-mode
+             :type git
+             :host github
+             :repo "salotz/xonsh-mode")
+  :require t)
 #+END_SRC
 ** xrdb
 #+BEGIN_SRC emacs-lisp
