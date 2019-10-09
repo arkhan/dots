@@ -340,7 +340,7 @@
 
 (global-font-lock-mode 1)
 (set-face-attribute 'default nil
-                    :font "Cascadia Code"
+                    :font "Cascadia Emacs"
                     :height 115
                     :slant 'normal
                     :weight 'normal
@@ -1106,6 +1106,13 @@
   :init
   (setq company-lsp-async t)
   (push '(company-lsp :with company-yasnippet) company-backends))
+
+(leaf lsp-ivy
+  :straight (lsp-ivy
+             :type git
+             :host github
+             :repo "emacs-lsp/lsp-ivy")
+  :require t)
 #+END_SRC
 ** makefile
 #+BEGIN_SRC emacs-lisp
@@ -2147,6 +2154,15 @@
   :straight t
   :after mu4e
   :config (mu4e-maildirs-extension))
+
+;; (leaf mu4e-conversation
+;;   :if (executable-find "mu")
+;;   :straight t
+;;   :after mu4e
+;;   :require t
+;;   :config
+;;   (setq mu4e-conversation-print-function 'mu4e-conversation-print-tree)
+;;   (global-mu4e-conversation-mode))
 #+END_SRC
 ** nginx
 #+BEGIN_SRC emacs-lisp
@@ -2724,7 +2740,7 @@
   :straight (xonsh-mode
              :type git
              :host github
-             :repo "salotz/xonsh-mode")
+             :repo "seanfarley/xonsh-mode")
   :require t)
 #+END_SRC
 ** xrdb
