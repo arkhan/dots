@@ -126,6 +126,7 @@ profiles:
     - d_bspwm
     - d_doom
     - d_dunst
+    - d_emacs
     - d_i3
     - d_mpd
     - d_networkmanager-dmenu

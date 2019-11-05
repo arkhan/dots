@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import os
 import shlex
 from shutil import which
@@ -32,6 +34,9 @@ $AUTO_CD = True
 $BROWSER = "firefox"
 $TERM = "screen-256color"
 $EDITOR = '/usr/bin/emacs'
+
+# $GDK_SCALE = 2
+# $GDK_DPI_SCALE = 0.5
 
 # Encoding
 $LANG = "es_EC.UTF-8"
@@ -72,7 +77,7 @@ def pyenv_prompt():
 
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
-$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} %{NO_COLOR} "
+$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} >{NO_COLOR} "
 $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 
 # Aliases (yeah... no shit, kid)

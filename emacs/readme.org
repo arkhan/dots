@@ -125,8 +125,20 @@
   "If the current buffer is 'readme.org' the code-blocks are tangled."
   (when (string= buffer-file-name (file-truename (concat user-emacs-directory "readme.org")))
     (let ((prog-mode-hook nil))
-      (async-shell-command "/usr/bin/sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\""))))
+      (async-shell-command "/usr/bin/sh -c \"/usr/bin/emacs ~/.emacs.d/readme.org --batch --eval='(org-babel-tangle)'\"" "*Messages*"))))
 (add-hook 'after-save-hook 'tangle-init-async)
+
+(defun straight-async-update ()
+  (interactive)
+  (async-start
+   (straight-x-pull-all)
+   (lambda (result)
+     (message "straight-x-pull finished with %s" result)))
+
+  (async-start
+   (straight-rebuild-all)
+   (lambda (result)
+     (message "straight-rebuild-all finished with %s" result))))
 #+END_SRC
 ** abbrev
 #+BEGIN_SRC emacs-lisp
@@ -241,7 +253,7 @@
   :require t
   :config
   (setq tramp-default-method "scp"
-        tramp-encoding-shell "/bin/bash"
+        ;tramp-encoding-shell "/bin/bash"
         tramp-persistency-file-name (concat conf:cache-dir "tramp")
         tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
         tramp-debug-buffer nil
@@ -325,6 +337,25 @@
   :diminish disable-mouse-global-mode
   :config (global-disable-mouse-mode))
 #+END_SRC
+** dired
+#+BEGIN_SRC emacs-lisp
+(leaf dired-sidebar
+  :straight t
+  :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+  :commands (dired-sidebar-toggle-sidebar)
+  :init
+  (add-hook 'dired-sidebar-mode-hook
+            (lambda ()
+              (unless (file-remote-p default-directory)
+                (auto-revert-mode))))
+  :config
+  (push 'toggle-window-split dired-sidebar-toggle-hidden-commands)
+  (push 'rotate-windows dired-sidebar-toggle-hidden-commands)
+
+  (setq dired-sidebar-subtree-line-prefix "__")
+  (setq dired-sidebar-use-term-integration t)
+  (setq dired-sidebar-use-custom-font t))
+#+END_SRC
 ** font
 #+BEGIN_SRC emacs-lisp
 (leaf pcache
@@ -346,154 +377,49 @@
                     :weight 'normal
                     :width 'normal)
 
-;; (defun fira-code-emacs-build (package &rest _)
-;;   (when (string= package "fira-code")
-;;     (let ((default-directory (straight--repos-dir "fira-code-emacs")))
-;;       (straight--get-call "make"))))
+(leaf composite
+  :leaf-defer nil
+  :config
+  (dolist (hook `(ediff-mode-hook
+                  mu4e-headers-mode-hook
+                  org-mode-hook
+                  package-menu-mode-hook))
+    (add-hook hook (lambda () (setq-local auto-composition-mode nil))))
 
-;; (add-hook 'straight-use-package-pre-build-functions #'fira-code-emacs-build)
-
-;; (leaf fira-code
-;;   :straight (fira-code
-;;              :type git
-;;              :host github
-;;              :repo "johnw42/fira-code-emacs")
-;;   :setq (fira-code-compose-predicate . 'prettify-symbols-default-compose-p)
-;;   :hook ((prog-mode-hook org-mode-hook) . fira-code-mode))
-
-;; Fira code
-;; This works when using emacs --daemon + emacsclient
-(add-hook 'after-make-frame-functions (lambda (frame) (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")))
-;; This works when using emacs without server/client
-(set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol")
-;; I haven't found one statement that makes both of the above situations work, so I use both for now
-
-(defconst fira-code-font-lock-keywords-alist
-  (mapcar (lambda (regex-char-pair)
-            `(,(car regex-char-pair)
-              (0 (prog1 ()
-                   (compose-region (match-beginning 1)
-                                   (match-end 1)
-                                   ;; The first argument to concat is a string containing a literal tab
-                                   ,(concat "	" (list (decode-char 'ucs (cadr regex-char-pair)))))))))
-          '(("\\(www\\)"                   #Xe100)
-            ("[^/]\\(\\*\\*\\)[^/]"        #Xe101)
-            ("\\(\\*\\*\\*\\)"             #Xe102)
-            ("\\(\\*\\*/\\)"               #Xe103)
-            ("\\(\\*>\\)"                  #Xe104)
-            ("[^*]\\(\\*/\\)"              #Xe105)
-            ("\\(\\\\\\\\\\)"              #Xe106)
-            ("\\(\\\\\\\\\\\\\\)"          #Xe107)
-            ("\\({-\\)"                    #Xe108)
-            ("\\(\\[\\]\\)"                #Xe109)
-            ("\\(::\\)"                    #Xe10a)
-            ("\\(:::\\)"                   #Xe10b)
-            ("[^=]\\(:=\\)"                #Xe10c)
-            ("\\(!!\\)"                    #Xe10d)
-            ("\\(!=\\)"                    #Xe10e)
-            ("\\(!==\\)"                   #Xe10f)
-            ("\\(-}\\)"                    #Xe110)
-            ("\\(--\\)"                    #Xe111)
-            ("\\(---\\)"                   #Xe112)
-            ("\\(-->\\)"                   #Xe113)
-            ("[^-]\\(->\\)"                #Xe114)
-            ("\\(->>\\)"                   #Xe115)
-            ("\\(-<\\)"                    #Xe116)
-            ("\\(-<<\\)"                   #Xe117)
-            ("\\(-~\\)"                    #Xe118)
-            ("\\(#{\\)"                    #Xe119)
-            ("\\(#\\[\\)"                  #Xe11a)
-            ("\\(##\\)"                    #Xe11b)
-            ("\\(###\\)"                   #Xe11c)
-            ("\\(####\\)"                  #Xe11d)
-            ("\\(#(\\)"                    #Xe11e)
-            ("\\(#\\?\\)"                  #Xe11f)
-            ("\\(#_\\)"                    #Xe120)
-            ("\\(#_(\\)"                   #Xe121)
-            ("\\(\\.-\\)"                  #Xe122)
-            ("\\(\\.=\\)"                  #Xe123)
-            ("\\(\\.\\.\\)"                #Xe124)
-            ("\\(\\.\\.<\\)"               #Xe125)
-            ("\\(\\.\\.\\.\\)"             #Xe126)
-            ("\\(\\?=\\)"                  #Xe127)
-            ("\\(\\?\\?\\)"                #Xe128)
-            ;; ("\\(;;\\)"                    #Xe892)
-            ;; ("\\(;;\\)"                    #Xe892)
-            ("\\(/\\*\\)"                  #Xe12a)
-            ("\\(/\\*\\*\\)"               #Xe12b)
-            ("\\(/=\\)"                    #Xe12c)
-            ("\\(/==\\)"                   #Xe12d)
-            ("\\(/>\\)"                    #Xe12e)
-            ("\\(//\\)"                    #Xe12f)
-            ("\\(///\\)"                   #Xe130)
-            ("\\(&&\\)"                    #Xe131)
-            ("\\(||\\)"                    #Xe132)
-            ("\\(||=\\)"                   #Xe133)
-            ("[^|]\\(|=\\)"                #Xe134)
-            ("\\(|>\\)"                    #Xe135)
-            ("\\(\\^=\\)"                  #Xe136)
-            ("\\(\\$>\\)"                  #Xe137)
-            ("\\(\\+\\+\\)"                #Xe138)
-            ("\\(\\+\\+\\+\\)"             #Xe139)
-            ("\\(\\+>\\)"                  #Xe13a)
-            ("\\(=:=\\)"                   #Xe13b)
-            ("[^!/]\\(==\\)[^>]"           #Xe13c)
-            ("\\(===\\)"                   #Xe13d)
-            ("\\(==>\\)"                   #Xe13e)
-            ("[^=]\\(=>\\)"                #Xe13f)
-            ("\\(=>>\\)"                   #Xe140)
-            ("\\(<=\\)"                    #Xe141)
-            ("\\(=<<\\)"                   #Xe142)
-            ("\\(=/=\\)"                   #Xe143)
-            ("\\(>-\\)"                    #Xe144)
-            ("\\(>=\\)"                    #Xe145)
-            ("\\(>=>\\)"                   #Xe146)
-            ("[^-=]\\(>>\\)"               #Xe147)
-            ("\\(>>-\\)"                   #Xe148)
-            ("\\(>>=\\)"                   #Xe149)
-            ("\\(>>>\\)"                   #Xe14a)
-            ("\\(<\\*\\)"                  #Xe14b)
-            ("\\(<\\*>\\)"                 #Xe14c)
-            ("\\(<|\\)"                    #Xe14d)
-            ("\\(<|>\\)"                   #Xe14e)
-            ("\\(<\\$\\)"                  #Xe14f)
-            ("\\(<\\$>\\)"                 #Xe150)
-            ("\\(<!--\\)"                  #Xe151)
-            ("\\(<-\\)"                    #Xe152)
-            ("\\(<--\\)"                   #Xe153)
-            ("\\(<->\\)"                   #Xe154)
-            ("\\(<\\+\\)"                  #Xe155)
-            ("\\(<\\+>\\)"                 #Xe156)
-            ("\\(<=\\)"                    #Xe157)
-            ("\\(<==\\)"                   #Xe158)
-            ("\\(<=>\\)"                   #Xe159)
-            ("\\(<=<\\)"                   #Xe15a)
-            ("\\(<>\\)"                    #Xe15b)
-            ("[^-=]\\(<<\\)"               #Xe15c)
-            ("\\(<<-\\)"                   #Xe15d)
-            ("\\(<<=\\)"                   #Xe15e)
-            ("\\(<<<\\)"                   #Xe15f)
-            ("\\(<~\\)"                    #Xe160)
-            ("\\(<~~\\)"                   #Xe161)
-            ("\\(</\\)"                    #Xe162)
-            ("\\(</>\\)"                   #Xe163)
-            ("\\(~@\\)"                    #Xe164)
-            ("\\(~-\\)"                    #Xe165)
-            ("\\(~=\\)"                    #Xe166)
-            ("\\(~>\\)"                    #Xe167)
-            ("[^<]\\(~~\\)"                #Xe168)
-            ("\\(~~>\\)"                   #Xe169)
-            ("\\(%%\\)"                    #Xe16a)
-            ;; ("\\(x\\)"                   #Xe16b) This ended up being hard to do properly so i'm leaving it out.
-            ("[^:=]\\(:\\)[^:=]"           #Xe16c)
-            ("[^\\+<>]\\(\\+\\)[^\\+<>]"   #Xe16d)
-            ("[^\\*/<>]\\(\\*\\)[^\\*/<>]" #Xe16f))))
-
-(defun add-fira-code-symbol-keywords ()
-  (font-lock-add-keywords nil fira-code-font-lock-keywords-alist))
-
-(add-hook 'prog-mode-hook
-          #'add-fira-code-symbol-keywords)
+  ;; support ligatures, some toned down to prevent hang
+  (when (version<= "27.0" emacs-version)
+    (let ((alist
+           '((33 . ".\\(?:\\(==\\|[!=]\\)[!=]?\\)")
+             (35 . ".\\(?:\\(###?\\|_(\\|[(:=?[_{]\\)[#(:=?[_{]?\\)")
+             (36 . ".\\(?:\\(>\\)>?\\)")
+             (37 . ".\\(?:\\(%\\)%?\\)")
+             (38 . ".\\(?:\\(&\\)&?\\)")
+             (42 . ".\\(?:\\(\\*\\*\\|[*>]\\)[*>]?\\)")
+             ;; (42 . ".\\(?:\\(\\*\\*\\|[*/>]\\).?\\)")
+             (43 . ".\\(?:\\([>]\\)>?\\)")
+             ;; (43 . ".\\(?:\\(\\+\\+\\|[+>]\\).?\\)")
+             (45 . ".\\(?:\\(-[->]\\|<<\\|>>\\|[-<>|~]\\)[-<>|~]?\\)")
+             (46 . ".\\(?:\\(\\.[.<]\\|[-.=]\\)[-.<=]?\\)")
+             (47 . ".\\(?:\\(//\\|==\\|[=>]\\)[/=>]?\\)")
+             ;; (47 . ".\\(?:\\(//\\|==\\|[*/=>]\\).?\\)")
+             (48 . ".\\(?:\\(x[a-fA-F0-9]\\).?\\)")
+             (58 . ".\\(?:\\(::\\|[:<=>]\\)[:<=>]?\\)")
+             (59 . ".\\(?:\\(;\\);?\\)")
+             (60 . ".\\(?:\\(!--\\|\\$>\\|\\*>\\|\\+>\\|-[-<>|]\\|/>\\|<[-<=]\\|=[<>|]\\|==>?\\||>\\||||?\\|~[>~]\\|[$*+/:<=>|~-]\\)[$*+/:<=>|~-]?\\)")
+             (61 . ".\\(?:\\(!=\\|/=\\|:=\\|<<\\|=[=>]\\|>>\\|[=>]\\)[=<>]?\\)")
+             (62 . ".\\(?:\\(->\\|=>\\|>[-=>]\\|[-:=>]\\)[-:=>]?\\)")
+             (63 . ".\\(?:\\([.:=?]\\)[.:=?]?\\)")
+             (91 . ".\\(?:\\(|\\)|?\\)")
+             ;; (92 . ".\\(?:\\([\\n]\\)[\\]?\\)")
+             (94 . ".\\(?:\\(=\\)=?\\)")
+             (95 . ".\\(?:\\(|_\\|[_]\\)_?\\)")
+             (119 . ".\\(?:\\(ww\\)w?\\)")
+             (123 . ".\\(?:\\(|\\).?\\)")
+             (124 . ".\\(?:\\(->\\|=>\\||[-=>]\\||||*>\\|[]=>|}-]\\).?\\)")
+             (126 . ".\\(?:\\(~>\\|[-=>@~]\\).?\\)"))))
+      (dolist (char-regexp alist)
+        (set-char-table-range composition-function-table (car char-regexp)
+                              `([,(cdr char-regexp) 0 font-shape-gstring]))))))
 
 (add-hook 'org-mode-hook '(lambda ()
                             (mapc (lambda (pair) (push pair prettify-symbols-alist))
@@ -582,27 +508,27 @@
   :after ivy
   :init (ivy-prescient-mode))
 
-(leaf ivy-posframe
-  :straight t
-  :after ivy
-  :diminish ivy-posframe-mode
-  :init
-  (setq ivy-posframe-hide-minibuffer t
-        ivy-fixed-height-minibuffer nil
-        ivy-posframe-parameters `((min-width . ,(window-width))
-                                  (min-height . ,ivy-height)
-                                  (internal-border-width . 0))
-        ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
-  :config (ivy-posframe-mode))
+;; (leaf ivy-posframe
+;;   :straight t
+;;   :after ivy
+;;   :diminish ivy-posframe-mode
+;;   :init
+;;   (setq ivy-posframe-hide-minibuffer t
+;;         ivy-fixed-height-minibuffer nil
+;;         ivy-posframe-parameters `((min-width . ,(window-width))
+;;                                   (min-height . ,ivy-height)
+;;                                   (internal-border-width . 0))
+;;         ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
+;;   :config (ivy-posframe-mode))
 
-(leaf ivy-explorer
-  :straight t
-  :diminish ivy-explorer-mode
-  :after ivy
-  :init
-  (if (display-graphic-p)
-      (setq ivy-explorer-message-function #'ivy-explorer--posframe))
-  (ivy-explorer-mode 1))
+;; (leaf ivy-explorer
+;;   :straight t
+;;   :diminish ivy-explorer-mode
+;;   :after ivy
+;;   :init
+;;   ;; (if (display-graphic-p)
+;;       ;; (setq ivy-explorer-message-function #'ivy-explorer--posframe))
+;;   (ivy-explorer-mode 1))
 
 (leaf ivy-xref
   :straight t
@@ -626,6 +552,7 @@
   :bind (("M-x" . counsel-M-x)
          ("C-c b" . counsel-imenu)
          ("C-x C-r" . counsel-rg)
+         ("C-x C-f" . counsel-find-file)
          ("C-h f" . counsel-describe-function)
          ("C-h v" . counsel-describe-variable)
          ("C-h b" . counsel-descbinds)
@@ -669,6 +596,29 @@
         ivy-rich-path-style 'abbrev)
   (ivy-rich-mode 1))
 #+END_SRC
+** minibuffer
+#+begin_src emacs-lisp
+(leaf maple-minibuffer
+  :straight (maple-minibuffer
+             :type git
+             :host github
+             :repo "honmaple/emacs-maple-minibuffer")
+  :require t
+  :config
+  (setq maple-minibuffer:position-type 'window-bottom-left
+        maple-minibuffer:height nil
+        maple-minibuffer:border-color "gray50"
+        maple-minibuffer:width 100)
+
+  ;; more custom parameters for frame
+  (defun maple-minibuffer:parameters ()
+    "Maple minibuffer parameters."
+    `((height . ,(or maple-minibuffer:height 10))
+      (width . ,(or (window-width) maple-minibuffer:width))
+      (left-fringe . 5)
+      (right-fringe . 5)))
+    :hook (after-init-hook . maple-minibuffer-mode))
+#+end_src
 ** modeline
 #+BEGIN_SRC emacs-lisp
 (setq line-number-mode t
@@ -704,7 +654,7 @@
 (leaf rich-minority
   :straight t
   :config (setq rm-blacklist nil
-                rm-whitelist "Flymake\\|lsp")
+                rm-whitelist "FlyC\\|Flymake\\|lsp")
   :hook (emacs-startup-hook . rich-minority-mode))
 #+END_SRC
 ** move-dup
@@ -820,7 +770,7 @@
           ("*Completions*" :size 0.3  :align t)
           ("*format-all-errors*" :select t :size 0.1 :align below)
           ("*Help*" :select t :inhibit-window-quit t :other t)
-          ("*Messages*" :select nil :inhibit-window-quit t :other t)
+          ("*Messages*" :ignore t)
           ("*Process List*" :select t :size 0.3 :align below)
           ("*Proced*" :select t :size 0.3 :align below)
           ("*Python*" :select t :size 0.3 :align bellow)
@@ -1013,7 +963,12 @@
     :fringe-bitmap 'flycheck-fringe-bitmap-arrow
     :fringe-face 'flycheck-fringe-info)
   (setq flycheck-indication-mode 'right-fringe)
-:hook (after-init . global-flycheck-mode))
+  :hook (after-init-hook . global-flycheck-mode))
+
+(leaf flycheck-posframe
+  :straight t
+  :after flycheck
+  :hook (flycheck-mode-hook . flycheck-posframe-mode))
 #+END_SRC
 ** flymake
 #+BEGIN_SRC emacs-lisp
@@ -1054,7 +1009,7 @@
 (leaf jinja2-mode :straight t)
 #+END_SRC
 ** lsp
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
 (leaf lsp
   :straight lsp-mode
   :commands (lsp lsp-deferred)
@@ -1066,7 +1021,7 @@
         lsp-inhibit-message t
         lsp-message-project-root-warning t
         lsp-auto-guess-root t
-        lsp-prefer-flymake t
+        lsp-prefer-flymake nil
         lsp-session-file (concat conf:cache-dir "lsp-session"))
   :hook (lsp-after-open-hook . lsp-enable-imenu))
 
@@ -1254,7 +1209,7 @@
              (when (empty-buffer?) (python-template))))
 #+END_SRC
 *** lsp-python
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
 (leaf lsp-python-ms
   :straight t
   :require t
@@ -1264,11 +1219,102 @@
   :straight t
   :hook (python-mode-hook . lsp-deferred))
 #+END_SRC
+*** elpy
+#+begin_src emacs-lisp
+(leaf elpy
+  :straight t
+  :diminish elpy-mode
+  :init (elpy-enable)
+  :config
+  (setq elpy-rpc-backend "jedi"
+        elpy-shell-echo-input nil)
+
+  ;; (when (load "flycheck" t t)
+  ;;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  ;;   (add-hook 'elpy-mode-hook 'flycheck-mode))
+
+  (add-to-list 'company-backends 'elpy-company-backend)
+  (require 'smartparens-python)
+  (require 'electric)
+
+  (defun prelude-python--encoding-comment-required-p ()
+    (re-search-forward "[^\0-\177]" nil t))
+
+  (defun prelude-python--detect-encoding ()
+    (let ((coding-system
+           (or save-buffer-coding-system
+               buffer-file-coding-system)))
+      (if coding-system
+          (symbol-name
+           (or (coding-system-get coding-system 'mime-charset)
+               (coding-system-change-eol-conversion coding-system nil)))
+        "ascii-8bit")))
+
+  (defun prelude-python--insert-coding-comment (encoding)
+    (let ((newlines (if (looking-at "^\\s *$") "\n" "\n\n")))
+      (insert (format "# coding: %s" encoding) newlines)))
+
+  (defun prelude-python-mode-set-encoding ()
+    "Insert a magic comment header with the proper encoding if necessary."
+    (save-excursion
+      (widen)
+      (goto-char (point-min))
+      (when (prelude-python--encoding-comment-required-p)
+        (goto-char (point-min))
+        (let ((coding-system (prelude-python--detect-encoding)))
+          (when coding-system
+            (if (looking-at "^#!") (beginning-of-line 2))
+            (cond ((looking-at "\\s *#\\s *.*\\(en\\)?coding\\s *:\\s *\\([-a-z0-9_]*\\)")
+                   ;; update existing encoding comment if necessary
+                   (unless (string= (match-string 2) coding-system)
+                     (goto-char (match-beginning 2))
+                     (delete-region (point) (match-end 2))
+                     (insert coding-system)))
+                  ((looking-at "\\s *#.*coding\\s *[:=]"))
+                  (t (prelude-python--insert-coding-comment coding-system)))
+            (when (buffer-modified-p)
+              (basic-save-buffer-1)))))))
+
+  (when (fboundp 'exec-path-from-shell-copy-env)
+    (exec-path-from-shell-copy-env "PYTHONPATH"))
+
+  (projectile-register-project-type 'python '("pyproject.toml")
+                                    :compile ""
+                                    :test "")
+
+  (defun prelude-python-mode-defaults ()
+    "Defaults for Python programming."
+    (subword-mode +1)
+    (eldoc-mode 1)
+    (setq-local electric-layout-rules
+                '((?: . (lambda ()
+                          (and (zerop (first (syntax-ppss)))
+                               (python-info-statement-starts-block-p)
+                               'after)))))
+    (when (fboundp #'python-imenu-create-flat-index)
+      (setq-local imenu-create-index-function
+                  #'python-imenu-create-flat-index))
+    (add-hook 'post-self-insert-hook
+              #'electric-layout-post-self-insert-function nil 'local)
+    (add-hook 'after-save-hook 'prelude-python-mode-set-encoding nil 'local))
+
+  (setq prelude-python-mode-hook 'prelude-python-mode-defaults)
+
+  (add-hook 'python-mode-hook (lambda ()
+                                (run-hooks 'prelude-python-mode-hook))))
+#+end_src
 *** venv
 #+BEGIN_SRC emacs-lisp
 (leaf auto-virtualenv
   :straight t
-  :hook (python-mode-hook . auto-virtualenv-set-virtualenv))
+  :hook ((elpy-mode-hook . auto-virtualenv-set-virtualenv)
+         (window-configuration-change-hook . auto-virtualenv-set-virtualenv)))
+#+END_SRC
+*** poetry
+#+BEGIN_SRC emacs-lisp
+(leaf poetry
+  :straight t
+  :require t)
 #+END_SRC
 *** pyenv
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -1432,6 +1478,12 @@
 
 (add-hook 'nxml-mode-hook
           '(lambda () (when (empty-buffer?) (nxml-template))))
+
+(reformatter-define xml-format
+  :program "xmlformat"
+  :group 'xml)
+
+  ;; (define-key nxml-mode-map (kbd "C-c C-f") 'xml-format-buffer)
 
 (leaf nxml-mode
   :mode (("\\.plist\\'" . nxml-mode)
@@ -1612,10 +1664,8 @@
 
 (leaf calfw
   :straight t
-  :bind ("C-c f" . cfw:open-org-calendar)
   :config
-  (setq cfw:org-overwrite-default-keybinding t
-        cfw:display-calendar-holidays nil
+  (setq cfw:display-calendar-holidays nil
         calendar-week-start-day 1
         cfw:fchar-junction ?╬
         cfw:fchar-vertical-line ?║
@@ -1628,7 +1678,10 @@
 
 (leaf calfw-org
   :straight t
-  :require t)
+  :bind ("C-c f" . cfw:open-org-calendar)
+  :require t
+  :config
+  (setq cfw:org-overwrite-default-keybinding t))
 #+END_SRC
 ** charmap
 #+BEGIN_SRC emacs-lisp
@@ -1666,94 +1719,6 @@
          ("M-g x" . dumb-jump-go-prefer-external)
          ("M-g z" . dumb-jump-go-prefer-external-other-window))
   :config (setq dumb-jump-selector 'ivy))
-#+END_SRC
-** exwm
-#+BEGIN_SRC emacs-lisp :tangle no
-(straight-use-package 'exwm)
-(straight-use-package 'exwm-x)
-
-(setq exwm-debug-on nil)
-(require 'xcb)
-(require 'exwm)
-
-(defun exwm-rename-buffer ()
-  (interactive)
-  (exwm-workspace-rename-buffer
-   (concat exwm-class-name ":"
-           (if (<= (length exwm-title) 50) exwm-title
-             (concat (substring exwm-title 0 49) "...")))))
-
-;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
-(add-hook 'exwm-update-class-hook 'exwm-rename-buffer)
-(add-hook 'exwm-update-title-hook 'exwm-rename-buffer)
-
-(exwm-input-set-key (kbd "s-r") 'exwm-reset)
-(exwm-input-set-key (kbd "s-w") 'exwm-workspace-switch)
-(setq exwm-workspace-number 2)
-
-(defun exwm-workspace-next ()
-  (interactive)
-  (let ((next-numb (mod (+ 1 exwm-workspace-current-index) exwm-workspace-number)))
-    (exwm-workspace-switch next-numb)))
-(exwm-input-set-key (kbd "s-j") 'exwm-workspace-next)
-(push (kbd "s-j") exwm-input-prefix-keys)
-
-(exwm-input-set-key (kbd "s-o") 'other-window)
-(exwm-input-set-key (kbd "s-k") 'other-window)
-(push (kbd "s-o") exwm-input-prefix-keys)
-(push (kbd "s-k") exwm-input-prefix-keys)
-(push (kbd "<escape>") exwm-input-prefix-keys)
-
-(defmacro exwm-switch-to-workspace-key (ws-num)
-  `(progn (exwm-input-set-key (kbd (concat "s-" ,(number-to-string ws-num)))
-                              (lambda ()
-                                (interactive)
-                                (exwm-workspace-switch ,ws-num)))
-          (let ((key-num (if (eq 0 ,ws-num)
-                             10
-                           ,ws-num)))
-            (exwm-input-set-key (kbd (concat "s-<f" (number-to-string key-num) ">"))
-                                (lambda ()
-                                  (interactive)
-                                  (exwm-workspace-switch ,ws-num))))))
-(exwm-switch-to-workspace-key 1)
-(exwm-switch-to-workspace-key 0)
-
-(add-to-list 'display-buffer-alist
-             `(,(rx bos " *async command*")
-               (display-buffer-no-window)))
-
-(defun background-shell-command (command)
-  (interactive (list (read-shell-command "$ ")))
-  (async-shell-command command (generate-new-buffer " *async command*")))
-
-(exwm-input-set-key (kbd "s-p")
-                    #'background-shell-command)
-
-(require 'exwm-config)
-(exwm-config-ido)
-
-(push ?\C-q exwm-input-prefix-keys)
-(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-(setq exwm-input-simulation-keys
-  `((,(kbd "C-b") . left)
-    (,(kbd "C-f") . right)
-    (,(kbd "C-p") . up)
-    (,(kbd "C-n") . down)
-    (,(kbd "C-a") . home)
-    (,(kbd "C-e") . end)
-    (,(kbd "C-y") . ,(kbd "C-v"))
-    (,(kbd "C-M-b") . ,(kbd "C-b"))))
-
-(when (cond ((equal "work" (system-name)) t)
-            ((equal "beebs" (system-name)) t)
-            ((equal "kusanagi" (system-name)) t)
-            ((equal "tres-ebow" (system-name)) t)
-            ((equal "Pantheon" (system-name)) t)
-            (t nil))
-    (message "Enabling EXWM.")
-    (exwm-enable))
 #+END_SRC
 ** flyspell
 #+BEGIN_SRC emacs-lisp
@@ -1814,15 +1779,36 @@
 
   :hook (prog-mode-hook . flyspell-prog-mode))
 
+(leaf frog-menu
+  :straight t
+  :require t)
+
 (leaf flyspell-correct
   :straight t
-  :bind ("C-M-'" . flyspell-correct-wrapper))
+  :bind ("C-M-'" . flyspell-correct-wrapper)
+  :config
+  (defun frog-menu-flyspell-correct (candidates word)
+    "Run `frog-menu-read' for the given CANDIDATES.
+     List of CANDIDATES is given by flyspell for the WORD.
+     Return selected word to use as a replacement or a tuple
+     of (command . word) to be used by `flyspell-do-correct'."
+    (let* ((corrects (if flyspell-sort-corrections
+                         (sort candidates 'string<)
+                       candidates))
+           (actions `(("C-s" "Save word"         (save    . ,word))
+                      ("C-a" "Accept (session)"  (session . ,word))
+                      ("C-b" "Accept (buffer)"   (buffer  . ,word))
+                      ("C-c" "Skip"              (skip    . ,word))))
+           (prompt   (format "Dictionary: [%s]"  (or ispell-local-dictionary
+                                                     ispell-dictionary
+                                                     "default")))
+           (res      (frog-menu-read prompt corrects actions)))
+      (unless res
+        (error "Quit"))
+      res))
 
-(leaf flyspell-correct-popup
-  :straight t
-  :require t
-  :init (setq flyspell-correct-interface #'flyspell-correct-popup
-              flyspell-correct-auto-mode-interface #'flyspell-correct-popup))
+  (setq flyspell-correct-interface #'frog-menu-flyspell-correct
+        flyspell-correct-auto-mode-interface #'frog-menu-flyspell-correct))
 #+END_SRC
 ** frog
 #+BEGIN_SRC emacs-lisp
@@ -2581,50 +2567,51 @@
 (leaf po-mode
   :straight t
   :mode ("\\.po\\'" . po-mode)
-  :config
-  ;; Fuente: https://www.emacswiki.org/emacs/PoMode
-  (defun po-wrap ()
-    "Filter current po-mode buffer through `msgcat' tool to wrap all lines."
-    (interactive)
-    (if (eq major-mode 'po-mode)
-        (let ((tmp-file (make-temp-file "po-wrap."))
-              (tmp-buf (generate-new-buffer "*temp*")))
-          (unwind-protect
-              (progn
-                (write-region (point-min) (point-max) tmp-file nil 1)
-                (if (zerop
-                     (call-process
-                      "msgcat" nil tmp-buf t (shell-quote-argument tmp-file)))
-                    (let ((saved (point))
-                          (inhibit-read-only t))
-                      (delete-region (point-min) (point-max))
-                      (insert-buffer-substring tmp-buf)
-                      (goto-char (min saved (point-max))))
-                  (with-current-buffer tmp-buf
-                    (error (buffer-string)))))
-            (kill-buffer tmp-buf)
-            (delete-file tmp-file)))))
+  :commands po-mode)
+  ;; :config
+  ;; ;; Fuente: https://www.emacswiki.org/emacs/PoMode
+  ;; (defun po-wrap ()
+  ;;   "Filter current po-mode buffer through `msgcat' tool to wrap all lines."
+  ;;   (interactive)
+  ;;   (if (eq major-mode 'po-mode)
+  ;;       (let ((tmp-file (make-temp-file "po-wrap."))
+  ;;             (tmp-buf (generate-new-buffer "*temp*")))
+  ;;         (unwind-protect
+  ;;             (progn
+  ;;               (write-region (point-min) (point-max) tmp-file nil 1)
+  ;;               (if (zerop
+  ;;                    (call-process
+  ;;                     "msgcat" nil tmp-buf t (shell-quote-argument tmp-file)))
+  ;;                   (let ((saved (point))
+  ;;                         (inhibit-read-only t))
+  ;;                     (delete-region (point-min) (point-max))
+  ;;                     (insert-buffer-substring tmp-buf)
+  ;;                     (goto-char (min saved (point-max))))
+  ;;                 (with-current-buffer tmp-buf
+  ;;                   (error (buffer-string)))))
+  ;;           (kill-buffer tmp-buf)
+  ;;           (delete-file tmp-file)))))
 
-  (defun po-guess-language ()
-    "Return the language related to this PO file."
-    (save-excursion
-      (goto-char (point-min))
-      (re-search-forward po-any-msgstr-block-regexp)
-      (goto-char (match-beginning 0))
-      (if (re-search-forward
-           "\n\"Language: +\\(.+\\)\\\\n\"$"
-           (match-end 0) t)
-          (po-match-string 1))))
+  ;; (defun po-guess-language ()
+  ;;   "Return the language related to this PO file."
+  ;;   (save-excursion
+  ;;     (goto-char (point-min))
+  ;;     (re-search-forward po-any-msgstr-block-regexp)
+  ;;     (goto-char (match-beginning 0))
+  ;;     (if (re-search-forward
+  ;;          "\n\"Language: +\\(.+\\)\\\\n\"$"
+  ;;          (match-end 0) t)
+  ;;         (po-match-string 1))))
 
-  (defadvice po-edit-string (around setup-spell-checking (string type expand-tabs) activate)
-    "Set up spell checking in subedit buffer."
-    (let ((po-language (po-guess-language)))
-      ad-do-it
-      (if po-language
-          (progn
-            (ispell-change-dictionary po-language)
-            (turn-on-flyspell)
-            (flyspell-buffer))))))
+  ;; (defadvice po-edit-string (around setup-spell-checking (string type expand-tabs) activate)
+  ;;   "Set up spell checking in subedit buffer."
+  ;;   (let ((po-language (po-guess-language)))
+  ;;     ad-do-it
+  ;;     (if po-language
+  ;;         (progn
+  ;;           (ispell-change-dictionary po-language)
+  ;;           (turn-on-flyspell)
+  ;;           (flyspell-buffer))))))
 #+END_SRC
 ** presentation
 #+BEGIN_SRC emacs-lisp
@@ -2682,30 +2669,12 @@
 (leaf sudo-edit
   :straight t)
 #+END_SRC
-** undo-tree
-#+BEGIN_SRC emacs-lisp :tangle no
-(leaf undo-tree
+** undo-propose
+#+BEGIN_SRC emacs-lisp
+(leaf undo-propose
   :straight t
-  :leaf-defer nil
-  :diminish undo-tree-mode
-  :bind* ("C-x u" . undo-tree-visualizer)
-  :init
-  (defadvice undo-tree-make-history-save-file-name
-      (after undo-tree activate)
-    (setq ad-return-value (concat ad-return-value ".7z")))
-
-  ;; (defadvice undo-tree-visualize (around undo-tree-split-side-by-side activate)
-  ;;   "Divide la ventana de lado a lado al visualizar undo-tree-visualize"
-  ;;   (let ((split-height-threshold nil)
-  ;;         (split-width-threshold 0))
-  ;;     ad-do-it))
-
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/cache/undo"))
-        undo-tree-visualizer-timestamps t
-        undo-tree-visualizer-diff t
-        undo-tree-auto-save-history t)
-  (defalias 'redo 'undo-tree-redo)
-  (global-undo-tree-mode 1))
+  :commands undo-propose
+  :config (undo-propose-mode))
 #+END_SRC
 ** vlf
 #+BEGIN_SRC emacs-lisp
@@ -2727,12 +2696,12 @@
   :config (setq which-key-sort-order 'which-key-key-order-alpha)
   :hook (emacs-startup-hook . which-key-mode))
 
-(leaf which-key-posframe
-  :straight t
-  :config
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
-        which-key-posframe-border-width 0)
-  (which-key-posframe-mode))
+;; (leaf which-key-posframe
+;;   :straight t
+;;   :config
+;;   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner
+;;         which-key-posframe-border-width 0)
+;;   (which-key-posframe-mode))
 #+END_SRC
 ** xonsh
 #+BEGIN_SRC emacs-lisp
