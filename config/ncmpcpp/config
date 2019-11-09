@@ -59,7 +59,7 @@ default_tag_editor_pattern = "%n - %t"
 
 header_visibility = "no"
 statusbar_visibility = "yes"
-titles_visibility = no
+titles_visibility = "no"
 header_text_scrolling = "yes"
 cyclic_scrolling = "no"
 lines_scrolled = "5"

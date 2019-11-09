@@ -119,6 +119,10 @@ dotfiles:
     src: xonshrc
     dst: ~/.xonshrc
     link: link
+  d_kitty:
+    src: config/kitty
+    dst: ~/.config/kitty
+    link: link
 profiles:
   Pantheon:
     dotfiles:
@@ -143,3 +147,4 @@ profiles:
     - f_xprofile
     - f_xresources
     - f_zathurarc
+    - d_kitty

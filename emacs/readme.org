@@ -250,10 +250,11 @@
 ** tramp
 #+BEGIN_SRC emacs-lisp
 (leaf tramp
+  :straight t
   :require t
   :config
   (setq tramp-default-method "scp"
-        ;tramp-encoding-shell "/bin/bash"
+        tramp-encoding-shell "/bin/bash"
         tramp-persistency-file-name (concat conf:cache-dir "tramp")
         tramp-auto-save-directory (concat conf:cache-dir "tramp-autosave")
         tramp-debug-buffer nil
@@ -371,7 +372,7 @@
 
 (global-font-lock-mode 1)
 (set-face-attribute 'default nil
-                    :font "Cascadia Emacs"
+                    :font "Fira Emacs Retina"
                     :height 115
                     :slant 'normal
                     :weight 'normal
@@ -2645,7 +2646,7 @@
   :straight t
   :bind (("C-<f5>" . terminal-here-launch)
          ("C-<f6>" . terminal-here-project-launch))
-  :config (setq terminal-here-terminal-command (list "urxvtcd" "-name" "ETmux" "-e" "tmx")))
+  :config (setq terminal-here-terminal-command (list "kitty" "--name=ETmux" "tmx")))
 #+END_SRC
 ** ssh
 #+BEGIN_SRC emacs-lisp
