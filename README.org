@@ -1,17 +1,3311 @@
-* dotfiles
+#+TITLE: Custom dot Files
+#+PROPERTY:   header-args+ :mkdirp yes
+#+PROPERTY:   header-args+ :noweb yes
 
-Managed using [[https://github.com/deadc0de6/dotdrop][dotdrop]].
+* Pantheon
+** bspwm
+*** bspwmrc
+#+begin_src sh :tangle ~/.config/bspwm/bspwmrc :tangle-mode (identity #o755)
+#!/usr/bin/env sh
 
-#+CAPTION: Screenshot
-#+ATTR_HTML: :width 800px
-[[https://imgur.com/SDMJ5aY][https://imgur.com/SDMJ5aY]]
+DISPLAY1="$(bspc query -M --names | awk -F: '{print $1}' | grep 'eDP1\|eDP-1\|VGA-0')"
+[[ ! -z "$DISPLAY1" ]] && bspc monitor "$DISPLAY1" -d 1 2 3 4 5 6 7 8 9 && bspc config -m "$DISPLAY1" top_padding 17
 
-** Getting started
-*** Install from pypi
-#+BEGIN_EXAMPLE
-  pip3 install --user dotdrop
-#+END_EXAMPLE
-*** Install from AUR
-#+BEGIN_EXAMPLE
-  yay -S dotdrop
-#+END_EXAMPLE
+[[ -z `pgrep enforce` ]] && ~/.bin/enforce "$DISPLAY1" '^1' &
+
+bspc config border_width 1
+bspc config window_gap 3
+bspc config split_ratio 0.5
+bspc config borderless_monocle true
+bspc config single_monocle true
+bspc config gapless_monocle false
+bspc config focus_follows_pointer true
+bspc config focused_border_color "#585858"
+bspc config normal_border_color "#12181d"
+bspc config active_border_color "#585858"
+bspc config presel_feedback_color "#9e9e9e"
+bspc config click_to_focus any
+bspc config honor_size_hints false
+bspc config ignore_ewmh_focus true
+
+# External Rules
+bspc config external_rules_command ~/.config/bspwm/external.sh
+
+# Workspaces
+bspc rule -a firefox follow=on desktop=^1
+bspc rule -a firefoxdeveloperedition follow=on desktop=^1
+bspc rule -a Qutebrowser follow=on desktop=^1
+bspc rule -a Iceweasel follow=on desktop=^1
+bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
+bspc rule -a Thunderbird follow=on desktop=^3
+bspc rule -a Icedove follow=on desktop=^3
+bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
+bspc rule -a *:Ranger follow=on desktop=^4 state=tiled
+bspc rule -a JDownloader follow=off  desktop=^5
+bspc rule -a *:RTorrent follow=off  desktop=^5
+bspc rule -a Lxappearance follow=on desktop=^6 state=floating
+bspc rule -a Anydesk follow=on desktop=^6 state=tiled
+bspc rule -a Remmina follow=on desktop=^6 state=tiled
+bspc rule -a qt5ct follow=on desktop=^6 state=floating
+bspc rule -a URxvt:music follow=on desktop=^7 state=tiled
+bspc rule -a *:Ncmpcpp follow=on desktop=^7 state=tiled
+bspc rule -a mpv follow=on desktop=^7 state=tiled
+bspc rule -a obs follow=on desktop=^7 state=tiled
+bspc rule -a cantata follow=on desktop=^7 state=tiled
+bspc rule -a Easytag follow=on desktop=^7 state=tiled
+bspc rule -a *:libreoffice follow=off desktop=^8 state=tiled
+bspc rule -a Soffice follow=off desktop=^8
+bspc rule -a Zathura follow=on desktop=^8 state=tiled
+bspc rule -a Emacs follow=on desktop=^9 state=tiled
+bspc rule -a Remacs follow=on desktop=^9 state=tiled
+bspc rule -a Wine follow=off desktop=^6 state=tiled
+
+# Floating apps
+bspc rule -a sxiv follow=off state=floating
+bspc rule -a URxvt:Terminal follow=off state=floating center=on
+bspc rule -a *:Terminal follow=off state=floating center=on
+bspc rule -a *:Buscando follow=off state=floating center=on
+
+# Xresources
+xrdb ~/.Xresources &
+# Wallpaper
+[[ -z $(pgrep feh) ]] && feh --bg-fill $HOME/.dots/walls/03.jpg &
+
+# i3lock Fancy
+[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'PragmataPro-Mono-Regular' &
+# clipboard
+[[ -z $(pgrep clipboard) ]] && ~/.bin/clipboard &
+# panel
+[[ -z $(pgrep panel) ]] && ~/.bin/panel &
+# udiskie
+[[ -z $(pgrep udiskie) ]] && udiskie &
+# sxhkd
+[[ -z $(pgrep sxhkd) ]] && sxhkd &
+# xcompmgr
+[[ -z $(pgrep xcompmgr) ]] && xcompmgr -c -C -t-5 -l-5 -r4.2 &
+#+end_src
+*** external.sh
+#+begin_src sh :tangle ~/.config/bspwm/bspwmrc :tangle-mode (identity #o755)
+#! /bin/sh
+
+window_id=$1
+class=$2
+instance=$3
+
+#WM_WINDOW_ROLE Rules
+role=$(xprop -id $1 | grep WM_WINDOW_ROLE | awk -F '"' '{print $2}')
+case "$role" in
+  quake) #Tilix Quake
+    echo "state=floating"
+    echo "border=off"
+    ;;
+  pop-up|bubble|task_dialog|Preferences|dialog|menu)
+    echo "state=floating"
+    ;;
+  About|Organizer|Buscando) #Firefox
+    echo "state=floating"
+    ;;
+esac
+#+end_src
+*** sxhkd
+#+begin_src sh :tangle ~/.config/sxhkd/sxhkdrc :tangle-mode (identity #o755)
+#!/usr/bin/env sh
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + Return
+#	urxvtcd -g 100x30 -name Terminal
+  kitty --name=Terminal
+
+# terminal emulator
+super + shift + Return
+#	urxvtcd -n TiledTerminal -e tmux
+  kitty --name=TiledTerminal tmux
+
+# program launcher
+super + @space
+  ~/.bin/rofi-run
+
+# window switcher
+alt + Tab
+  rofi -show window -width 32
+
+# Clipbard
+super + shift + c
+  ~/.bin/rofi-clip
+
+# Passwords
+super + shift + p
+  rofi-pass
+
+# MPD
+super + control + p
+  rofi-mpc
+
+# ScreenShot/ScreenCast
+Print; {s,c}
+  teiler {--screenshot,--togglecast}
+
+# Cli Apps
+super + shift + {f,d,n}
+#  urxvt {-name Ranger -e ranger, -name RTorrent -e rtorrent, -name Ncmpcpp -e ncmpcpp}
+  kitty {--name=Ranger ranger, --name=RTorrent rtorrent, --name=Ncmpcpp tmux new-session "tmux source-file ~/.config/ncmpcpp/tmux_session" }
+
+# Volume
+{XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}
+  pulseaudio-ctl {mute, up, down}
+
+# exit
+super + alt + {l,o,s,r,p}
+  ~/.bin/exit {lock,logout,suspend,reboot,poweroff}
+
+# make sxhkd reload its configuration files:
+super + Escape
+  pkill -USR1 -x sxhkd
+
+#
+# bspwm hotkeys
+#
+# reload bspwm
+super + shift + r
+  ~/.config/bspwm/bspwmrc
+
+# quit bspwm normally
+super + alt + Escape
+	bspc quit
+
+# close and kill
+super + {_,shift + }w
+	bspc node -{c,k}
+
+# alternate between the tiled and monocle layout
+super + m
+	bspc desktop -l next
+
+# send the newest marked node to the newest preselected node
+super + y
+	bspc node newest.marked.local -n newest.!automatic.local
+
+# swap the current node and the biggest node
+super + g
+	bspc node -s biggest
+
+#
+# state/flags
+#
+
+# set the window state
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+super + {_,shift + }{h,j,k,l}
+	bspc node -{f,s} {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous node in the current desktop
+super + {_,shift + }c
+	bspc node -f {next,prev}.local
+
+# focus the next/previous desktop in the current monitor
+super + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
+
+# focus or send to the given desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# move/resize
+#
+
+# expand a window by moving one of its side outward
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+super + alt + shift + {h,j,k,l}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+#+end_src
+
+** picom
+#+begin_src conf :tangle ~/.config/picom.conf
+shadow = true;
+no-dnd-shadow = true;
+no-dock-shadow = true;
+clear-shadow = true;
+shadow-radius = 7;
+shadow-offset-x = -7;
+shadow-offset-y = -7;
+shadow-exclude = [ "name = 'Notification'",
+                   "class_g = 'Conky'",
+                   "class_g ?= 'Notify-osd'",
+                   "class_g = 'Cairo-clock'" ];
+shadow-ignore-shaped = false;
+menu-opacity = 0.9;
+inactive-opacity = 0.9;
+active-opacity = 1.0;
+frame-opacity = 0.7;
+inactive-opacity-override = false;
+alpha-step = 0.05;
+blur-background = true;
+blur-kern = "7x7box";
+
+blur-background-exclude = [ "window_type = 'dock'", "window_type = 'desktop'", "_GTK_FRAME_EXTENTS@:c", "class_g = 'slop'" ];
+fading = false;
+fade-in-step = 0.03;
+fade-out-step = 0.03;
+fade-exclude = [ ];
+backend = "glx";
+mark-wmwin-focused = true;
+mark-ovredir-focused = true;
+detect-rounded-corners = true;
+detect-client-opacity = true;
+refresh-rate = 0;
+vsync = "none";
+dbe = false;
+paint-on-overlay = true;
+focus-exclude = [ "class_g = 'Cairo-clock'", "_NET_WM_NAME@:s = 'rofi'" ];
+detect-transient = true;
+detect-client-leader = true;
+invert-color-include = [ ];
+glx-copy-from-front = false;
+glx-swap-method = "undefined";
+opacity-rule = [ "99:name *?= 'Screenshot'", "99:class_g = 'Firefox'",
+"99:name *?= 'Pale Moon'", "99:name *?= 'QupZilla'", "99:class_g =
+'Midori'", "99:class_g = 'Lazpaint'", "99:class_g = 'Pinta'",
+"99:class_g = 'Viewnior'", "99:class_g = 'GIMP'", "99:class_g =
+'Darktable'", "99:name *?= 'VLC'", "99:name *?= 'Event'", "99:name *?=
+'Call'", "99:name *?= 'Minitube'", "99:name *?= 'Write'", "99:name *?=
+'VirtualBox'", "99:name *?= 'Conky'", "90:name *?= 'Panel'", "90:name
+,*?= 'Restart'", "90:name *?= 'Page Info'", "99:name *?= 'Image'",
+"75:class_g = 'kwrite'", "75:name *?= 'mousepad'", "85:class_g *?=
+'Rofi'", "75:class_g *?= 'Weechat'"];
+wintypes :
+{
+  tooltip :
+  {
+fade = true;
+shadow = false;
+opacity = 0.75;
+focus = true;
+  };
+};
+blur-background-frame = true;
+#+end_src
+** polybar
+#+begin_src conf :tangle ~/.config/polybar/config
+[colors]
+bg_normal = "#b3020202"
+bg_focus = "#b3020202"
+bg_urgent = "#2A1F1EAA"
+bg_warning = "#2A1F1EAA"
+
+fg_normal = "#747474"
+fg_focus = "#DDDCFF"
+fg_urgent = "#CC9393"
+fg_warning = #ffa900
+
+fg_underline = "#00FF65"
+
+[global/wm]
+margin-bottom = 1
+
+[bar/top]
+monitor = ${env:MONITOR}
+monitor-strict = true
+width = 100%
+height = 18
+clickareas = 18
+
+tray-position = right
+tray-padding = 1
+pseudo-transparency = true
+tray-background = ${colors.bg_normal}
+
+background = ${colors.bg_normal}
+foreground = ${colors.fg_normal}
+
+dpi = 96
+separator = "|"
+enable-ipc = true
+
+overline-size = 0
+overline-color = ${colors.fg_urgent}
+underline-size = 2
+underline-color = ${colors.bg_urgent}
+
+locale = es_EC.UTF-8
+
+font-0 = Terminus:size=12;0
+font-1 = Siji:size=14;1
+font-2 = FontAwesome:size=10;1
+
+modules-left = bsp title
+modules-center =
+modules-right = wireless wired volume cpu memory fs email datetime battery
+
+wm-restack = bspwm
+
+[module/ewmh]
+type = internal/xworkspaces
+pin-workspaces = true
+enable-click = true
+enable-scroll = true
+
+icon-0 = 0;
+icon-1 = 1;
+icon-2 = 2;
+icon-3 = 3;
+icon-4 = 4;
+icon-5 = 5;
+icon-6 = 6;
+icon-7 = 7;
+icon-8 = 8;
+icon-9 = 9;
+icon-default = 
+
+format = <label-state>
+
+label-monitor = %name%
+
+#label-dimmed-underline = ${colors.fg_normal}
+
+label-active = %icon%
+label-active-background = ${colors.bg_focus}
+label-active-foreground = ${colors.fg_focus}
+label-active-padding = 1
+label-active-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-unfocused = %icon%
+
+label-empty =
+
+[module/bsp]
+type = internal/bspwm
+inline-mode = false
+fuzzy-match = true
+
+pin-workspaces = true
+ws-icon-0 = 0;
+ws-icon-1 = 1;
+ws-icon-2 = 2;
+ws-icon-3 = 3;
+ws-icon-4 = 4;
+ws-icon-5 = 5;
+ws-icon-6 = 6;
+ws-icon-7 = 7;
+ws-icon-8 = 8;
+ws-icon-9 = 9;
+ws-icon-default = 
+
+format = <label-state> <label-mode>
+
+label-dimmed-underline = ${colors.fg_normal}
+
+label-focused = %icon%
+label-focused-background = ${colors.bg_focus}
+label-focused-foreground = ${colors.fg_focus}
+label-focused-padding = 1
+label-focused-underline = ${colors.fg_underline}
+
+label-occupied = %icon%
+label-occupied-foreground = ${colors.fg_normal}
+label-occupied-padding = 1
+label-occupied-underline = ${colors.fg_normal}
+
+label-urgent = %icon%
+label-urgent-background = ${colors.bg_normal}
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-padding = 1
+label-urgent-underline = ${colors.fg_urgent}
+
+label-empty =
+
+[module/i3]
+type = internal/i3
+pin-workspaces = true
+
+ws-icon-default = 
+ws-icon-0 = 0;
+ws-icon-1 = 1;
+ws-icon-2 = 2;
+ws-icon-3 = 3;
+ws-icon-4 = 4;
+ws-icon-5 = 5;
+ws-icon-6 = 6;
+ws-icon-7 = 7;
+ws-icon-8 = 8;
+ws-icon-9 = 9;
+
+label-dimmed = %icon%
+label-dimmed-padding = 1
+label-dimmed-foreground = ${colors.fg_normal}
+label-dimmed-underline = ${colors.fg_normal}
+
+label-focused = %icon%
+label-focused-foreground = ${colors.fg_focus}
+label-focused-background = ${colors.bg_normal}
+label-focused-underline = ${colors.fg_underline}
+label-focused-padding = 1
+
+label-occupied = %icon%
+label-occupied-padding = 1
+
+label-unfocused = %icon%
+label-unfocused-padding = 1
+label-unfocused-foreground = ${colors.fg_normal}
+label-unfocused-underline = ${colors.fg_normal}
+
+label-visible = %icon%
+label-visible-underline = ${colors.fg_normal}
+label-visible-padding = 1
+
+label-urgent = %icon%
+label-urgent-foreground = ${colors.fg_urgent}
+label-urgent-background = ${colors.bg_normal}
+label-urgent-underline = ${colors.fg_urgent}
+label-urgent-padding = 1
+
+label-empty =
+
+[module/battery]
+type = internal/battery
+full-at = 99
+time-format = %H:%M
+
+battery = ${env:BAT}
+adapter = ACAD
+
+label-charging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+label-discharging = %{F#fff}%percentage%%%{F-} (%{F#fff}%time%%{F-})
+
+format-charging = <animation-charging> <label-charging>
+format-discharging = <ramp-capacity> <label-discharging>
+format-full = <ramp-capacity> <label-full>
+
+ramp-capacity-0 = 
+ramp-capacity-0-foreground = ${colors.fg_urgent}
+ramp-capacity-1 = 
+ramp-capacity-1-foreground = ${colors.fg_warning}
+ramp-capacity-2 = 
+ramp-capacity-3 = 
+ramp-capacity-4 = 
+ramp-capacity-5 = 
+ramp-capacity-6 = 
+ramp-capacity-7 = 
+ramp-capacity-8 = 
+
+animation-charging-0 = 
+animation-charging-1 = 
+animation-charging-2 = 
+animation-charging-3 = 
+animation-charging-4 = 
+animation-charging-5 = 
+animation-charging-6 = 
+animation-charging-7 = 
+animation-charging-8 = 
+animation-charging-framerate = 750
+
+[module/wireless]
+type = internal/network
+interface = wan0
+interval = 1.0
+ping-interval = 10
+
+format-connected = <ramp-signal> <label-connected>
+label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%essid%%{A}%{F-} (%{F#fff}%signal%%%{F-}) %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
+label-disconnected = %{A1:networkmanager_dmenu:}%{A}
+label-disconnected-foreground = #66
+
+ramp-signal-0 = 
+ramp-signal-1 = 
+ramp-signal-2 = 
+ramp-signal-3 = 
+ramp-signal-4 = 
+
+animation-packetloss-0 = 
+animation-packetloss-0-foreground = ${colors.fg_warning}
+animation-packetloss-1 = 
+animation-packetloss-1-foreground = ${colors.fg_normal}
+animation-packetloss-framerate = 500
+
+[module/wired]
+type = internal/network
+interface = eth0
+interval = 1.0
+format-connected = <ramp-signal> <label-connected>
+label-connected = %{F#fff}%{A1:networkmanager_dmenu:}%local_ip%%{A}%{F-} %{F#fff}%downspeed%%{F-}%{F#fff}%upspeed%%{F-}
+label-disconnected =
+
+ramp-signal-0 = 
+
+animation-packetloss-0 = 
+animation-packetloss-0-foreground = ${colors.fg_warning}
+animation-packetloss-1 = 
+animation-packetloss-1-foreground = ${colors.fg_normal}
+animation-packetloss-framerate = 500
+
+[module/volume]
+type = internal/pulseaudio
+use-ui-max = true
+
+format-volume = <ramp-volume> <label-volume>
+label-volume = %{F#fff}%percentage%%%{F-}
+
+format-muted-prefix = " "
+label-muted = %{F#920}%percentage%M%{F-}
+
+ramp-volume-0 = 
+ramp-volume-1 = 
+
+[module/fs]
+type = internal/fs
+interval = 10
+mount-0 = /
+mount-1 = /media/data
+label-mounted =  %{F#fff}%mountpoint% %free%%{F-}
+label-unmounted =
+
+[module/memory]
+type = internal/memory
+interval = 3
+label =  %{F#fff}%gb_used%/%gb_total%%{F-}
+
+[module/cpu]
+type = internal/cpu
+interval = 0.5
+label =  %{F#fff}%percentage%%%{F-}
+
+[module/email]
+type = custom/script
+exec = notmuch count tag:unread
+interval = 3
+format = <label>
+label =  %{F#fff}%output%%{F-}
+
+[module/datetime]
+type = internal/date
+format = <label>
+date =  %%{F#fff}W%W %a, %Y/%m/%d%{F-}
+time =  %{F#fff}%R%{F-}
+label = %date% %time%
+
+[module/title]
+type = internal/xwindow
+label = >_ %title:0:35:...%
+#+end_src
+** ranger
+*** commands.py
+#+begin_src python :tangle ~/.config/ranger/commands.py
+# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+import os
+import re
+
+from ranger.api.commands import *
+from ranger.core.loader import CommandLoader
+from ranger.core.runner import ALLOWED_FLAGS
+from ranger.ext.get_executables import get_executables
+
+
+class alias(Command):
+    """:alias <newcommand> <oldcommand>
+
+    Copies the oldcommand as newcommand.
+    """
+
+    context = "browser"
+    resolve_macros = False
+
+    def execute(self):
+        if not self.arg(1) or not self.arg(2):
+            self.fm.notify("Syntax: alias <newcommand> <oldcommand>", bad=True)
+        else:
+            self.fm.commands.alias(self.arg(1), self.rest(2))
+
+
+class cd(Command):
+    """:cd [-r] <dirname>
+
+    The cd command changes the directory.
+    The command 'cd -' is equivalent to typing ``.
+    Using the option "-r" will get you to the real path.
+    """
+
+    def execute(self):
+        import os.path
+
+        if self.arg(1) == "-r":
+            self.shift()
+            destination = os.path.realpath(self.rest(1))
+            if os.path.isfile(destination):
+                destination = os.path.dirname(destination)
+        else:
+            destination = self.rest(1)
+
+        if not destination:
+            destination = "~"
+
+        if destination == "-":
+            self.fm.enter_bookmark("`")
+        else:
+            self.fm.cd(destination)
+
+    def tab(self):
+        import os
+        from os.path import dirname, basename, expanduser, join
+
+        cwd = self.fm.thisdir.path
+        rel_dest = self.rest(1)
+
+        bookmarks = [
+            v.path for v in self.fm.bookmarks.dct.values() if rel_dest in v.path
+        ]
+
+        # expand the tilde into the user directory
+        if rel_dest.startswith("~"):
+            rel_dest = expanduser(rel_dest)
+
+        # define some shortcuts
+        abs_dest = join(cwd, rel_dest)
+        abs_dirname = dirname(abs_dest)
+        rel_basename = basename(rel_dest)
+        rel_dirname = dirname(rel_dest)
+
+        try:
+            # are we at the end of a directory?
+            if rel_dest.endswith("/") or rel_dest == "":
+                _, dirnames, _ = next(os.walk(abs_dest))
+
+            # are we in the middle of the filename?
+            else:
+                _, dirnames, _ = next(os.walk(abs_dirname))
+                dirnames = [dn for dn in dirnames if dn.startswith(rel_basename)]
+        except (OSError, StopIteration):
+            # os.walk found nothing
+            pass
+        else:
+            dirnames.sort()
+            dirnames = bookmarks + dirnames
+
+            # no results, return None
+            if len(dirnames) == 0:
+                return
+
+            # one result. since it must be a directory, append a slash.
+            if len(dirnames) == 1:
+                return self.start(1) + join(rel_dirname, dirnames[0]) + "/"
+
+            # more than one result. append no slash, so the user can
+            # manually type in the slash to advance into that directory
+            return (self.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
+
+
+class chain(Command):
+    """:chain <command1>; <command2>; ...
+
+    Calls multiple commands at once, separated by semicolons.
+    """
+
+    def execute(self):
+        for command in self.rest(1).split(";"):
+            self.fm.execute_console(command)
+
+
+class shell(Command):
+    escape_macros_for_shell = True
+
+    def execute(self):
+        if self.arg(1) and self.arg(1)[0] == "-":
+            flags = self.arg(1)[1:]
+            command = self.rest(2)
+        else:
+            flags = ""
+            command = self.rest(1)
+
+        if not command and "p" in flags:
+            command = "cat %f"
+        if command:
+            if "%" in command:
+                command = self.fm.substitute_macros(command, escape=True)
+            self.fm.execute_command(command, flags=flags)
+
+    def tab(self):
+        from ranger.ext.get_executables import get_executables
+
+        if self.arg(1) and self.arg(1)[0] == "-":
+            command = self.rest(2)
+        else:
+            command = self.rest(1)
+        start = self.line[0 : len(self.line) - len(command)]
+
+        try:
+            position_of_last_space = command.rindex(" ")
+        except ValueError:
+            return (
+                start + program + " "
+                for program in get_executables()
+                if program.startswith(command)
+            )
+        if position_of_last_space == len(command) - 1:
+            selection = self.fm.thistab.get_selection()
+            if len(selection) == 1:
+                return self.line + selection[0].shell_escaped_basename + " "
+            else:
+                return self.line + "%s "
+        else:
+            before_word, start_of_word = self.line.rsplit(" ", 1)
+            return (
+                before_word + " " + file.shell_escaped_basename
+                for file in self.fm.thisdir.files
+                if file.shell_escaped_basename.startswith(start_of_word)
+            )
+
+
+class open_with(Command):
+    def execute(self):
+        app, flags, mode = self._get_app_flags_mode(self.rest(1))
+        self.fm.execute_file(
+            files=[f for f in self.fm.thistab.get_selection()],
+            app=app,
+            flags=flags,
+            mode=mode,
+        )
+
+    def tab(self):
+        return self._tab_through_executables()
+
+    def _get_app_flags_mode(self, string):
+        """Extracts the application, flags and mode from a string.
+
+        examples:
+        "mplayer f 1" => ("mplayer", "f", 1)
+        "aunpack 4" => ("aunpack", "", 4)
+        "p" => ("", "p", 0)
+        "" => None
+        """
+
+        app = ""
+        flags = ""
+        mode = 0
+        split = string.split()
+
+        if len(split) == 0:
+            pass
+
+        elif len(split) == 1:
+            part = split[0]
+            if self._is_app(part):
+                app = part
+            elif self._is_flags(part):
+                flags = part
+            elif self._is_mode(part):
+                mode = part
+
+        elif len(split) == 2:
+            part0 = split[0]
+            part1 = split[1]
+
+            if self._is_app(part0):
+                app = part0
+                if self._is_flags(part1):
+                    flags = part1
+                elif self._is_mode(part1):
+                    mode = part1
+            elif self._is_flags(part0):
+                flags = part0
+                if self._is_mode(part1):
+                    mode = part1
+            elif self._is_mode(part0):
+                mode = part0
+                if self._is_flags(part1):
+                    flags = part1
+
+        elif len(split) >= 3:
+            part0 = split[0]
+            part1 = split[1]
+            part2 = split[2]
+
+            if self._is_app(part0):
+                app = part0
+                if self._is_flags(part1):
+                    flags = part1
+                    if self._is_mode(part2):
+                        mode = part2
+                elif self._is_mode(part1):
+                    mode = part1
+                    if self._is_flags(part2):
+                        flags = part2
+            elif self._is_flags(part0):
+                flags = part0
+                if self._is_mode(part1):
+                    mode = part1
+            elif self._is_mode(part0):
+                mode = part0
+                if self._is_flags(part1):
+                    flags = part1
+
+        return app, flags, int(mode)
+
+    def _is_app(self, arg):
+        return not self._is_flags(arg) and not arg.isdigit()
+
+    def _is_flags(self, arg):
+        from ranger.core.runner import ALLOWED_FLAGS
+
+        return all(x in ALLOWED_FLAGS for x in arg)
+
+    def _is_mode(self, arg):
+        return all(x in "0123456789" for x in arg)
+
+
+class set_(Command):
+    """:set <option name>=<python expression>
+
+    Gives an option a new value.
+    """
+
+    name = "set"  # don't override the builtin set class
+
+    def execute(self):
+        name = self.arg(1)
+        name, value, _ = self.parse_setting_line()
+        self.fm.set_option_from_string(name, value)
+
+    def tab(self):
+        name, value, name_done = self.parse_setting_line()
+        settings = self.fm.settings
+        if not name:
+            return sorted(self.firstpart + setting for setting in settings)
+        if not value and not name_done:
+            return (
+                self.firstpart + setting
+                for setting in settings
+                if setting.startswith(name)
+            )
+        if not value:
+            return self.firstpart + str(settings[name])
+        if bool in settings.types_of(name):
+            if "true".startswith(value.lower()):
+                return self.firstpart + "True"
+            if "false".startswith(value.lower()):
+                return self.firstpart + "False"
+
+
+class setlocal(set_):
+    """:setlocal path=<python string> <option name>=<python expression>
+
+    Gives an option a new value.
+    """
+
+    PATH_RE = re.compile(r'^\s*path="?(.*?)"?\s*$')
+
+    def execute(self):
+        import os.path
+
+        match = self.PATH_RE.match(self.arg(1))
+        if match:
+            path = os.path.normpath(os.path.expanduser(match.group(1)))
+            self.shift()
+        elif self.fm.thisdir:
+            path = self.fm.thisdir.path
+        else:
+            path = None
+
+        if path:
+            name = self.arg(1)
+            name, value, _ = self.parse_setting_line()
+            self.fm.set_option_from_string(name, value, localpath=path)
+
+
+class setintag(setlocal):
+    """:setintag <tag or tags> <option name>=<option value>
+
+    Sets an option for directories that are tagged with a specific tag.
+    """
+
+    def execute(self):
+        tags = self.arg(1)
+        self.shift()
+        name, value, _ = self.parse_setting_line()
+        self.fm.set_option_from_string(name, value, tags=tags)
+
+
+class quit(Command):
+    """:quit
+
+    Closes the current tab.  If there is only one tab, quit the program.
+    """
+
+    def execute(self):
+        if len(self.fm.tabs) <= 1:
+            self.fm.exit()
+        self.fm.tab_close()
+
+
+class quitall(Command):
+    """:quitall
+
+    Quits the program immediately.
+    """
+
+    def execute(self):
+        self.fm.exit()
+
+
+class quit_bang(quitall):
+    """:quit!
+
+    Quits the program immediately.
+    """
+
+    name = "quit!"
+    allow_abbrev = False
+
+
+class terminal(Command):
+    """:terminal
+
+    Spawns an "x-terminal-emulator" starting in the current directory.
+    """
+
+    def execute(self):
+        import os
+        from ranger.ext.get_executables import get_executables
+
+        command = os.environ.get("TERMCMD", os.environ.get("TERM"))
+        if command not in get_executables():
+            command = "x-terminal-emulator"
+        if command not in get_executables():
+            command = "xterm"
+        self.fm.run(command, flags="f")
+
+
+class delete(Command):
+    """:delete
+
+    Tries to delete the selection.
+
+    "Selection" is defined as all the "marked files" (by default, you
+    can mark files with space or v). If there are no marked files,
+    use the "current file" (where the cursor is)
+
+    When attempting to delete non-empty directories or multiple
+    marked files, it will require a confirmation.
+    """
+
+    allow_abbrev = False
+
+    def execute(self):
+        import os
+
+        if self.rest(1):
+            self.fm.notify(
+                "Error: delete takes no arguments! It deletes " "the selected file(s).",
+                bad=True,
+            )
+            return
+
+        cwd = self.fm.thisdir
+        cf = self.fm.thisfile
+        if not cwd or not cf:
+            self.fm.notify("Error: no file selected for deletion!", bad=True)
+            return
+
+        confirm = self.fm.settings.confirm_on_delete
+        many_files = cwd.marked_items or (
+            cf.is_directory and not cf.is_link and len(os.listdir(cf.path)) > 0
+        )
+
+        if confirm != "never" and (confirm != "multiple" or many_files):
+            self.fm.ui.console.ask(
+                "Confirm deletion of: %s (y/N)"
+                % ", ".join(f.basename for f in self.fm.thistab.get_selection()),
+                self._question_callback,
+                ("n", "N", "y", "Y"),
+            )
+        else:
+            # no need for a confirmation, just delete
+            self.fm.delete()
+
+    def _question_callback(self, answer):
+        if answer == "y" or answer == "Y":
+            self.fm.delete()
+
+
+class mark_tag(Command):
+    """:mark_tag [<tags>]
+
+    Mark all tags that are tagged with either of the given tags.
+    When leaving out the tag argument, all tagged files are marked.
+    """
+
+    do_mark = True
+
+    def execute(self):
+        cwd = self.fm.thisdir
+        tags = self.rest(1).replace(" ", "")
+        if not self.fm.tags:
+            return
+        for fileobj in cwd.files:
+            try:
+                tag = self.fm.tags.tags[fileobj.realpath]
+            except KeyError:
+                continue
+            if not tags or tag in tags:
+                cwd.mark_item(fileobj, val=self.do_mark)
+        self.fm.ui.status.need_redraw = True
+        self.fm.ui.need_redraw = True
+
+
+class console(Command):
+    """:console <command>
+
+    Open the console with the given command.
+    """
+
+    def execute(self):
+        position = None
+        if self.arg(1)[0:2] == "-p":
+            try:
+                position = int(self.arg(1)[2:])
+                self.shift()
+            except:
+                pass
+        self.fm.open_console(self.rest(1), position=position)
+
+
+class load_copy_buffer(Command):
+    """:load_copy_buffer
+
+    Load the copy buffer from confdir/copy_buffer
+    """
+
+    copy_buffer_filename = "copy_buffer"
+
+    def execute(self):
+        from ranger.container.file import File
+        from os.path import exists
+
+        try:
+            fname = self.fm.confpath(self.copy_buffer_filename)
+            f = open(fname, "r")
+        except:
+            return self.fm.notify(
+                "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True
+            )
+        self.fm.copy_buffer = set(File(g) for g in f.read().split("\n") if exists(g))
+        f.close()
+        self.fm.ui.redraw_main_column()
+
+
+class save_copy_buffer(Command):
+    """:save_copy_buffer
+
+    Save the copy buffer to confdir/copy_buffer
+    """
+
+    copy_buffer_filename = "copy_buffer"
+
+    def execute(self):
+        fname = None
+        try:
+            fname = self.fm.confpath(self.copy_buffer_filename)
+            f = open(fname, "w")
+        except:
+            return self.fm.notify(
+                "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True
+            )
+        f.write("\n".join(f.path for f in self.fm.copy_buffer))
+        f.close()
+
+
+class unmark_tag(mark_tag):
+    """:unmark_tag [<tags>]
+
+    Unmark all tags that are tagged with either of the given tags.
+    When leaving out the tag argument, all tagged files are unmarked.
+    """
+
+    do_mark = False
+
+
+class mkdir(Command):
+    """:mkdir <dirname>
+
+    Creates a directory with the name <dirname>.
+    """
+
+    def execute(self):
+        from os.path import join, expanduser, lexists
+        from os import mkdir
+
+        dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
+        if not lexists(dirname):
+            mkdir(dirname)
+        else:
+            self.fm.notify("file/directory exists!", bad=True)
+
+    def tab(self):
+        return self._tab_directory_content()
+
+
+class touch(Command):
+    """:touch <fname>
+
+    Creates a file with the name <fname>.
+    """
+
+    def execute(self):
+        from os.path import join, expanduser, lexists
+
+        fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
+        if not lexists(fname):
+            open(fname, "a").close()
+        else:
+            self.fm.notify("file/directory exists!", bad=True)
+
+    def tab(self):
+        return self._tab_directory_content()
+
+
+class edit(Command):
+    """:edit <filename>
+
+    Opens the specified file in vim
+    """
+
+    def execute(self):
+        if not self.arg(1):
+            self.fm.edit_file(self.fm.thisfile.path)
+        else:
+            self.fm.edit_file(self.rest(1))
+
+    def tab(self):
+        return self._tab_directory_content()
+
+
+class eval_(Command):
+    """:eval [-q] <python code>
+
+    Evaluates the python code.
+    `fm' is a reference to the FM instance.
+    To display text, use the function `p'.
+
+    Examples:
+    :eval fm
+    :eval len(fm.directories)
+    :eval p("Hello World!")
+    """
+
+    name = "eval"
+    resolve_macros = False
+
+    def execute(self):
+        if self.arg(1) == "-q":
+            code = self.rest(2)
+            quiet = True
+        else:
+            code = self.rest(1)
+            quiet = False
+        import ranger
+
+        global cmd, fm, p, quantifier
+        fm = self.fm
+        cmd = self.fm.execute_console
+        p = fm.notify
+        quantifier = self.quantifier
+        try:
+            try:
+                result = eval(code)
+            except SyntaxError:
+                exec(code)
+            else:
+                if result and not quiet:
+                    p(result)
+        except Exception as err:
+            p(err)
+
+
+class rename(Command):
+    """:rename <newname>
+
+    Changes the name of the currently highlighted file to <newname>
+    """
+
+    def execute(self):
+        from ranger.container.file import File
+        from os import access
+
+        new_name = self.rest(1)
+
+        if not new_name:
+            return self.fm.notify("Syntax: rename <newname>", bad=True)
+
+        if new_name == self.fm.thisfile.basename:
+            return
+
+        if access(new_name, os.F_OK):
+            return self.fm.notify("Can't rename: file already exists!", bad=True)
+
+        self.fm.rename(self.fm.thisfile, new_name)
+        f = File(new_name)
+        self.fm.thisdir.pointed_obj = f
+        self.fm.thisfile = f
+
+    def tab(self):
+        return self._tab_directory_content()
+
+
+class chmod(Command):
+    """:chmod <octal number>
+
+    Sets the permissions of the selection to the octal number.
+
+    The octal number is between 0 and 777. The digits specify the
+    permissions for the user, the group and others.
+
+    A 1 permits execution, a 2 permits writing, a 4 permits reading.
+    Add those numbers to combine them. So a 7 permits everything.
+    """
+
+    def execute(self):
+        mode = self.rest(1)
+        if not mode:
+            mode = str(self.quantifier)
+
+        try:
+            mode = int(mode, 8)
+            if mode < 0 or mode > 0o777:
+                raise ValueError
+        except ValueError:
+            self.fm.notify("Need an octal number between 0 and 777!", bad=True)
+            return
+
+        for file in self.fm.thistab.get_selection():
+            try:
+                os.chmod(file.path, mode)
+            except Exception as ex:
+                self.fm.notify(ex)
+
+        try:
+            # reloading directory.  maybe its better to reload the selected
+            # files only.
+            self.fm.thisdir.load_content()
+        except:
+            pass
+
+
+class bulkrename(Command):
+    """:bulkrename
+
+    This command opens a list of selected files in an external editor.
+    After you edit and save the file, it will generate a shell script
+    which does bulk renaming according to the changes you did in the file.
+
+    This shell script is opened in an editor for you to review.
+    After you close it, it will be executed.
+    """
+
+    def execute(self):
+        import sys
+        import tempfile
+        from ranger.container.file import File
+        from ranger.ext.shell_escape import shell_escape as esc
+
+        py3 = sys.version > "3"
+
+        # Create and edit the file list
+        filenames = [f.basename for f in self.fm.thistab.get_selection()]
+        listfile = tempfile.NamedTemporaryFile()
+
+        if py3:
+            listfile.write("\n".join(filenames).encode("utf-8"))
+        else:
+            listfile.write("\n".join(filenames))
+        listfile.flush()
+        self.fm.execute_file([File(listfile.name)], app="editor")
+        listfile.seek(0)
+        if py3:
+            new_filenames = listfile.read().decode("utf-8").split("\n")
+        else:
+            new_filenames = listfile.read().split("\n")
+        listfile.close()
+        if all(a == b for a, b in zip(filenames, new_filenames)):
+            self.fm.notify("No renaming to be done!")
+            return
+
+        # Generate and execute script
+        cmdfile = tempfile.NamedTemporaryFile()
+        cmdfile.write(b"# This file will be executed when you close the editor.\n")
+        cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
+        if py3:
+            cmdfile.write(
+                "\n".join(
+                    "mv -vi -- " + esc(old) + " " + esc(new)
+                    for old, new in zip(filenames, new_filenames)
+                    if old != new
+                ).encode("utf-8")
+            )
+        else:
+            cmdfile.write(
+                "\n".join(
+                    "mv -vi -- " + esc(old) + " " + esc(new)
+                    for old, new in zip(filenames, new_filenames)
+                    if old != new
+                )
+            )
+        cmdfile.flush()
+        self.fm.execute_file([File(cmdfile.name)], app="editor")
+        self.fm.run(["/bin/sh", cmdfile.name], flags="w")
+        cmdfile.close()
+
+
+class relink(Command):
+    """:relink <newpath>
+
+    Changes the linked path of the currently highlighted symlink to <newpath>
+    """
+
+    def execute(self):
+        from ranger.container.file import File
+
+        new_path = self.rest(1)
+        cf = self.fm.thisfile
+
+        if not new_path:
+            return self.fm.notify("Syntax: relink <newpath>", bad=True)
+
+        if not cf.is_link:
+            return self.fm.notify("%s is not a symlink!" % cf.basename, bad=True)
+
+        if new_path == os.readlink(cf.path):
+            return
+
+        try:
+            os.remove(cf.path)
+            os.symlink(new_path, cf.path)
+        except OSError as err:
+            self.fm.notify(err)
+
+        self.fm.reset()
+        self.fm.thisdir.pointed_obj = cf
+        self.fm.thisfile = cf
+
+    def tab(self):
+        if not self.rest(1):
+            return self.line + os.readlink(self.fm.thisfile.path)
+        else:
+            return self._tab_directory_content()
+
+
+class help_(Command):
+    """:help
+
+    Display ranger's manual page.
+    """
+
+    name = "help"
+
+    def execute(self):
+        if self.quantifier == 1:
+            self.fm.dump_keybindings()
+        elif self.quantifier == 2:
+            self.fm.dump_commands()
+        elif self.quantifier == 3:
+            self.fm.dump_settings()
+        else:
+            self.fm.display_help()
+
+
+class copymap(Command):
+    """:copymap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "browser" keybinding from <keys> to <newkeys>
+    """
+
+    context = "browser"
+
+    def execute(self):
+        if not self.arg(1) or not self.arg(2):
+            return self.fm.notify("Not enough arguments", bad=True)
+
+        for arg in self.args[2:]:
+            self.fm.ui.keymaps.copy(self.context, self.arg(1), arg)
+
+
+class copypmap(copymap):
+    """:copypmap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "pager" keybinding from <keys> to <newkeys>
+    """
+
+    context = "pager"
+
+
+class copycmap(copymap):
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "console" keybinding from <keys> to <newkeys>
+    """
+
+    context = "console"
+
+
+class copytmap(copymap):
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "taskview" keybinding from <keys> to <newkeys>
+    """
+
+    context = "taskview"
+
+
+class unmap(Command):
+    """:unmap <keys> [<keys2>, ...]
+
+    Remove the given "browser" mappings
+    """
+
+    context = "browser"
+
+    def execute(self):
+        for arg in self.args[1:]:
+            self.fm.ui.keymaps.unbind(self.context, arg)
+
+
+class cunmap(unmap):
+    """:cunmap <keys> [<keys2>, ...]
+
+    Remove the given "console" mappings
+    """
+
+    context = "browser"
+
+
+class punmap(unmap):
+    """:punmap <keys> [<keys2>, ...]
+
+    Remove the given "pager" mappings
+    """
+
+    context = "pager"
+
+
+class tunmap(unmap):
+    """:tunmap <keys> [<keys2>, ...]
+
+    Remove the given "taskview" mappings
+    """
+
+    context = "taskview"
+
+
+class map_(Command):
+    """:map <keysequence> <command>
+
+    Maps a command to a keysequence in the "browser" context.
+
+    Example:
+    map j move down
+    map J move down 10
+    """
+
+    name = "map"
+    context = "browser"
+    resolve_macros = False
+
+    def execute(self):
+        self.fm.ui.keymaps.bind(self.context, self.arg(1), self.rest(2))
+
+
+class cmap(map_):
+    """:cmap <keysequence> <command>
+
+    Maps a command to a keysequence in the "console" context.
+
+    Example:
+    cmap <ESC> console_close
+    cmap <C-x> console_type test
+    """
+
+    context = "console"
+
+
+class tmap(map_):
+    """:tmap <keysequence> <command>
+
+    Maps a command to a keysequence in the "taskview" context.
+    """
+
+    context = "taskview"
+
+
+class pmap(map_):
+    """:pmap <keysequence> <command>
+
+    Maps a command to a keysequence in the "pager" context.
+    """
+
+    context = "pager"
+
+
+class scout(Command):
+    """:scout [-FLAGS] <pattern>
+
+    Swiss army knife command for searching, traveling and filtering files.
+    The command takes various flags as arguments which can be used to
+    influence its behaviour:
+
+    -a = automatically open a file on unambiguous match
+    -e = open the selected file when pressing enter
+    -f = filter files that match the current search pattern
+    -g = interpret pattern as a glob pattern
+    -i = ignore the letter case of the files
+    -k = keep the console open when changing a directory with the command
+    -l = letter skipping; e.g. allow "rdme" to match the file "readme"
+    -m = mark the matching files after pressing enter
+    -M = unmark the matching files after pressing enter
+    -p = permanent filter: hide non-matching files after pressing enter
+    -s = smart case; like -i unless pattern contains upper case letters
+    -t = apply filter and search pattern as you type
+    -v = inverts the match
+
+    Multiple flags can be combined.  For example, ":scout -gpt" would create
+    a :filter-like command using globbing.
+    """
+
+    AUTO_OPEN = "a"
+    OPEN_ON_ENTER = "e"
+    FILTER = "f"
+    SM_GLOB = "g"
+    IGNORE_CASE = "i"
+    KEEP_OPEN = "k"
+    SM_LETTERSKIP = "l"
+    MARK = "m"
+    UNMARK = "M"
+    PERM_FILTER = "p"
+    SM_REGEX = "r"
+    SMART_CASE = "s"
+    AS_YOU_TYPE = "t"
+    INVERT = "v"
+
+    def __init__(self, *args, **kws):
+        Command.__init__(self, *args, **kws)
+        self._regex = None
+        self.flags, self.pattern = self.parse_flags()
+
+    def execute(self):
+        thisdir = self.fm.thisdir
+        flags = self.flags
+        pattern = self.pattern
+        regex = self._build_regex()
+        count = self._count(move=True)
+
+        self.fm.thistab.last_search = regex
+        self.fm.set_search_method(order="search")
+
+        if self.MARK in flags or self.UNMARK in flags:
+            value = flags.find(self.MARK) > flags.find(self.UNMARK)
+            if self.FILTER in flags:
+                for f in thisdir.files:
+                    thisdir.mark_item(f, value)
+            else:
+                for f in thisdir.files:
+                    if regex.search(f.basename):
+                        thisdir.mark_item(f, value)
+
+        if self.PERM_FILTER in flags:
+            thisdir.filter = regex if pattern else None
+
+        # clean up:
+        self.cancel()
+
+        if self.OPEN_ON_ENTER in flags or self.AUTO_OPEN in flags and count == 1:
+            if os.path.exists(pattern):
+                self.fm.cd(pattern)
+            else:
+                self.fm.move(right=1)
+
+        if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
+            # reopen the console:
+            self.fm.open_console(self.line[0 : -len(pattern)])
+
+        if thisdir != self.fm.thisdir and pattern != "..":
+            self.fm.block_input(0.5)
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
+        self.fm.thisdir.refilter()
+
+    def quick(self):
+        asyoutype = self.AS_YOU_TYPE in self.flags
+        if self.FILTER in self.flags:
+            self.fm.thisdir.temporary_filter = self._build_regex()
+        if self.PERM_FILTER in self.flags and asyoutype:
+            self.fm.thisdir.filter = self._build_regex()
+        if self.FILTER in self.flags or self.PERM_FILTER in self.flags:
+            self.fm.thisdir.refilter()
+        if self._count(move=asyoutype) == 1 and self.AUTO_OPEN in self.flags:
+            return True
+        return False
+
+    def tab(self):
+        self._count(move=True, offset=1)
+
+    def _build_regex(self):
+        if self._regex is not None:
+            return self._regex
+
+        frmat = "%s"
+        flags = self.flags
+        pattern = self.pattern
+
+        if pattern == ".":
+            return re.compile("")
+
+        # Handle carets at start and dollar signs at end separately
+        if pattern.startswith("^"):
+            pattern = pattern[1:]
+            frmat = "^" + frmat
+        if pattern.endswith("$"):
+            pattern = pattern[:-1]
+            frmat += "$"
+
+        # Apply one of the search methods
+        if self.SM_REGEX in flags:
+            regex = pattern
+        elif self.SM_GLOB in flags:
+            regex = re.escape(pattern).replace("\\*", ".*").replace("\\?", ".")
+        elif self.SM_LETTERSKIP in flags:
+            regex = ".*".join(re.escape(c) for c in pattern)
+        else:
+            regex = re.escape(pattern)
+
+        regex = frmat % regex
+
+        # Invert regular expression if necessary
+        if self.INVERT in flags:
+            regex = "^(?:(?!%s).)*$" % regex
+
+        # Compile Regular Expression
+        options = re.LOCALE | re.UNICODE
+        if self.IGNORE_CASE in flags or self.SMART_CASE in flags and pattern.islower():
+            options |= re.IGNORECASE
+        try:
+            self._regex = re.compile(regex, options)
+        except:
+            self._regex = re.compile("")
+        return self._regex
+
+    def _count(self, move=False, offset=0):
+        count = 0
+        cwd = self.fm.thisdir
+        pattern = self.pattern
+
+        if not pattern:
+            return 0
+        if pattern == ".":
+            return 0
+        if pattern == "..":
+            return 1
+
+        deq = deque(cwd.files)
+        deq.rotate(-cwd.pointer - offset)
+        i = offset
+        regex = self._build_regex()
+        for fsobj in deq:
+            if regex.search(fsobj.basename):
+                count += 1
+                if move and count == 1:
+                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
+                    self.fm.thisfile = cwd.pointed_obj
+            if count > 1:
+                return count
+            i += 1
+
+        return count == 1
+
+
+class grep(Command):
+    """:grep <string>
+
+    Looks for a string in all marked files or directories
+    """
+
+    def execute(self):
+        if self.rest(1):
+            action = ["grep", "--line-number"]
+            action.extend(["-e", self.rest(1), "-r"])
+            action.extend(f.path for f in self.fm.thistab.get_selection())
+            self.fm.execute_command(action, flags="p")
+
+
+# Version control commands
+# --------------------------------
+class stage(Command):
+    """
+    :stage
+
+    Stage selected files for the corresponding version control system
+    """
+
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        filelist = [f.path for f in self.fm.thistab.get_selection()]
+        self.fm.thisdir.vcs_outdated = True
+        #        for f in self.fm.thistab.get_selection():
+        #            f.vcs_outdated = True
+
+        try:
+            self.fm.thisdir.vcs.add(filelist)
+        except VcsError:
+            self.fm.notify("Could not stage files.")
+
+        self.fm.reload_cwd()
+
+
+class unstage(Command):
+    """
+    :unstage
+
+    Unstage selected files for the corresponding version control system
+    """
+
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        filelist = [f.path for f in self.fm.thistab.get_selection()]
+        self.fm.thisdir.vcs_outdated = True
+        #        for f in self.fm.thistab.get_selection():
+        #            f.vcs_outdated = True
+
+        try:
+            self.fm.thisdir.vcs.reset(filelist)
+        except VcsError:
+            self.fm.notify("Could not unstage files.")
+
+        self.fm.reload_cwd()
+
+
+class diff(Command):
+    """
+    :diff
+
+    Displays a diff of selected files against the last committed version
+    """
+
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+        import tempfile
+
+        L = self.fm.thistab.get_selection()
+        if len(L) == 0:
+            return
+
+        filelist = [f.path for f in L]
+        vcs = L[0].vcs
+
+        diff = vcs.get_raw_diff(filelist=filelist)
+        if len(diff.strip()) > 0:
+            tmp = tempfile.NamedTemporaryFile()
+            tmp.write(diff.encode("utf-8"))
+            tmp.flush()
+
+            pager = os.environ.get("PAGER", ranger.DEFAULT_PAGER)
+            self.fm.run([pager, tmp.name])
+        else:
+            raise Exception("diff is empty")
+
+
+class log(Command):
+    """
+    :log
+
+    Displays the log of the current repo or files
+    """
+
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+        import tempfile
+
+        L = self.fm.thistab.get_selection()
+        if len(L) == 0:
+            return
+
+        filelist = [f.path for f in L]
+        vcs = L[0].vcs
+
+        log = vcs.get_raw_log(filelist=filelist)
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(log.encode("utf-8"))
+        tmp.flush()
+
+        pager = os.environ.get("PAGER", ranger.DEFAULT_PAGER)
+        self.fm.run([pager, tmp.name])
+
+
+# Customizations
+# ------------------------
+
+
+class empty(Command):
+    """
+    :empty
+
+    Empties the trash directory ~/.local/share/Trash/files
+
+    """
+
+    def execute(self):
+        self.fm.run("rm -rf ~/.local/share/Trash/files/{*,.[^.]*}")
+        self.fm.run("rm -rf ~/.local/share/Trash/info/{*,.[^.]*}")
+        self.fm.run("rm -rf ~/.local/share/Trash/expunged/{*,.[^.]*}")
+
+
+class compress(Command):
+    def execute(self):
+        """ Compress marked files to current directory """
+        cwd = self.fm.thisdir
+        marked_files = cwd.get_selection()
+
+        if not marked_files:
+            return
+
+        def refresh(_):
+            cwd = self.fm.get_directory(original_path)
+            cwd.load_content()
+
+        original_path = cwd.path
+        parts = self.line.split()
+        au_flags = parts[1:]
+
+        descr = "compressing files in: " + os.path.basename(parts[1])
+        obj = CommandLoader(
+            args=["apack"]
+            + au_flags
+            + [os.path.relpath(f.path, cwd.path) for f in marked_files],
+            descr=descr,
+        )
+
+        obj.signal_bind("after", refresh)
+        self.fm.loader.add(obj)
+
+    def tab(self):
+        """ Complete with current folder name """
+
+        extension = [".zip", ".tar.gz", ".rar", ".7z"]
+        return [
+            "compress " + os.path.basename(self.fm.thisdir.path) + ext
+            for ext in extension
+        ]
+
+
+class extracthere(Command):
+    def execute(self):
+        """ Extract copied files to current directory """
+        copied_files = tuple(self.fm.copy_buffer)
+
+        if not copied_files:
+            return
+
+        def refresh(_):
+            cwd = self.fm.get_directory(original_path)
+            cwd.load_content()
+
+        one_file = copied_files[0]
+        cwd = self.fm.thisdir
+        original_path = cwd.path
+        au_flags = ["-X", cwd.path]
+        au_flags += self.line.split()[1:]
+        au_flags += ["-e"]
+
+        self.fm.copy_buffer.clear()
+        self.fm.cut_buffer = False
+        if len(copied_files) == 1:
+            descr = "extracting: " + os.path.basename(one_file.path)
+        else:
+            descr = "extracting files from: " + os.path.basename(one_file.dirname)
+            obj = CommandLoader(
+                args=["aunpack"] + au_flags + [f.path for f in copied_files],
+                descr=descr,
+            )
+
+        obj.signal_bind("after", refresh)
+        self.fm.loader.add(obj)
+
+#+end_src
+*** rc.conf
+#+begin_src conf :tangle ~/.config/ranger/rc.conf
+# ===================================================================
+# == Options
+# ===================================================================
+
+set viewmode miller
+set column_ratios 1,3,4
+set hidden_filter ^\.|\.(?:pyc|pyo|bak|swp)$|^lost\+found$|^__(py)?cache__$
+set show_hidden false
+set confirm_on_delete multiple
+set use_preview_script true
+set automatically_count_files true
+set open_all_images true
+set vcs_aware false
+set vcs_backend_git disabled
+set vcs_backend_hg disabled
+set vcs_backend_bzr disabled
+set preview_images true
+set preview_images_method ueberzug
+set unicode_ellipsis false
+set show_hidden_bookmarks true
+set colorscheme default
+set preview_files true
+set preview_directories true
+set collapse_preview true
+set save_console_history true
+set status_bar_on_top false
+set draw_progress_bar_in_status_bar true
+set draw_borders false
+set dirname_in_tabs true
+set mouse_enabled false
+set display_size_in_main_column true
+set display_size_in_status_bar true
+set display_free_space_in_status_bar true
+set display_tags_in_all_columns true
+set update_title true
+set update_tmux_title true
+set shorten_title 3
+set hostname_in_titlebar true
+set tilde_in_titlebar true
+set max_history_size 20
+set max_console_history_size 50
+set scroll_offset 8
+set flushinput true
+set padding_right true
+set autosave_bookmarks true
+set autoupdate_cumulative_size false
+set show_cursor false
+set sort natural
+set sort_reverse false
+set sort_case_insensitive true
+set sort_directories_first true
+set sort_unicode false
+set xterm_alt_key false
+set cd_bookmarks true
+set preview_max_size 0
+set show_selection_in_titlebar true
+set idle_delay 2000
+set metadata_deep_search false
+
+# ===================================================================
+# == Local Options
+# ===================================================================
+# You can set local options that only affect a single directory.
+
+# Examples:
+# setlocal path=~/downloads sort mtime
+
+# ===================================================================
+# == Command Aliases in the Console
+# ===================================================================
+
+alias e    edit
+alias q    quit
+alias q!   quitall
+alias qa   quitall
+alias qall quitall
+alias setl setlocal
+
+alias filter     scout -prt
+alias find       scout -aeit
+alias mark       scout -mr
+alias unmark     scout -Mr
+alias search     scout -rs
+alias search_inc scout -rts
+alias travel     scout -aefiklst
+
+# ===================================================================
+# == Define keys for the browser
+# ===================================================================
+
+# Basic
+map <C-x><C-c> quit!
+map <C-x>k quit
+
+map <C-x>R     reload_cwd
+map <C-x><C-r> reset
+map <C-l>      redraw_window
+map <C-g>      chain abort; change_mode normal; mark_files all=True val=False
+
+map <C-x>i display_file
+map <C-h>  help
+map <C-x>W display_log
+map <C-x>w taskview_open
+
+map <A-x>  console
+map <A-!>  console shell%space
+map <A-f> chain draw_possible_programs; console open_with%space
+
+# Change the line mode
+map <C-x>mf linemode filename
+map <C-x>mi linemode fileinfo
+map <C-x>mp linemode permissions
+map <C-x>mt linemode metatitle
+
+# Tagging / Marking
+map <C-x>t<any> tag_toggle tag=%any
+map <C-_>t      tag_remove
+map <Space>     mark_files toggle=True
+map <C-Space>   toggle_visual_mode
+
+# For the nostalgics: Midnight Commander bindings
+map <F1> help
+map <F3> display_file
+map <F4> edit
+map <F5> copy
+map <F6> cut
+map <F7> console mkdir%space
+map <F8> console delete
+map <F10> exit
+
+# Direction keys
+map <UP>       move up=1
+map <DOWN>     move down=1
+map <LEFT>     move left=1
+map <RIGHT>    move right=1
+map <HOME>     move to=0
+map <END>      move to=-1
+map <PAGEDOWN> move down=1   pages=True
+map <PAGEUP>   move up=1     pages=True
+map <CR>       move right=1
+#map <DELETE>   console delete
+map <INSERT>   console touch%space
+
+copymap <UP>       <C-p>
+copymap <DOWN>     <C-n>
+copymap <LEFT>     <C-b>
+copymap <RIGHT>    <C-f>
+copymap <HOME>     <A-LT>
+copymap <END>      <A-GT>
+copymap <PAGEDOWN> <A-v>
+copymap <PAGEUP>   <C-v>
+
+# Jumping around
+map <C-u><C-space> history_go -1
+map <A-}> move_parent 1
+map <A-{> move_parent -1
+
+map <C-x>gh cd ~
+map <C-x>ge cd /etc
+map <C-x>gu cd /usr
+map <C-x>gd cd /dev
+map <C-x>gl cd -r .
+map <C-x>gL cd -r %f
+map <C-x>go cd /opt
+map <C-x>gv cd /var
+map <C-x>gm cd /media
+map <C-x>gM cd /mnt
+map <C-x>gs cd /srv
+map <C-x>gr cd /
+map <C-x>gR eval fm.cd(ranger.RANGERDIR)
+map <C-x>g/ cd /
+map <C-x>g? cd /usr/share/doc/ranger
+
+# External Programs
+map <C-x><C-f>  edit
+map <C-x>du shell -p du --max-depth=1 -h --apparent-size
+map <C-x>dU shell -p du --max-depth=1 -h --apparent-size | sort -rh
+map <C-x>wp shell -f echo -n %d/%f | xsel -i; xsel -o | xsel -i -b
+map <C-x>wd shell -f echo -n %d    | xsel -i; xsel -o | xsel -i -b
+map <C-x>wn shell -f echo -n %f    | xsel -i; xsel -o | xsel -i -b
+
+# Filesystem Operations
+map <C-x>= chmod
+
+map <A-d>  console rename%space
+map <C-e>  eval fm.open_console('rename ' + fm.thisfile.relative_path)
+map <C-a>  eval fm.open_console('rename ' + fm.thisfile.relative_path, position=7)
+
+map <C-y>y  paste
+map <C-y>o  paste overwrite=True
+map <C-y>l  paste_symlink relative=False
+map <C-y>L  paste_symlink relative=True
+map <C-y>hl paste_hardlink
+map <C-y>ht paste_hardlinked_subtree
+
+map <C-w>  cut
+map <C-_>w uncut
+map <C-x><C-w>a cut mode=add
+map <C-x><C-w>r cut mode=remove
+
+map <A-w>  copy
+map <C-x><A-w>a copy mode=add
+map <C-x><A-w>r copy mode=remove
+
+# Searching
+map <C-x>s console search_inc%space
+map <C-s> search_next
+map <C-r> search_next forward=False
+
+# Tabs
+#map <C-n>     tab_new ~
+map <C-x>b    tab_move 1
+map <A-Right> tab_move 1
+map <A-Left>  tab_move -1
+map <C-x><C-f> tab_new ~
+map <C-_>k    tab_restore
+map <a-1>     tab_open 1
+map <a-2>     tab_open 2
+map <a-3>     tab_open 3
+map <a-4>     tab_open 4
+map <a-5>     tab_open 5
+map <a-6>     tab_open 6
+map <a-7>     tab_open 7
+map <a-8>     tab_open 8
+map <a-9>     tab_open 9
+
+
+# Sorting
+map <C-x>or toggle_option sort_reverse
+map <C-x>oz set sort=random
+map <C-x>os chain set sort=size;      set sort_reverse=False
+map <C-x>ob chain set sort=basename;  set sort_reverse=False
+map <C-x>on chain set sort=natural;   set sort_reverse=False
+map <C-x>om chain set sort=mtime;     set sort_reverse=False
+map <C-x>oc chain set sort=ctime;     set sort_reverse=False
+map <C-x>oa chain set sort=atime;     set sort_reverse=False
+map <C-x>ot chain set sort=type;      set sort_reverse=False
+map <C-x>oe chain set sort=extension; set sort_reverse=False
+
+map <C-x>oS chain set sort=size;      set sort_reverse=True
+map <C-x>oB chain set sort=basename;  set sort_reverse=True
+map <C-x>oN chain set sort=natural;   set sort_reverse=True
+map <C-x>oM chain set sort=mtime;     set sort_reverse=True
+map <C-x>oC chain set sort=ctime;     set sort_reverse=True
+map <C-x>oA chain set sort=atime;     set sort_reverse=True
+map <C-x>oT chain set sort=type;      set sort_reverse=True
+map <C-x>oE chain set sort=extension; set sort_reverse=True
+
+map <C-x>dc get_cumulative_size
+
+# Settings
+map <C-x>zc    toggle_option collapse_preview
+map <C-x>zd    toggle_option sort_directories_first
+map <C-x>zh    toggle_option show_hidden
+map <C-x>zi    toggle_option flushinput
+map <C-x>zm    toggle_option mouse_enabled
+map <C-x>zp    toggle_option preview_files
+map <C-x>zP    toggle_option preview_directories
+map <C-x>zs    toggle_option sort_case_insensitive
+map <C-x>zu    toggle_option autoupdate_cumulative_size
+map <C-x>zv    toggle_option use_preview_script
+map <C-x>zf    console filter%space
+map <C-x>nn    narrow
+
+# Bookmarks
+map <C-x>rb<any> enter_bookmark %any
+map <C-x>rm<any> set_bookmark %any
+map <C-x>ru<any> unset_bookmark %any
+
+map <C-x>rb<bg>   draw_bookmarks
+copymap <C-x>rb<bg>  <C-x>rm<bg> <C-x>ru<bg>
+
+map <C-x>u shell -d udiskie-umount %d/%f
+
+# Generate all the chmod bindings with some python help:
+eval for arg in "rwxXst": cmd("map <C-x>+u{0} shell -f chmod u+{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>+g{0} shell -f chmod g+{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>+o{0} shell -f chmod o+{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>+a{0} shell -f chmod a+{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>+{0}  shell -f chmod u+{0} %s".format(arg))
+
+eval for arg in "rwxXst": cmd("map <C-x>-u{0} shell -f chmod u-{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>-g{0} shell -f chmod g-{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>-o{0} shell -f chmod o-{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>-a{0} shell -f chmod a-{0} %s".format(arg))
+eval for arg in "rwxXst": cmd("map <C-x>-{0}  shell -f chmod u-{0} %s".format(arg))
+
+# Search for letters as you type them
+#eval for arg in "abcdefghijklmnopqrstuvwxyz": cmd("map {0} console search_inc {0}".format(arg))
+map <allow_quantifiers> false
+
+# ===================================================================
+# == Define keys for the console
+# ===================================================================
+# Note: Unmapped keys are passed directly to the console.
+
+# Basic
+cmap <tab>   eval fm.ui.console.tab()
+cmap <s-tab> eval fm.ui.console.tab(-1)
+cmap <C-g>   eval fm.ui.console.close()
+cmap <CR>    eval fm.ui.console.execute()
+cmap <C-l>   redraw_window
+
+copycmap <C-g> <esc>
+copycmap <CR>  <C-j>
+
+# Move around
+cmap <up>    eval fm.ui.console.history_move(-1)
+cmap <down>  eval fm.ui.console.history_move(1)
+cmap <left>  eval fm.ui.console.move(left=1)
+cmap <right> eval fm.ui.console.move(right=1)
+cmap <home>  eval fm.ui.console.move(right=0, absolute=True)
+cmap <end>   eval fm.ui.console.move(right=-1, absolute=True)
+
+# Line Editing
+cmap <backspace>  eval fm.ui.console.delete(-1)
+cmap <delete>     eval fm.ui.console.delete(0)
+cmap <C-w>        eval fm.ui.console.delete_word()
+cmap <C-k>        eval fm.ui.console.delete_rest(1)
+cmap <C-u>        eval fm.ui.console.delete_rest(-1)
+cmap <C-y>        eval fm.ui.console.paste()
+
+# And of course the emacs way
+copycmap <up>        <C-p>
+copycmap <down>      <C-n>
+copycmap <left>      <C-b>
+copycmap <right>     <C-f>
+copycmap <home>      <C-a>
+copycmap <end>       <C-e>
+copycmap <delete>    <C-d>
+copycmap <backspace> <C-h>
+
+# Note: There are multiple ways to express backspaces.  <backspace> (code 263)
+# and <backspace2> (code 127).  To be sure, use both.
+copycmap <backspace> <backspace2>
+
+# This special expression allows typing in numerals:
+cmap <allow_quantifiers> false
+
+# ===================================================================
+# == Pager Keybindings
+# ===================================================================
+
+# Movement
+pmap  <down>      pager_move  down=1
+pmap  <up>        pager_move  up=1
+pmap  <left>      pager_move  left=4
+pmap  <right>     pager_move  right=4
+pmap  <home>      pager_move  to=0
+pmap  <end>       pager_move  to=-1
+pmap  <pagedown>  pager_move  down=1.0  pages=True
+pmap  <pageup>    pager_move  up=1.0    pages=True
+
+copypmap <UP>       <C-p>
+copypmap <DOWN>     <C-n> <CR>
+copypmap <LEFT>     <C-b>
+copypmap <RIGHT>    <C-f>
+copypmap <HOME>     <A-LT>
+copypmap <END>      <A-GT>
+copypmap <PAGEDOWN> <C-F> <A-v> <Space>
+copypmap <PAGEUP>   <C-B> <C-v>
+
+# Basic
+pmap     <C-l> redraw_window
+pmap     <C-g> pager_close
+copypmap <C-g> q Q i <F3>
+pmap E      edit_file
+
+# ===================================================================
+# == Taskview Keybindings
+# ===================================================================
+
+# Movement
+tmap <up>        taskview_move up=1
+tmap <down>      taskview_move down=1
+tmap <home>      taskview_move to=0
+tmap <end>       taskview_move to=-1
+tmap <pagedown>  taskview_move down=1.0  pages=True
+tmap <pageup>    taskview_move up=1.0    pages=True
+tmap <C-d>       taskview_move down=0.5  pages=True
+tmap <C-u>       taskview_move up=0.5    pages=True
+
+copytmap <UP>       k  <C-p>
+copytmap <DOWN>     j  <C-n> <CR>
+copytmap <HOME>     g
+copytmap <END>      G
+copytmap <C-u>      u
+copytmap <PAGEDOWN> n  f  <C-F>  <Space>
+copytmap <PAGEUP>   p  b  <C-B>
+
+# Changing priority and deleting tasks
+tmap <A-n>      eval -q fm.ui.taskview.task_move(-1)
+tmap <A-p>      eval -q fm.ui.taskview.task_move(0)
+tmap <C-d>      eval -q fm.ui.taskview.task_remove()
+tmap <pagedown> eval -q fm.ui.taskview.task_move(-1)
+tmap <pageup>   eval -q fm.ui.taskview.task_move(0)
+tmap <delete>   eval -q fm.ui.taskview.task_remove()
+
+# Basic
+tmap <C-l> redraw_window
+tmap <C-g> taskview_close
+
+#MPD
+map <C-x>go eval from ranger.ext.spawn import spawn; fm.select_file(spawn("grep ^music_directory ~/.config/mpd/mpd.conf | grep -oP '(?<=\").*(?=\")'").strip() + "/" + spawn("mpc -f %file% | head -1"))
+
+# Start shell
+map <C-x>mm shell $SHELL -c "cd %d; $SHELL"
+#+end_src
+*** rifle.conf
+#+begin_src conf :tangle ~/.config/ranger/rifle.conf
+#-------------------------------------------
+# Websites
+#-------------------------------------------
+# Rarely installed browsers get higher priority; It is assumed that if you
+# install a rare browser, you probably use it.  Firefox/konqueror/w3m on the
+# other hand are often only installed as fallback browsers.
+ext x?html?, has surf,           X, flag f = surf -- file://"$1"
+ext x?html?, has vimprobable,    X, flag f = vimprobable -- "$@"
+ext x?html?, has vimprobable2,   X, flag f = vimprobable2 -- "$@"
+ext x?html?, has qutebrowser,    X, flag f = qutebrowser -- "$@"
+ext x?html?, has dwb,            X, flag f = dwb -- "$@"
+ext x?html?, has jumanji,        X, flag f = jumanji -- "$@"
+ext x?html?, has luakit,         X, flag f = luakit -- "$@"
+ext x?html?, has uzbl,           X, flag f = uzbl -- "$@"
+ext x?html?, has uzbl-tabbed,    X, flag f = uzbl-tabbed -- "$@"
+ext x?html?, has uzbl-browser,   X, flag f = uzbl-browser -- "$@"
+ext x?html?, has uzbl-core,      X, flag f = uzbl-core -- "$@"
+ext x?html?, has midori,         X, flag f = midori -- "$@"
+ext x?html?, has chromium,       X, flag f = chromium -- "$@"
+ext x?html?, has opera,          X, flag f = opera -- "$@"
+ext x?html?, has firefox,        X, flag f = firefox -- "$@"
+ext x?html?, has seamonkey,      X, flag f = seamonkey -- "$@"
+ext x?html?, has iceweasel,      X, flag f = iceweasel -- "$@"
+ext x?html?, has epiphany,       X, flag f = epiphany -- "$@"
+ext x?html?, has konqueror,      X, flag f = konqueror -- "$@"
+ext x?html?, has elinks,          terminal = elinks "$@"
+ext x?html?, has links2,          terminal = links2 "$@"
+ext x?html?, has links,           terminal = links "$@"
+ext x?html?, has lynx,            terminal = lynx -- "$@"
+ext x?html?, has w3m,             terminal = w3m "$@"
+
+#-------------------------------------------
+# Misc
+#-------------------------------------------
+# Define the "editor" for text files as first action
+mime ^text,  label editor = emacsclient -t "$@"
+mime ^text,  label pager  = less "$@"
+!mime ^text, label editor, ext xml|json|csv|tex|py|pl|rb|js|sh|php = $EDITOR -- "$@"
+!mime ^text, label pager,  ext xml|json|csv|tex|py|pl|rb|js|sh|php = "$PAGER" -- "$@"
+
+ext 1                         = man "$1"
+ext s[wmf]c, has zsnes, X     = zsnes "$1"
+ext s[wmf]c, has snes9x-gtk,X = snes9x-gtk "$1"
+ext nes, has fceux, X         = fceux "$1"
+ext exe                       = wine "$1"
+name ^[mM]akefile$            = make
+
+#--------------------------------------------
+# Code
+#-------------------------------------------
+ext py  = python -- "$1"
+ext pl  = perl -- "$1"
+ext rb  = ruby -- "$1"
+ext js  = node -- "$1"
+ext sh  = sh -- "$1"
+ext php = php -- "$1"
+
+#--------------------------------------------
+# Audio without X
+#-------------------------------------------
+mime ^audio|ogg$, terminal, has mpv      = mpv -- "$@"
+mime ^audio|ogg$, terminal, has mplayer2 = mplayer2 -- "$@"
+mime ^audio|ogg$, terminal, has mplayer  = mplayer -- "$@"
+ext midi?,        terminal, has wildmidi = wildmidi -- "$@"
+
+#--------------------------------------------
+# Video/Audio with a GUI
+#-------------------------------------------
+mime ^video|audio, has gmplayer, X, flag f = gmplayer -- "$@"
+mime ^video|audio, has smplayer, X, flag f = smplayer "$@"
+mime ^video,       has mpv,      X, flag f = mpv -- "$@"
+mime ^video,       has mpv,      X, flag f = mpv --fs -- "$@"
+mime ^video,       has mplayer2, X, flag f = mplayer2 -- "$@"
+mime ^video,       has mplayer2, X, flag f = mplayer2 -fs -- "$@"
+mime ^video,       has mplayer,  X, flag f = mplayer -- "$@"
+mime ^video,       has mplayer,  X, flag f = mplayer -fs -- "$@"
+mime ^video|audio, has vlc,      X, flag f = vlc -- "$@"
+mime ^video|audio, has totem,    X, flag f = totem -- "$@"
+mime ^video|audio, has totem,    X, flag f = totem --fullscreen -- "$@"
+
+#--------------------------------------------
+# Video without X:
+#-------------------------------------------
+mime ^video, terminal, !X, has mpv       = mpv -- "$@"
+mime ^video, terminal, !X, has mplayer2  = mplayer2 -- "$@"
+mime ^video, terminal, !X, has mplayer   = mplayer -- "$@"
+
+#-------------------------------------------
+# Documents
+#-------------------------------------------
+ext pdf, has zathura,  X, flag f = zathura -- "$@"
+ext pdf, has llpp,     X, flag f = llpp "$@"
+ext pdf, has mupdf,    X, flag f = mupdf "$@"
+ext pdf, has mupdf-x11,X, flag f = mupdf-x11 "$@"
+ext pdf, has apvlv,    X, flag f = apvlv -- "$@"
+ext pdf, has xpdf,     X, flag f = xpdf -- "$@"
+ext pdf, has evince,   X, flag f = evince -- "$@"
+ext pdf, has atril,    X, flag f = atril -- "$@"
+ext pdf, has okular,   X, flag f = okular -- "$@"
+ext pdf, has epdfview, X, flag f = epdfview -- "$@"
+ext pdf, has qpdfview, X, flag f = qpdfview "$@"
+
+ext docx?, has catdoc,       terminal = catdoc -- "$@" | "$PAGER"
+
+ext                        sxc|xlsx?|xlt|xlw|gnm|gnumeric, has gnumeric,    X, flag f = gnumeric -- "$@"
+ext                        sxc|xlsx?|xlt|xlw|gnm|gnumeric, has kspread,     X, flag f = kspread -- "$@"
+ext pptx?|od[dfgpst]|fod[dfgpst]|docx?|sxc|xlsx?|xlt|xlw|gnm|gnumeric, has libreoffice, X, flag f = libreoffice "$@"
+ext pptx?|od[dfgpst]|fod[dfgpst]|docx?|sxc|xlsx?|xlt|xlw|gnm|gnumeric, has soffice,     X, flag f = soffice "$@"
+ext pptx?|od[dfgpst]|fod[dfgpst]|docx?|sxc|xlsx?|xlt|xlw|gnm|gnumeric, has ooffice,     X, flag f = ooffice "$@"
+
+ext djvu, has zathura,X, flag f = zathura -- "$@"
+ext djvu, has evince, X, flag f = evince -- "$@"
+ext djvu, has atril,  X, flag f = atril -- "$@"
+
+#-------------------------------------------
+# Image Viewing:
+#-------------------------------------------
+mime ^image/svg, has inkscape, X, flag f = inkscape -- "$@"
+mime ^image/svg, has display,  X, flag f = display -- "$@"
+
+mime ^image, has pqiv,      X, flag f = pqiv -- "$@"
+mime ^image, has sxiv,      X, flag f = sxiv -- "$@"
+mime ^image, has feh,       X, flag f = feh -- "$@"
+mime ^image, has mirage,    X, flag f = mirage -- "$@"
+mime ^image, has ristretto, X, flag f = ristretto "$@"
+mime ^image, has eog,       X, flag f = eog -- "$@"
+mime ^image, has eom,       X, flag f = eom -- "$@"
+mime ^image, has gimp,      X, flag f = gimp -- "$@"
+ext xcf,                    X, flag f = gimp -- "$@"
+
+#-------------------------------------------
+# Archives
+#-------------------------------------------
+
+# avoid password prompt by providing empty password
+ext 7z, has 7z = 7z -p l "$@" | "$PAGER"
+# This requires atool
+ext 7z|ace|ar|arc|bz2?|cab|cpio|cpt|deb|dgc|dmg|gz,  has als     = als -- "$@" | "$PAGER"
+ext iso|jar|msi|pkg|shar|tar|tgz|xar|xpi|xz|zip,     has als     = als -- "$@" | "$PAGER"
+ext 7z|ace|ar|arc|bz2?|cab|cpio|cpt|deb|dgc|dmg|gz,  has aunpack = aunpack -- "$@"
+ext iso|jar|msi|pkg|shar|tar|tgz|xar|xpi|xz|zip,     has aunpack = aunpack -- "$@"
+
+# RAR Archives
+ext rar,                                             has lsar   = lsar -l "$@" | "$PAGER"
+ext rar,                                             has unar   = unar -D -f "$@"
+
+# Fallback:
+ext tar|gz, has tar = tar vvtf "$@" | "$PAGER"
+ext tar|gz, has tar = tar vvxf "$@"
+
+#-------------------------------------------
+# Misc
+#-------------------------------------------
+label wallpaper, number 11, mime ^image, has feh, X = feh --bg-scale "$1"
+label wallpaper, number 12, mime ^image, has feh, X = feh --bg-tile "$1"
+label wallpaper, number 13, mime ^image, has feh, X = feh --bg-center "$1"
+label wallpaper, number 14, mime ^image, has feh, X = feh --bg-fill "$1"
+
+# Define the editor for non-text files + pager as last action
+              !mime ^text, !ext xml|json|csv|tex|py|pl|rb|js|sh|php  = ask
+label editor, !mime ^text, !ext xml|json|csv|tex|py|pl|rb|js|sh|php  = $EDITOR -- "$@"
+label pager,  !mime ^text, !ext xml|json|csv|tex|py|pl|rb|js|sh|php  = "$PAGER" -- "$@"
+
+# The very last action, so that it's never triggered accidentally, is to execute a program:
+mime application/x-executable = "$1"
+#+end_src
+*** scope.sh
+#+begin_src sh :tangle ~/.config/ranger/scope.sh :tangle-mode (identity #o755)
+#!/usr/bin/env sh
+# Meaningful aliases for arguments:
+path="$1"            # Full path of the selected file
+width="$2"           # Width of the preview pane (number of fitting characters)
+height="$3"          # Height of the preview pane (number of fitting characters)
+cached="$4"          # Path that should be used to cache image previews
+preview_images="$5"  # "True" if image previews are enabled, "False" otherwise.
+
+maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
+
+# Find out something about the file:
+mimetype=$(file --mime-type -Lb "$path")
+extension=$(/bin/echo "${path##*.}" | awk '{print tolower($0)}')
+
+# Functions:
+# runs a command and saves its output into $output.  Useful if you need
+# the return value AND want to use the output in a pipe
+try() { output=$(eval '"$@"'); }
+
+# writes the output of the previously used "try" command
+dump() { /bin/echo "$output"; }
+
+# a common post-processing function used after most commands
+trim() { head -n "$maxln"; }
+
+# wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
+safepipe() { "$@"; test $? = 0 -o $? = 141; }
+
+# Image previews, if enabled in ranger.
+if [ "$preview_images" = "True" ]; then
+    case "$mimetype" in
+        # Image previews for SVG files, disabled by default.
+        ###image/svg+xml)
+        ###   convert "$path" "$cached" && exit 6 || exit 1;;
+        # Image previews for image files. w3mimgdisplay will be called for all
+        # image files (unless overriden as above), but might fail for
+        # unsupported types.
+        image/*)
+            exit 7;;
+        # Image preview for video, disabled by default.:
+        ###video/*)
+        ###    ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1;;
+    esac
+fi
+
+case "$extension" in
+    # Archive extensions:
+    a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
+    rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
+      try als "$path" && { dump | trim; exit 0; }
+      try acat "$path" && { dump | trim; exit 3; }
+      try bsdtar -lf "$path" && { dump | trim; exit 0; }
+      exit 1;;
+    rar)
+      # avoid password prompt by providing empty password
+      try lsar -l "$path" && { dump | trim; exit 0; } || exit 1;;
+    7z)
+      # avoid password prompt by providing empty password
+      try 7z -p l "$path" && { dump | trim; exit 0; } || exit 1;;
+    # PDF documents:
+    pdf)
+      try pdftotext -l 10 -nopgbrk -q "$path" - && \
+        { dump | trim | fmt -s -w $width; exit 0; } || exit 1;;
+    # BitTorrent Files
+    torrent)
+      try transmission-show "$path" && { dump | trim; exit 5; } || exit 1;;
+    # ODT Files
+    odt|ods|odp|sxw)
+      try odt2txt "$path" && { dump | trim; exit 5; } || exit 1;;
+    # HTML Pages:
+    htm|html|xhtml)
+      try w3m    -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+      try lynx   -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+      try elinks -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+      ;; # fall back to highlight/cat if the text browsers fail
+esac
+
+case "$mimetype" in
+    # Syntax highlight for text files:
+    text/* | */xml)
+        if [ "$(tput colors)" -ge 256 ]; then
+            pygmentize_format=terminal256
+            highlight_format=xterm256
+        else
+            pygmentize_format=terminal
+            highlight_format=ansi
+        fi
+        try safepipe highlight --out-format=${highlight_format} "$path" && { dump | trim; exit 5; }
+        try safepipe pygmentize -f ${pygmentize_format} "$path" && { dump | trim; exit 5; }
+        exit 2;;
+    # Ascii-previews of images:
+    image/*)
+        img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
+    # Image preview for videos, disabled by default:
+    video/*)
+        ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1;;
+    # Display information about media files:
+    video/* | audio/*)
+        exiftool "$path" && exit 5
+        # Use sed to remove spaces so the output fits into the narrow window
+        try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
+esac
+
+exit 1
+
+#+end_src
+** rofi
+#+begin_src conf :tangle ~/.config/rofi/config.rasi
+Configuration {
+  width: 30;
+  lines: 5;
+  font: "Terminus 12";
+  location: 0;
+  fixed-num-lines: false;
+  terminal: "xst -e";
+  line-margin: 5;
+  separator-style: "dash";
+  hide-scrollbar: true;
+  dpi: 96;
+  color-normal: "#000000, #747474, #000000, #000000, #dddcff";
+  color-urgent: "#000000, #cc9393, #000000, #000000, #e62424";
+  color-active: "#000000, #747474, #000000, #000000, #dddcff";
+  color-window: "#000000, #292929, #747474";
+  eh: 1;
+}
+#+end_src
+** rofi-pass
+#+begin_src conf :tangle ~/.config/rofi-pass/config
+# permanently set alternative root dir
+# root=/path/to/root
+
+# rofi command. Make sure to have "$@" as last argument
+_rofi () {
+    rofi -width 22 -i -no-auto-select "$@"
+}
+
+# xdotool needs the keyboard layout to be set using setxkbmap
+# You can do this in your autostart scripts (e.g. xinitrc)
+
+# If for some reason, you cannot do this, you can set the command here.
+# and set fix_layout to true
+fix_layout=false
+
+layout_cmd () {
+  setxkbmap us
+}
+
+# fields to be used
+URL_field='url'
+USERNAME_field='user'
+AUTOTYPE_field='autotype'
+
+# delay to be used for :delay keyword
+delay=2
+
+# rofi-pass needs to close itself before it can type passwords. Set delay here.
+wait=0.2
+
+## Programs to be used
+# Editor
+EDITOR='emacs'
+
+# Browser
+BROWSER='firefox'
+
+## Misc settings
+
+default_do='menu' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+auto_enter='false'
+notify='false'
+default_autotype='user :tab pass'
+
+# color of the help messages
+# leave empty for autodetection
+help_color="#4872FF"
+
+# Clipboard settings
+# Possible options: primary, clipboard, both
+clip=clipboard
+
+# show help header
+help_header="false"
+
+# Options for generating new password entries
+# default_user is also used for password files that have no user field.
+#default_user=john_doe
+#default_user2=mary_ann
+#password_length=12
+
+# Custom Keybindings
+autotype="Alt+1"
+type_user="Alt+2"
+type_pass="Alt+3"
+open_url="Alt+4"
+copy_name="Alt+u"
+copy_url="Alt+l"
+copy_pass="Alt+p"
+show="Alt+o"
+copy_entry="Alt+2"
+type_entry="Alt+1"
+copy_menu="Alt+c"
+action_menu="Alt+a"
+type_menu="Alt+t"
+help="Alt+h"
+switch="Alt+x"
+insert_pass="Alt+n"
+
+#+end_src
+** xprofile
+#+begin_src conf :tangle ~/.xprofile
+#!/usr/bin/env sh
+export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_PLATFORMTHEME=qt5ct
+export QT_PLATFORM_PLUGIN=qt5ct
+
+export DESKTOP_SESSION=gnome
+
+export RANGER_LOAD_DEFAULT_RC=FALSE
+export _JAVA_AWT_WM_NONREPARENTING=1
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+
+xsetroot -cursor_name left_ptr &
+unclutter &
+wmname LG3D &
+#+end_src
+** xonsh
+#+begin_src xonsh :tangle ~/.xonshrc
+# -*- coding: utf-8 -*-
+import os
+import shlex
+from shutil import which
+
+source-foreign zsh --login True --overwrite-alias "echo loading xonsh foreign shell"
+
+xontrib load readable-traceback
+
+if ${...}.get('INSIDE_EMACS', False):
+    $TITLE = None
+else:
+    $TITLE = '{current_job:{} | }{user}@{hostname}: {short_cwd} | xonsh'
+
+if $TERM == "dumb":
+    $PS1="> "
+
+$HOME = os.path.expanduser('~')
+$PATH.insert(0, $HOME + '/.bin')
+$PATH.insert(0, $HOME + '/.local/bin')
+$SHELL_TYPE = 'prompt_toolkit'
+
+if os.path.exists(f'{$HOME}/.pyenv'):
+    $PYENV_ROOT = f'{$HOME}/.pyenv'
+    $PATH.insert(0, $PYENV_ROOT + '/bin')
+    source-foreign zsh --overwrite-alias $(pyenv init -)
+    source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
+    $BASH_COMPLETIONS.insert(0, $PYENV_ROOT + '/completions')
+
+if os.path.exists(f'{$HOME}/.emacs.d/bin'):
+    $PATH.insert(0, $HOME + '/.emacs.d/bin')
+
+# Enable AUTO_CD
+$AUTO_CD = True
+
+# Default
+$BROWSER = "firefox"
+$TERM = "screen-256color"
+$EDITOR = '/usr/bin/emacs'
+
+# $GDK_SCALE = 2
+# $GDK_DPI_SCALE = 0.5
+
+# Encoding
+$LANG = "es_EC.UTF-8"
+$LC_ALL = "es_EC.UTF-8"
+
+# keep the prompt short
+$DYNAMIC_CWD_WIDTH = '20%'
+
+# ptk display stuff
+$CASE_SENSITIVE_COMPLETIONS = False
+$COMPLETIONS_BRACKETS = True
+$COMPLETIONS_CONFIRM = True
+
+# Less Stuff
+$PAGER = 'eless'
+$LESS = '-iMSx4 -FX'
+
+# Ignore Errors
+$XONSH_ENCODING_ERRORS = 'ignore'
+
+$XONSH_GITSTATUS_HASH = "{NO_COLOR}:"
+$XONSH_GITSTATUS_BRANCH = "{BOLD_PURPLE}"
+$XONSH_GITSTATUS_OPERATION = "{CYAN}"
+$XONSH_GITSTATUS_STAGED = "{RED}●"
+$XONSH_GITSTATUS_CONFLICTS = "{RED}×"
+$XONSH_GITSTATUS_CHANGED = "{BOLD_BLUE}+"
+$XONSH_GITSTATUS_UNTRACKED = "{NO_COLOR}…"
+$XONSH_GITSTATUS_CLEAN = "{BOLD_GREEN}✔"
+$XONSH_GITSTATUS_AHEAD = "{NO_COLOR}↑"
+$XONSH_GITSTATUS_BEHIND = "{NO_COLOR}↓"
+$SUPPRESS_BRANCH_TIMEOUT_MESSAGE = True
+
+def pyenv_prompt():
+    pyenv_name = ""
+    if $(pyenv version-name).replace('\n', '') != 'system':
+        pyenv_name = $(pyenv version-name).replace('\n', '')
+    return pyenv_name
+
+$PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
+
+$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} »{NO_COLOR} "
+$RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
+
+# Aliases (yeah... no shit, kid)
+def _pyclean():
+    from os.path import Path
+    d = Path($PWD)
+    bflist = ["c", "o"]
+    for b in bflist:
+        files = d.walkfiles("*.py{}".format(b))
+        for f in files:
+            f.remove_p()
+    for dir in d.walkdirs("__pycache__"):
+        dir.removedirs_p()
+    return True
+
+
+def _get_branch_name():
+    import os
+    from subprocess import call, STDOUT, check_output
+    branch = ""
+    if not call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
+        out = check_output(["git", "branch"]).decode("utf8")
+        current = next(line for line in out.split("\n") if line.startswith("*"))
+        branch = current.strip("*").strip()
+    return branch, call
+
+def _git_pull_current_branch():
+    branch, call = _get_branch_name()
+    if branch:
+        call(["git", "pull", "origin", branch])
+
+def _git_push_current_branch():
+    branch, call = _get_branch_name()
+    if branch:
+        call(["git", "push", "origin", branch])
+
+
+custom = {}
+
+pairs = (
+    ("dt", "dotdrop -c ~/.dotdrop.yml"),
+    ("ls", "exa"),
+    ("mkdir", "mkdir -p"),
+    ("lookup", '/usr/bin/dict'),
+    ("next", '/usr/bin/next'),
+    ("ping", 'ping -4'),
+    ("rm", "safe-rm"),
+    ('cp', 'acp -g'),
+    ('mv', 'amv -g'),
+    ('pyc', _pyclean),
+    ('pyi', 'python setup.py install'),
+    ('pyd', 'python setup.py develop'),
+    ('pyb', 'python setup.py build'),
+    ('ggpull', _git_pull_current_branch),
+    ('ggpush', _git_push_current_branch),
+    ('ggpt', 'git pull --tags'),
+    ('dco', 'docker-compose'),
+    ('dcb', 'docker-compose build'),
+    ('dce', 'docker-compose exec'),
+    ('dcps', 'docker-compose ps'),
+    ('dcrestart', 'docker-compose restart'),
+    ('dcrm', 'docker-compose rm'),
+    ('dcr', 'docker-compose run'),
+    ('dcstop', 'docker-compose stop'),
+    ('dcup', 'docker-compose up'),
+    ('dcupd', 'docker-compose up -d'),
+    ('dcdn', 'docker-compose down'),
+    ('dcl', 'docker-compose logs'),
+    ('dclf', 'docker-compose logs -f'),
+    ('dcpull', 'docker-compose pull'),
+    ('dcstart', 'docker-compose start'),
+
+)
+
+for pair in pairs:
+    key, name = pair
+    if callable(name):
+        name.__xonsh__threadable = False
+        name.__xonsh__capturable = False
+
+    if callable(name) or which(shlex.split(name)[0]) is not None:
+        custom[key] = name
+
+aliases.update(custom)
+
+del os
+del shlex
+
+#+end_src
+** zathura
+#+begin_src conf :tangle ~/.config/zathura/zathurarc
+set selection-clipboard clipboard
+set adjust-open width
+
+map <F1> set 'pages-per-row 1'
+map <F2> set 'pages-per-row 2'
+
+map \< goto top
+map \> goto bottom
+map b navigate previous
+map e follow
+map f navigate next
+map p goto top
+
+map <C-+> zoom in
+map <C--> zoom out
+map <C-=> zoom in
+map <C-)> adjust_window best-fit
+map <C-0> adjust_window width
+map <C-a> scroll full-left
+map <C-b> scroll left
+map <C-e> scroll full-right
+map <C-f> scroll right
+map <C-g> abort
+map <C-n> scroll down
+map <C-p> scroll up
+map <C-v> scroll full-down
+
+map <A-\<> goto top
+map <A-\>> goto bottom
+map <A-v> scroll full-up
+
+set font 'PragmataPro Mono 1z3.5'
+set default-bg "#000000" #00
+set default-fg "#F7F7F6" #01
+
+set statusbar-fg "#B0B0B0" #04
+set statusbar-bg "#202020" #01
+
+set inputbar-bg "#151515" #00 currently not used
+set inputbar-fg "#FFFFFF" #02
+
+set notification-error-bg "#AC4142" #08
+set notification-error-fg "#151515" #00
+
+set notification-warning-bg "#AC4142" #08
+set notification-warning-fg "#151515" #00
+
+set highlight-color "#F4BF75" #0A
+set highlight-active-color "#6A9FB5" #0D
+
+set completion-highlight-fg "#151515" #02
+set completion-highlight-bg "#90A959" #0C
+
+set completion-bg "#303030" #02
+set completion-fg "#E0E0E0" #0C
+
+set notification-bg "#90A959" #0B
+set notification-fg "#151515" #00
+#+end_src
+** ncmpcpp
+*** config
+#+begin_src conf :tangle ~/.config/ncmpcpp/config
+ncmpcpp_directory = "~/.config/ncmpcpp"
+lyrics_directory = "~/.lyrics"
+execute_on_song_change = "~/.config/ncmpcpp/art.sh"
+
+mpd_host = "localhost"
+mpd_port = "6600"
+mpd_music_dir = "/media/data/Metal"
+mpd_connection_timeout = "5"
+
+audio_output {
+    type "fifo"
+    name "mpd_fifo"
+    path "/tmp/mpd.fifo"
+    format "44100:16:2"
+}
+
+visualizer_in_stereo = "no"
+visualizer_fifo_path = "/tmp/mpd.fifo"
+visualizer_output_name = "mpd_fifo"
+visualizer_sync_interval = 10
+visualizer_type = "spectrum" (spectrum/wave)
+visualizer_look = "||"
+
+playlist_disable_highlight_delay = "5"
+message_delay_time = "3"
+
+song_list_format = "(6f)[withe]{l} (25)[green]{a} (5)[]{n} (40)[]{t|f} (30)[yellow]{b}"
+song_status_format = "{(%l) }{%a - }{%t}|{%f}"
+song_library_format = "{%n - }{%t}|{%f}"
+media_library_primary_tag = "artist"
+tags_separator = " | "
+now_playing_prefix = "$b$u"
+now_playing_suffix = "$/b$/u"
+locked_screen_width_part = 50
+ask_for_locked_screen_width_part = no
+
+browser_sort_mode = "format"
+
+alternative_header_first_line_format = "{$b$2%t$9$/b}"
+alternative_header_second_line_format ="$8{%a} - {%b}"
+
+playlist_shorten_total_times = "no"
+playlist_display_mode = "columns" (classic/columns)
+browser_display_mode = "columns" (classic/columns)
+search_engine_display_mode = "columns" (classic/columns)
+
+incremental_seeking = "yes"
+seek_time = "1"
+autocenter_mode = "yes"
+centered_cursor = "no"
+
+progressbar_look = "->-"
+default_place_to_search_in = "database" (database/playlist)
+
+user_interface = "classic" (classic/alternative)
+
+default_find_mode = "wrapped" (wrapped/normal)
+default_tag_editor_pattern = "%n - %t"
+
+header_visibility = "no"
+statusbar_visibility = "yes"
+titles_visibility = "no"
+header_text_scrolling = "yes"
+cyclic_scrolling = "no"
+lines_scrolled = "5"
+follow_now_playing_lyrics = "no"
+store_lyrics_in_song_dir = "no"
+
+jump_to_now_playing_song_at_start = "yes"
+
+clock_display_seconds = "yes"
+display_volume_level = "yes"
+display_bitrate = "yes"
+display_remaining_time = "no"
+regular_expressions = "extended" (basic/extended)
+ignore_leading_the = "yes"
+mouse_support = "yes"
+mouse_list_scroll_whole_page = "yes"
+empty_tag_marker = " -- ‼ -- "
+enable_window_title = yes
+search_engine_default_search_mode = "2"
+
+external_editor = "emacsclient -t"
+use_console_editor = "yes"
+
+colors_enabled = "yes"
+empty_tag_color = "blue"
+header_window_color = "white"
+volume_color = "white"
+state_line_color = "blue"
+state_flags_color = "blue"
+main_window_color = "white"
+color1 = "blue"
+color2 = "white"
+current_item_prefix = "$(cyan)$r"
+current_item_suffix = "$/r$(end)"
+progressbar_color = "cyan"
+progressbar_elapsed_color = "white"
+statusbar_color = "white"
+alternative_ui_separator_color = "black"
+current_item_inactive_column_prefix = "$(white)$r"
+current_item_inactive_column_suffix = "$/r$(end)"
+active_window_border = "blue"
+window_border_color = "blue"
+#+end_src
+*** art.sh
+#+begin_src sh :tangle ~/.config/ncmpcpp/art.sh :tangle-mode (identity #o755)
+#!/usr/bin/env sh
+
+#-------------------------------#
+# Generate current song cover   #
+# ffmpeg version                #
+#-------------------------------#
+MPD_CONF=~/.config/mpd/mpd.conf
+MUSIC_DIR=$(cat "$MPD_CONF" | grep -v '#' | grep 'music_directory' | cut -d ' ' -f2 | awk '{print $2}' | sed 's/"//g')
+COVER="/tmp/cover.png"
+COVER_SIZE=300
+
+BORDERS=false
+BORDER_WIDTH=5
+BORDER_COLOR="white"
+
+function ffmpeg_cover {
+    if $BORDERS; then
+        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1,pad=$COVER_SIZE+$BORDER_WIDTH:ow:(ow-iw)/2:(oh-ih)/2:$BORDER_COLOR" "$COVER"
+    else
+        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1" "$COVER"
+    fi
+}
+
+function fallback_find_cover {
+    album="${file%/*}"
+    album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\).*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    if [ "$album_cover" == "" ]; then
+        album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    fi
+    if [ "$album_cover" == "" ]; then
+        album_cover="$(find "$album/.." -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\|booklet\).*?1[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    fi
+    album_cover="$(echo -n "$album_cover" | head -n1)"
+}
+
+{
+    file="$MUSIC_DIR/$(mpc --format %file% current)"
+
+    if [[ -n "$file" ]] ; then
+        if ffmpeg_cover "$file"; then
+            exit
+        else
+            fallback_find_cover
+            ffmpeg_cover "$album_cover"
+        fi
+    fi
+} &
+#+end_src
+*** cover.sh
+#+begin_src bash :tangle ~/.config/ncmpcpp/cover.sh :tangle-mode (identity #o755)
+#!/usr/bin/env bash
+
+#-------------------------------#
+# Display current cover         #
+# ueberzug version              #
+#-------------------------------#
+
+function ImageLayer {
+    [[ -z $(pgrep ueberzug) ]] && ueberzug layer -sp json
+}
+
+COVER="/tmp/cover.png"
+X_PADDING=0
+Y_PADDING=0
+
+function add_cover {
+    if [ -e $COVER ]; then
+        echo "{\"action\": \"add\", \"identifier\": \"cover\", \"x\": $X_PADDING, \"y\": $Y_PADDING, \"path\": \"$COVER\"}";
+    fi
+}
+
+clear
+ImageLayer -< <(
+    add_cover
+    while inotifywait -q -q -e close_write "$COVER"; do
+        add_cover
+    done
+)
+#+end_src
+*** tmux_session
+#+begin_src conf :tangle ~/.config/ncmpcpp/tmux_session
+neww
+set -g status off
+send-keys '~/.config/ncmpcpp/cover.sh' C-m
+split-window -h
+resize-pane -t 1 -x 35
+send-keys 'ncmpcpp' C-m
+#+end_src
+** kitty
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+font_family      JetBrains Mono
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+
+allow_remote_control yes
+
+font_size 12
+
+remember_window_size  no
+initial_window_width 100c
+initial_window_height 30c
+
+enable_audio_bell no
+
+cursor #cccccc
+cursor_text_color #111111
+cursor_shape underline
+cursor_blink_interval 0.0
+cursor_stop_blinking_after 15.0
+
+scrollback_lines 2000
+scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
+wheel_scroll_multiplier 5.0
+
+url_color #0087BD
+url_style double
+open_url_modifiers kitty_mod
+open_url_with default
+copy_on_select yes
+
+rectangle_select_modifiers ctrl+alt
+select_by_word_characters :@-./_~?&=%+#
+
+click_interval 0.5
+mouse_hide_wait 3.0
+focus_follows_mouse no
+
+foreground #cfcfc2
+background #000000
+
+#: black
+color0 #202020
+color8 #31363b
+
+#: red
+color1 #c0392b
+color9 #f44f4f
+
+#: green
+color2 #218058
+color10 #27ae60
+
+#: yellow
+color3 #fdbc4b
+color11 #fdbc4b
+
+#: blue
+color4 #2980b9
+color12 #0099ff
+
+#: magenta
+color5 #8e44ad
+color13 #af81ff
+
+#: cyan
+color6 #27aeae
+color14 #31dddd
+
+#: white
+color7 #acada1
+color15 #cfd0c2
+#+end_src
