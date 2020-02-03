@@ -3,6 +3,17 @@
 #+PROPERTY:   header-args+ :noweb yes
 
 * Pantheon
+** base
+*** font-name
+#+name: font-name
+#+begin_src text :tangle no
+PragmataPro Mono Liga
+#+end_src
+*** font-size
+#+name: font-size
+#+begin_src text :tangle no
+13.5
+#+end_src
 ** bspwm
 *** bspwmrc
 #+begin_src sh :tangle ~/.config/bspwm/bspwmrc :tangle-mode (identity #o755)
@@ -31,46 +42,46 @@ bspc config ignore_ewmh_focus true
 # External Rules
 bspc config external_rules_command ~/.config/bspwm/external.sh
 
-# Workspaces
-bspc rule -a firefox follow=on desktop=^1
-bspc rule -a firefoxdeveloperedition follow=on desktop=^1
-bspc rule -a Qutebrowser follow=on desktop=^1
-bspc rule -a Iceweasel follow=on desktop=^1
-bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
-bspc rule -a Thunderbird follow=on desktop=^3
-bspc rule -a Icedove follow=on desktop=^3
-bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
-bspc rule -a *:Ranger follow=on desktop=^4 state=tiled
-bspc rule -a JDownloader follow=off  desktop=^5
-bspc rule -a *:RTorrent follow=off  desktop=^5
-bspc rule -a Lxappearance follow=on desktop=^6 state=floating
-bspc rule -a Anydesk follow=on desktop=^6 state=tiled
-bspc rule -a Remmina follow=on desktop=^6 state=tiled
-bspc rule -a qt5ct follow=on desktop=^6 state=floating
-bspc rule -a URxvt:music follow=on desktop=^7 state=tiled
-bspc rule -a *:Ncmpcpp follow=on desktop=^7 state=tiled
-bspc rule -a mpv follow=on desktop=^7 state=tiled
-bspc rule -a obs follow=on desktop=^7 state=tiled
-bspc rule -a cantata follow=on desktop=^7 state=tiled
-bspc rule -a Easytag follow=on desktop=^7 state=tiled
-bspc rule -a *:libreoffice follow=off desktop=^8 state=tiled
-bspc rule -a Soffice follow=off desktop=^8
-bspc rule -a Zathura follow=on desktop=^8 state=tiled
-bspc rule -a Emacs follow=on desktop=^9 state=tiled
-bspc rule -a Remacs follow=on desktop=^9 state=tiled
-bspc rule -a Wine follow=off desktop=^6 state=tiled
+# # Workspaces
+# bspc rule -a firefox follow=on desktop=^1
+# bspc rule -a firefoxdeveloperedition follow=on desktop=^1
+# bspc rule -a Qutebrowser follow=on desktop=^1
+# bspc rule -a Iceweasel follow=on desktop=^1
+# bspc rule -a TelegramDesktop follow=on desktop=^2 state=tiled
+# bspc rule -a Thunderbird follow=on desktop=^3
+# bspc rule -a Icedove follow=on desktop=^3
+# bspc rule -a URxvt:ranger follow=on desktop=^4 state=tiled
+# bspc rule -a *:Ranger follow=on desktop=^4 state=tiled
+# bspc rule -a JDownloader follow=off  desktop=^5
+# bspc rule -a *:RTorrent follow=off  desktop=^5
+# bspc rule -a Lxappearance follow=on desktop=^6 state=floating
+# bspc rule -a Anydesk follow=on desktop=^6 state=tiled
+# bspc rule -a Remmina follow=on desktop=^6 state=tiled
+# bspc rule -a qt5ct follow=on desktop=^6 state=floating
+# bspc rule -a URxvt:music follow=on desktop=^7 state=tiled
+# bspc rule -a *:Ncmpcpp follow=on desktop=^7 state=tiled
+# bspc rule -a mpv follow=on desktop=^7 state=tiled
+# bspc rule -a obs follow=on desktop=^7 state=tiled
+# bspc rule -a cantata follow=on desktop=^7 state=tiled
+# bspc rule -a Easytag follow=on desktop=^7 state=tiled
+# bspc rule -a *:libreoffice follow=off desktop=^8 state=tiled
+# bspc rule -a Soffice follow=off desktop=^8
+# bspc rule -a Zathura follow=on desktop=^8 state=tiled
+# bspc rule -a Emacs follow=on desktop=^9 state=tiled
+# bspc rule -a Remacs follow=on desktop=^9 state=tiled
+# bspc rule -a Wine follow=off desktop=^6 state=tiled
 
-# Floating apps
-bspc rule -a sxiv follow=off state=floating
-bspc rule -a URxvt:Terminal follow=off state=floating center=on
-bspc rule -a *:Terminal follow=off state=floating center=on
-bspc rule -a *:Buscando follow=off state=floating center=on
+# # Floating apps
+# bspc rule -a feh follow=off state=floating
+# bspc rule -a sxiv follow=off state=floating
+# bspc rule -a URxvt:Terminal follow=off state=floating center=on
+# bspc rule -a *:Terminal follow=off state=floating center=on
+# bspc rule -a *:Buscando follow=off state=floating center=on
 
 # Xresources
 xrdb ~/.Xresources &
 # Wallpaper
 [[ -z $(pgrep feh) ]] && feh --bg-fill $HOME/.dots/walls/03.jpg &
-
 # i3lock Fancy
 [[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'PragmataPro-Mono-Regular' &
 # clipboard
@@ -82,30 +93,131 @@ xrdb ~/.Xresources &
 # sxhkd
 [[ -z $(pgrep sxhkd) ]] && sxhkd &
 # xcompmgr
-[[ -z $(pgrep xcompmgr) ]] && xcompmgr -c -C -t-5 -l-5 -r4.2 &
+[[ -z $(pgrep xcompmgr) ]] && xcompmgr -c -C -t-9 -l-11 -r9 -o.95 -D6 &
 #+end_src
 *** external.sh
-#+begin_src sh :tangle ~/.config/bspwm/bspwmrc :tangle-mode (identity #o755)
-#! /bin/sh
+#+begin_src sh :tangle ~/.config/bspwm/external.sh :tangle-mode (identity #o755)
+#!/bin/sh
+#
+# bspwm: external_rules_command
+#
+# Absolute path to the command used to retrieve rule consequences.
+# The command will receive the following arguments: window ID, class
+# name, instance name, and intermediate consequences. The output of
+# that command must have the following format: key1=value1
+# key2=value2 ...  (the valid key/value pairs are given in the
+# description of the rule command).
+#
+#
+# Rule
+#    General Syntax
+#      rule COMMANDS
+#
+#    Commands
+#      -a, --add (<class_name>|*)[:(<instance_name>|*)] [-o|--one-shot]
+#      [monitor=MONITOR_SEL|desktop=DESKTOP_SEL|node=NODE_SEL]
+#      [state=STATE] [layer=LAYER] [split_dir=DIR] [split_ratio=RATIO]
+#      [(hidden|sticky|private|locked|marked|center|follow|manage|focus|border)=(on|off)]
+#      [rectangle=WxH+X+Y]
+#          Create a new rule.
+#
+#      -r, --remove
+#      ^<n>|head|tail|(<class_name>|*)[:(<instance_name>|*)]...
+#          Remove the given rules.
+#
+#      -l, --list
+#          List the rules.
 
-window_id=$1
+border= \
+center= \
 class=$2
-instance=$3
+desktop= \
+focus= \
+follow= \
+hidden= \
+id=${1?} \
+instance=$3 \
+layer= \
+locked= \
+manage= \
+marked= \
+misc=$4 \
+monitor= \
+node= \
+private= \
+rectangle= \
+split_dir= \
+split_ratio= \
+state= \
+sticky= \
+urgent=;
 
-#WM_WINDOW_ROLE Rules
-role=$(xprop -id $1 | grep WM_WINDOW_ROLE | awk -F '"' '{print $2}')
-case "$role" in
-  quake) #Tilix Quake
-    echo "state=floating"
-    echo "border=off"
+role=$(xprop -id $id | grep WM_WINDOW_ROLE | awk -F '"' '{print $2}')
+
+case $instance.$class in
+    ,*.[Pp]avucontrol|*.[Ff]eh|*.[Ss]xiv|*.[Tt]erminal|*[Ll]xappearance)
+        state=floating;
+        ;;
+    ,*.[Ff]irefox)
+        desktop=^1;
+        state=tiled;
+        layer=normal;
+        ;;
+    ,*.[Rr]anger)
+        desktop=^4;
+        state=tiled;
+        follow=on;
+        layer=normal;
+        ;;
+    [lL]ibre[oO]ffice.*|*.[Zz]athura)
+        desktop=^8;
+        state=tiled;
+        layer=normal;
+        ;;
+    ,*.Emacs)
+        desktop=^9;
+        state=tiled;
+        follow=on;
+        layer=normal;
     ;;
-  pop-up|bubble|task_dialog|Preferences|dialog|menu)
-    echo "state=floating"
-    ;;
-  About|Organizer|Buscando) #Firefox
-    echo "state=floating"
-    ;;
+    ,*)
+        case "$(xprop -id "$id" _NET_WM_WINDOW_TYPE)" in
+            ,*_NET_WM_WINDOW_TYPE_DIALOG*)
+                state=floating;
+                ;;
+            ,*)
+                state=tiled;
+                ;;
+        esac;
+esac;
+
+case $role in
+  About|GtkFileChooserDialog)
+      state=floating;
+      ;;
 esac
+
+echo \
+    ${border:+"border=$border"} \
+    ${center:+"center=$center"} \
+    ${desktop:+"desktop=$desktop"} \
+    ${focus:+"focus=$focus"} \
+    ${follow:+"follow=$follow"} \
+    ${hidden:+"hidden=$hidden"} \
+    ${layer:+"layer=$layer"} \
+    ${locked:+"locked=$locked"} \
+    ${manage:+"manage=$manage"} \
+    ${marked:+"marked=$marked"} \
+    ${monitor:+"monitor=$monitor"} \
+    ${node:+"node=$node"} \
+    ${private:+"private=$private"} \
+    ${rectangle:+"rectangle=$rectangle"} \
+    ${split_dir:+"split_dir=$split_dir"} \
+    ${split_ratio:+"split_ratio=$split_ratio"} \
+    ${state:+"state=$state"} \
+    ${sticky:+"sticky=$sticky"} \
+    ${urgent:+"urgent=$urgent"};
+# echo "$@" >> "$HOME"/.rules_cmd.log
 #+end_src
 *** sxhkd
 #+begin_src sh :tangle ~/.config/sxhkd/sxhkdrc :tangle-mode (identity #o755)
@@ -116,13 +228,13 @@ esac
 
 # terminal emulator
 super + Return
-#	urxvtcd -g 100x30 -name Terminal
-  kitty --name=Terminal
+#   urxvtcd -g 100x30 -name Terminal
+  kitty --class=Terminal
 
 # terminal emulator
 super + shift + Return
-#	urxvtcd -n TiledTerminal -e tmux
-  kitty --name=TiledTerminal tmux
+#   urxvtcd -n TiledTerminal -e tmux
+  kitty --class=TiledTerminal tmux
 
 # program launcher
 super + @space
@@ -151,7 +263,7 @@ Print; {s,c}
 # Cli Apps
 super + shift + {f,d,n}
 #  urxvt {-name Ranger -e ranger, -name RTorrent -e rtorrent, -name Ncmpcpp -e ncmpcpp}
-  kitty {--name=Ranger ranger, --name=RTorrent rtorrent, --name=Ncmpcpp tmux new-session "tmux source-file ~/.config/ncmpcpp/tmux_session" }
+  kitty {--class=Ranger ranger, --class=RTorrent rtorrent, --class=Ncmpcpp ncmpcpp}
 
 # Volume
 {XF86AudioMute,XF86AudioRaiseVolume,XF86AudioLowerVolume}
@@ -174,23 +286,23 @@ super + shift + r
 
 # quit bspwm normally
 super + alt + Escape
-	bspc quit
+    bspc quit
 
 # close and kill
 super + {_,shift + }w
-	bspc node -{c,k}
+    bspc node -{c,k}
 
 # alternate between the tiled and monocle layout
 super + m
-	bspc desktop -l next
+    bspc desktop -l next
 
 # send the newest marked node to the newest preselected node
 super + y
-	bspc node newest.marked.local -n newest.!automatic.local
+    bspc node newest.marked.local -n newest.!automatic.local
 
 # swap the current node and the biggest node
 super + g
-	bspc node -s biggest
+    bspc node -s biggest
 
 #
 # state/flags
@@ -198,11 +310,11 @@ super + g
 
 # set the window state
 super + {t,shift + t,s,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+    bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
 
 # set the node flags
 super + ctrl + {m,x,y,z}
-	bspc node -g {marked,locked,sticky,private}
+    bspc node -g {marked,locked,sticky,private}
 
 #
 # focus/swap
@@ -210,33 +322,33 @@ super + ctrl + {m,x,y,z}
 
 # focus the node in the given direction
 super + {_,shift + }{h,j,k,l}
-	bspc node -{f,s} {west,south,north,east}
+    bspc node -{f,s} {west,south,north,east}
 
 # focus the node for the given path jump
 super + {p,b,comma,period}
-	bspc node -f @{parent,brother,first,second}
+    bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous node in the current desktop
 super + {_,shift + }c
-	bspc node -f {next,prev}.local
+    bspc node -f {next,prev}.local
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
-	bspc desktop -f {prev,next}.local
+    bspc desktop -f {prev,next}.local
 
 # focus the last node/desktop
 super + {grave,Tab}
-	bspc {node,desktop} -f last
+    bspc {node,desktop} -f last
 
 # focus the older or newer node in the focus history
 super + {o,i}
-	bspc wm -h off; \
-	bspc node {older,newer} -f; \
-	bspc wm -h on
+    bspc wm -h off; \
+    bspc node {older,newer} -f; \
+    bspc wm -h on
 
 # focus or send to the given desktop
 super + {_,shift + }{1-9,0}
-	bspc {desktop -f,node -d} '^{1-9,10}'
+    bspc {desktop -f,node -d} '^{1-9,10}'
 
 #
 # preselect
@@ -244,20 +356,20 @@ super + {_,shift + }{1-9,0}
 
 # preselect the direction
 super + ctrl + {h,j,k,l}
-	bspc node -p {west,south,north,east}
+    bspc node -p {west,south,north,east}
 
 # preselect the ratio
 super + ctrl + {1-9}
-	bspc node -o 0.{1-9}
+    bspc node -o 0.{1-9}
 
 # cancel the preselection for the focused node
 super + ctrl + space
-	bspc node -p cancel
+    bspc node -p cancel
 
 
 # cancel the preselection for the focused desktop
 super + ctrl + shift + space
-	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+    bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
 
 #
 # move/resize
@@ -265,17 +377,74 @@ super + ctrl + shift + space
 
 # expand a window by moving one of its side outward
 super + alt + {h,j,k,l}
-	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+    bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 
 # contract a window by moving one of its side inward
 super + alt + shift + {h,j,k,l}
-	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+    bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
 
 # move a floating window
 super + {Left,Down,Up,Right}
-	bspc node -v {-20 0,0 20,0 -20,20 0}
+    bspc node -v {-20 0,0 20,0 -20,20 0}
 #+end_src
+*** tabs.sh
+#+begin_src sh :tangle ~/.bin/tabs.sh :tangle-mode (identity #o755)
+#!/bin/sh
 
+# Usage:
+# tabc.sh <tabbed-id> <command>
+# Commands:
+#    add <window-id> 	- Add window to tabbed
+#    remove <window-id> - Remove window from tabbed
+#    list				- List all clients of tabbed
+
+#
+# Functions
+#
+
+# Get wid of root window
+function get_root_wid {
+	xwininfo -root | awk '/Window id:/{print $4}'
+}
+
+# Get children of tabbed
+function get_clients {
+	id=$1
+	xwininfo -id $id -children | sed -n '/[0-9]\+ \(child\|children\):/,$s/ \+\(0x[0-9a-z]\+\).*/\1/p'
+}
+
+# Get class of a wid
+function get_class {
+	id=$1
+	xprop -id $id | sed -n '/WM_CLASS/s/.*, "\(.*\)"/\1/p'
+}
+
+#
+# Main Program
+#
+
+tabbed=$1; shift
+if [ "$(get_class $tabbed)" != "tabbed" ]; then
+	echo "Not an instance of tabbed" 2>&1
+fi
+
+cmd=$1; shift
+
+case $cmd in
+	add)
+		wid=$1; shift
+		xdotool windowreparent $wid $tabbed
+		;;
+	remove)
+		wid=$1; shift
+		xdotool windowreparent $wid $(get_root_wid)
+		;;
+	list)
+		get_clients $tabbed
+		;;
+esac
+
+#+end_src
 ** picom
 #+begin_src conf :tangle ~/.config/picom.conf
 shadow = true;
@@ -391,7 +560,7 @@ font-2 = FontAwesome:size=10;1
 
 modules-left = bsp title
 modules-center =
-modules-right = wireless wired volume cpu memory fs email datetime battery
+modules-right = wireless wired volume cpu memory fs datetime battery
 
 wm-restack = bspwm
 
@@ -638,8 +807,8 @@ label =  %{F#fff}%percentage%%%{F-}
 
 [module/email]
 type = custom/script
-exec = notmuch count tag:unread
-interval = 3
+exec = ~/.bin/notmuch-notification.sh
+interval = 200
 format = <label>
 label =  %{F#fff}%output%%{F-}
 
@@ -2797,6 +2966,9 @@ export RANGER_LOAD_DEFAULT_RC=FALSE
 export _JAVA_AWT_WM_NONREPARENTING=1
 export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
 
+export CM_LAUNCHER=rofi
+export CM_DIR=~/.cache
+
 xsetroot -cursor_name left_ptr &
 unclutter &
 wmname LG3D &
@@ -3236,14 +3408,13 @@ send-keys 'ncmpcpp' C-m
 #+end_src
 ** kitty
 #+begin_src conf :tangle ~/.config/kitty/kitty.conf
-font_family      JetBrains Mono
+font_family      <<font-name>>
+font_size        <<font-size>>
 bold_font        auto
 italic_font      auto
 bold_italic_font auto
 
 allow_remote_control yes
-
-font_size 12
 
 remember_window_size  no
 initial_window_width 100c
