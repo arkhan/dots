@@ -154,11 +154,13 @@ urgent=;
 
 role=$(xprop -id $id | grep WM_WINDOW_ROLE | awk -F '"' '{print $2}')
 
+# notify-send $instance.$class
+
 case $instance.$class in
     ,*.[Pp]avucontrol|*.[Ff]eh|*.[Ss]xiv|*.[Tt]erminal|*[Ll]xappearance)
         state=floating;
         ;;
-    ,*.[Ff]irefox)
+    ,*.[Ff]irefox|[Nn]avigator.*|*.[Qq]utebrowser|*.[Nn]ext)
         desktop=^1;
         state=tiled;
         layer=normal;
@@ -444,6 +446,278 @@ case $cmd in
 		;;
 esac
 
+#+end_src
+** kitty
+#+begin_src conf :tangle ~/.config/kitty/kitty.conf
+font_family      <<font-name>>
+font_size        <<font-size>>
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+
+allow_remote_control yes
+
+remember_window_size  no
+initial_window_width 100c
+initial_window_height 30c
+
+enable_audio_bell no
+
+cursor #cccccc
+cursor_text_color #111111
+cursor_shape underline
+cursor_blink_interval 0.0
+cursor_stop_blinking_after 15.0
+
+scrollback_lines 2000
+scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
+wheel_scroll_multiplier 5.0
+
+url_color #0087BD
+url_style double
+open_url_modifiers kitty_mod
+open_url_with default
+copy_on_select yes
+
+rectangle_select_modifiers ctrl+alt
+select_by_word_characters :@-./_~?&=%+#
+
+click_interval 0.5
+mouse_hide_wait 3.0
+focus_follows_mouse no
+
+foreground #cfcfc2
+background #000000
+
+#: black
+color0 #202020
+color8 #31363b
+
+#: red
+color1 #c0392b
+color9 #f44f4f
+
+#: green
+color2 #218058
+color10 #27ae60
+
+#: yellow
+color3 #fdbc4b
+color11 #fdbc4b
+
+#: blue
+color4 #2980b9
+color12 #0099ff
+
+#: magenta
+color5 #8e44ad
+color13 #af81ff
+
+#: cyan
+color6 #27aeae
+color14 #31dddd
+
+#: white
+color7 #acada1
+color15 #cfd0c2
+#+end_src
+** ncmpcpp
+*** config
+#+begin_src conf :tangle ~/.config/ncmpcpp/config
+ncmpcpp_directory = "~/.config/ncmpcpp"
+lyrics_directory = "~/.lyrics"
+execute_on_song_change = "~/.config/ncmpcpp/art.sh"
+
+mpd_host = "localhost"
+mpd_port = "6600"
+mpd_music_dir = "/media/data/Metal"
+mpd_connection_timeout = "5"
+
+audio_output {
+    type "fifo"
+    name "mpd_fifo"
+    path "/tmp/mpd.fifo"
+    format "44100:16:2"
+}
+
+visualizer_in_stereo = "no"
+visualizer_fifo_path = "/tmp/mpd.fifo"
+visualizer_output_name = "mpd_fifo"
+visualizer_sync_interval = 10
+visualizer_type = "spectrum" (spectrum/wave)
+visualizer_look = "||"
+
+playlist_disable_highlight_delay = "5"
+message_delay_time = "3"
+
+song_list_format = "(6f)[withe]{l} (25)[green]{a} (5)[]{n} (40)[]{t|f} (30)[yellow]{b}"
+song_status_format = "{(%l) }{%a - }{%t}|{%f}"
+song_library_format = "{%n - }{%t}|{%f}"
+media_library_primary_tag = "artist"
+tags_separator = " | "
+now_playing_prefix = "$b$u"
+now_playing_suffix = "$/b$/u"
+locked_screen_width_part = 50
+ask_for_locked_screen_width_part = no
+
+browser_sort_mode = "format"
+
+alternative_header_first_line_format = "{$b$2%t$9$/b}"
+alternative_header_second_line_format ="$8{%a} - {%b}"
+
+playlist_shorten_total_times = "no"
+playlist_display_mode = "columns" (classic/columns)
+browser_display_mode = "columns" (classic/columns)
+search_engine_display_mode = "columns" (classic/columns)
+
+incremental_seeking = "yes"
+seek_time = "1"
+autocenter_mode = "yes"
+centered_cursor = "no"
+
+progressbar_look = "->-"
+default_place_to_search_in = "database" (database/playlist)
+
+user_interface = "classic" (classic/alternative)
+
+default_find_mode = "wrapped" (wrapped/normal)
+default_tag_editor_pattern = "%n - %t"
+
+header_visibility = "no"
+statusbar_visibility = "yes"
+titles_visibility = "no"
+header_text_scrolling = "yes"
+cyclic_scrolling = "no"
+lines_scrolled = "5"
+follow_now_playing_lyrics = "no"
+store_lyrics_in_song_dir = "no"
+
+jump_to_now_playing_song_at_start = "yes"
+
+clock_display_seconds = "yes"
+display_volume_level = "yes"
+display_bitrate = "yes"
+display_remaining_time = "no"
+regular_expressions = "extended" (basic/extended)
+ignore_leading_the = "yes"
+mouse_support = "yes"
+mouse_list_scroll_whole_page = "yes"
+empty_tag_marker = " -- ‼ -- "
+enable_window_title = yes
+search_engine_default_search_mode = "2"
+
+external_editor = "emacsclient -t"
+use_console_editor = "yes"
+
+colors_enabled = "yes"
+empty_tag_color = "blue"
+header_window_color = "white"
+volume_color = "white"
+state_line_color = "blue"
+state_flags_color = "blue"
+main_window_color = "white"
+color1 = "blue"
+color2 = "white"
+current_item_prefix = "$(cyan)$r"
+current_item_suffix = "$/r$(end)"
+progressbar_color = "cyan"
+progressbar_elapsed_color = "white"
+statusbar_color = "white"
+alternative_ui_separator_color = "black"
+current_item_inactive_column_prefix = "$(white)$r"
+current_item_inactive_column_suffix = "$/r$(end)"
+active_window_border = "blue"
+window_border_color = "blue"
+#+end_src
+*** art.sh
+#+begin_src sh :tangle ~/.config/ncmpcpp/art.sh :tangle-mode (identity #o755)
+#!/usr/bin/env sh
+
+#-------------------------------#
+# Generate current song cover   #
+# ffmpeg version                #
+#-------------------------------#
+MPD_CONF=~/.config/mpd/mpd.conf
+MUSIC_DIR=$(cat "$MPD_CONF" | grep -v '#' | grep 'music_directory' | cut -d ' ' -f2 | awk '{print $2}' | sed 's/"//g')
+COVER="/tmp/cover.png"
+COVER_SIZE=300
+
+BORDERS=false
+BORDER_WIDTH=5
+BORDER_COLOR="white"
+
+function ffmpeg_cover {
+    if $BORDERS; then
+        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1,pad=$COVER_SIZE+$BORDER_WIDTH:ow:(ow-iw)/2:(oh-ih)/2:$BORDER_COLOR" "$COVER"
+    else
+        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1" "$COVER"
+    fi
+}
+
+function fallback_find_cover {
+    album="${file%/*}"
+    album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\).*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    if [ "$album_cover" == "" ]; then
+        album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    fi
+    if [ "$album_cover" == "" ]; then
+        album_cover="$(find "$album/.." -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\|booklet\).*?1[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
+    fi
+    album_cover="$(echo -n "$album_cover" | head -n1)"
+}
+
+{
+    file="$MUSIC_DIR/$(mpc --format %file% current)"
+
+    if [[ -n "$file" ]] ; then
+        if ffmpeg_cover "$file"; then
+            exit
+        else
+            fallback_find_cover
+            ffmpeg_cover "$album_cover"
+        fi
+    fi
+} &
+#+end_src
+*** cover.sh
+#+begin_src bash :tangle ~/.config/ncmpcpp/cover.sh :tangle-mode (identity #o755)
+#!/usr/bin/env bash
+
+#-------------------------------#
+# Display current cover         #
+# ueberzug version              #
+#-------------------------------#
+
+function ImageLayer {
+    [[ -z $(pgrep ueberzug) ]] && ueberzug layer -sp json
+}
+
+COVER="/tmp/cover.png"
+X_PADDING=0
+Y_PADDING=0
+
+function add_cover {
+    if [ -e $COVER ]; then
+        echo "{\"action\": \"add\", \"identifier\": \"cover\", \"x\": $X_PADDING, \"y\": $Y_PADDING, \"path\": \"$COVER\"}";
+    fi
+}
+
+clear
+ImageLayer -< <(
+    add_cover
+    while inotifywait -q -q -e close_write "$COVER"; do
+        add_cover
+    done
+)
+#+end_src
+*** tmux_session
+#+begin_src conf :tangle ~/.config/ncmpcpp/tmux_session
+neww
+set -g status off
+send-keys '~/.config/ncmpcpp/cover.sh' C-m
+split-window -h
+resize-pane -t 1 -x 35
+send-keys 'ncmpcpp' C-m
 #+end_src
 ** picom
 #+begin_src conf :tangle ~/.config/picom.conf
@@ -2953,26 +3227,6 @@ switch="Alt+x"
 insert_pass="Alt+n"
 
 #+end_src
-** xprofile
-#+begin_src conf :tangle ~/.xprofile
-#!/usr/bin/env sh
-export QT_QPA_PLATFORMTHEME=qt5ct
-export QT_PLATFORMTHEME=qt5ct
-export QT_PLATFORM_PLUGIN=qt5ct
-
-export DESKTOP_SESSION=gnome
-
-export RANGER_LOAD_DEFAULT_RC=FALSE
-export _JAVA_AWT_WM_NONREPARENTING=1
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
-
-export CM_LAUNCHER=rofi
-export CM_DIR=~/.cache
-
-xsetroot -cursor_name left_ptr &
-unclutter &
-wmname LG3D &
-#+end_src
 ** xonsh
 #+begin_src xonsh :tangle ~/.xonshrc
 # -*- coding: utf-8 -*-
@@ -3000,9 +3254,10 @@ $SHELL_TYPE = 'prompt_toolkit'
 if os.path.exists(f'{$HOME}/.pyenv'):
     $PYENV_ROOT = f'{$HOME}/.pyenv'
     $PATH.insert(0, $PYENV_ROOT + '/bin')
-    source-foreign zsh --overwrite-alias $(pyenv init -)
-    source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
-    $BASH_COMPLETIONS.insert(0, $PYENV_ROOT + '/completions')
+    xontrib load pyenv
+    #source-foreign zsh --overwrite-alias $(pyenv init -)
+    #source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
+    #$BASH_COMPLETIONS.insert(0, $PYENV_ROOT + '/completions')
 
 if os.path.exists(f'{$HOME}/.emacs.d/bin'):
     $PATH.insert(0, $HOME + '/.emacs.d/bin')
@@ -3147,6 +3402,26 @@ del os
 del shlex
 
 #+end_src
+** xprofile
+#+begin_src conf :tangle ~/.xprofile
+#!/usr/bin/env sh
+export QT_QPA_PLATFORMTHEME=qt5ct
+export QT_PLATFORMTHEME=qt5ct
+export QT_PLATFORM_PLUGIN=qt5ct
+
+export DESKTOP_SESSION=gnome
+
+export RANGER_LOAD_DEFAULT_RC=FALSE
+export _JAVA_AWT_WM_NONREPARENTING=1
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'
+
+export CM_LAUNCHER=rofi
+export CM_DIR=~/.cache
+
+xsetroot -cursor_name left_ptr &
+unclutter &
+wmname LG3D &
+#+end_src
 ** zathura
 #+begin_src conf :tangle ~/.config/zathura/zathurarc
 set selection-clipboard clipboard
@@ -3207,276 +3482,4 @@ set completion-fg "#E0E0E0" #0C
 
 set notification-bg "#90A959" #0B
 set notification-fg "#151515" #00
-#+end_src
-** ncmpcpp
-*** config
-#+begin_src conf :tangle ~/.config/ncmpcpp/config
-ncmpcpp_directory = "~/.config/ncmpcpp"
-lyrics_directory = "~/.lyrics"
-execute_on_song_change = "~/.config/ncmpcpp/art.sh"
-
-mpd_host = "localhost"
-mpd_port = "6600"
-mpd_music_dir = "/media/data/Metal"
-mpd_connection_timeout = "5"
-
-audio_output {
-    type "fifo"
-    name "mpd_fifo"
-    path "/tmp/mpd.fifo"
-    format "44100:16:2"
-}
-
-visualizer_in_stereo = "no"
-visualizer_fifo_path = "/tmp/mpd.fifo"
-visualizer_output_name = "mpd_fifo"
-visualizer_sync_interval = 10
-visualizer_type = "spectrum" (spectrum/wave)
-visualizer_look = "||"
-
-playlist_disable_highlight_delay = "5"
-message_delay_time = "3"
-
-song_list_format = "(6f)[withe]{l} (25)[green]{a} (5)[]{n} (40)[]{t|f} (30)[yellow]{b}"
-song_status_format = "{(%l) }{%a - }{%t}|{%f}"
-song_library_format = "{%n - }{%t}|{%f}"
-media_library_primary_tag = "artist"
-tags_separator = " | "
-now_playing_prefix = "$b$u"
-now_playing_suffix = "$/b$/u"
-locked_screen_width_part = 50
-ask_for_locked_screen_width_part = no
-
-browser_sort_mode = "format"
-
-alternative_header_first_line_format = "{$b$2%t$9$/b}"
-alternative_header_second_line_format ="$8{%a} - {%b}"
-
-playlist_shorten_total_times = "no"
-playlist_display_mode = "columns" (classic/columns)
-browser_display_mode = "columns" (classic/columns)
-search_engine_display_mode = "columns" (classic/columns)
-
-incremental_seeking = "yes"
-seek_time = "1"
-autocenter_mode = "yes"
-centered_cursor = "no"
-
-progressbar_look = "->-"
-default_place_to_search_in = "database" (database/playlist)
-
-user_interface = "classic" (classic/alternative)
-
-default_find_mode = "wrapped" (wrapped/normal)
-default_tag_editor_pattern = "%n - %t"
-
-header_visibility = "no"
-statusbar_visibility = "yes"
-titles_visibility = "no"
-header_text_scrolling = "yes"
-cyclic_scrolling = "no"
-lines_scrolled = "5"
-follow_now_playing_lyrics = "no"
-store_lyrics_in_song_dir = "no"
-
-jump_to_now_playing_song_at_start = "yes"
-
-clock_display_seconds = "yes"
-display_volume_level = "yes"
-display_bitrate = "yes"
-display_remaining_time = "no"
-regular_expressions = "extended" (basic/extended)
-ignore_leading_the = "yes"
-mouse_support = "yes"
-mouse_list_scroll_whole_page = "yes"
-empty_tag_marker = " -- ‼ -- "
-enable_window_title = yes
-search_engine_default_search_mode = "2"
-
-external_editor = "emacsclient -t"
-use_console_editor = "yes"
-
-colors_enabled = "yes"
-empty_tag_color = "blue"
-header_window_color = "white"
-volume_color = "white"
-state_line_color = "blue"
-state_flags_color = "blue"
-main_window_color = "white"
-color1 = "blue"
-color2 = "white"
-current_item_prefix = "$(cyan)$r"
-current_item_suffix = "$/r$(end)"
-progressbar_color = "cyan"
-progressbar_elapsed_color = "white"
-statusbar_color = "white"
-alternative_ui_separator_color = "black"
-current_item_inactive_column_prefix = "$(white)$r"
-current_item_inactive_column_suffix = "$/r$(end)"
-active_window_border = "blue"
-window_border_color = "blue"
-#+end_src
-*** art.sh
-#+begin_src sh :tangle ~/.config/ncmpcpp/art.sh :tangle-mode (identity #o755)
-#!/usr/bin/env sh
-
-#-------------------------------#
-# Generate current song cover   #
-# ffmpeg version                #
-#-------------------------------#
-MPD_CONF=~/.config/mpd/mpd.conf
-MUSIC_DIR=$(cat "$MPD_CONF" | grep -v '#' | grep 'music_directory' | cut -d ' ' -f2 | awk '{print $2}' | sed 's/"//g')
-COVER="/tmp/cover.png"
-COVER_SIZE=300
-
-BORDERS=false
-BORDER_WIDTH=5
-BORDER_COLOR="white"
-
-function ffmpeg_cover {
-    if $BORDERS; then
-        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1,pad=$COVER_SIZE+$BORDER_WIDTH:ow:(ow-iw)/2:(oh-ih)/2:$BORDER_COLOR" "$COVER"
-    else
-        ffmpeg -loglevel 0 -y -i "$1" -vf "scale=$COVER_SIZE:-1" "$COVER"
-    fi
-}
-
-function fallback_find_cover {
-    album="${file%/*}"
-    album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\).*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
-    if [ "$album_cover" == "" ]; then
-        album_cover="$(find "$album" -type d -exec find {} -maxdepth 1 -type f -iregex ".*[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
-    fi
-    if [ "$album_cover" == "" ]; then
-        album_cover="$(find "$album/.." -type d -exec find {} -maxdepth 1 -type f -iregex ".*\(cover?s\|folder?s\|artwork?s\|front?s\|scan?s\|booklet\).*?1[.]\(jpe?g\|png\|gif\|bmp\)" \;)"
-    fi
-    album_cover="$(echo -n "$album_cover" | head -n1)"
-}
-
-{
-    file="$MUSIC_DIR/$(mpc --format %file% current)"
-
-    if [[ -n "$file" ]] ; then
-        if ffmpeg_cover "$file"; then
-            exit
-        else
-            fallback_find_cover
-            ffmpeg_cover "$album_cover"
-        fi
-    fi
-} &
-#+end_src
-*** cover.sh
-#+begin_src bash :tangle ~/.config/ncmpcpp/cover.sh :tangle-mode (identity #o755)
-#!/usr/bin/env bash
-
-#-------------------------------#
-# Display current cover         #
-# ueberzug version              #
-#-------------------------------#
-
-function ImageLayer {
-    [[ -z $(pgrep ueberzug) ]] && ueberzug layer -sp json
-}
-
-COVER="/tmp/cover.png"
-X_PADDING=0
-Y_PADDING=0
-
-function add_cover {
-    if [ -e $COVER ]; then
-        echo "{\"action\": \"add\", \"identifier\": \"cover\", \"x\": $X_PADDING, \"y\": $Y_PADDING, \"path\": \"$COVER\"}";
-    fi
-}
-
-clear
-ImageLayer -< <(
-    add_cover
-    while inotifywait -q -q -e close_write "$COVER"; do
-        add_cover
-    done
-)
-#+end_src
-*** tmux_session
-#+begin_src conf :tangle ~/.config/ncmpcpp/tmux_session
-neww
-set -g status off
-send-keys '~/.config/ncmpcpp/cover.sh' C-m
-split-window -h
-resize-pane -t 1 -x 35
-send-keys 'ncmpcpp' C-m
-#+end_src
-** kitty
-#+begin_src conf :tangle ~/.config/kitty/kitty.conf
-font_family      <<font-name>>
-font_size        <<font-size>>
-bold_font        auto
-italic_font      auto
-bold_italic_font auto
-
-allow_remote_control yes
-
-remember_window_size  no
-initial_window_width 100c
-initial_window_height 30c
-
-enable_audio_bell no
-
-cursor #cccccc
-cursor_text_color #111111
-cursor_shape underline
-cursor_blink_interval 0.0
-cursor_stop_blinking_after 15.0
-
-scrollback_lines 2000
-scrollback_pager less --chop-long-lines --RAW-CONTROL-CHARS +INPUT_LINE_NUMBER
-wheel_scroll_multiplier 5.0
-
-url_color #0087BD
-url_style double
-open_url_modifiers kitty_mod
-open_url_with default
-copy_on_select yes
-
-rectangle_select_modifiers ctrl+alt
-select_by_word_characters :@-./_~?&=%+#
-
-click_interval 0.5
-mouse_hide_wait 3.0
-focus_follows_mouse no
-
-foreground #cfcfc2
-background #000000
-
-#: black
-color0 #202020
-color8 #31363b
-
-#: red
-color1 #c0392b
-color9 #f44f4f
-
-#: green
-color2 #218058
-color10 #27ae60
-
-#: yellow
-color3 #fdbc4b
-color11 #fdbc4b
-
-#: blue
-color4 #2980b9
-color12 #0099ff
-
-#: magenta
-color5 #8e44ad
-color13 #af81ff
-
-#: cyan
-color6 #27aeae
-color14 #31dddd
-
-#: white
-color7 #acada1
-color15 #cfd0c2
 #+end_src
