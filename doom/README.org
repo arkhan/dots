@@ -1,4 +1,4 @@
-#+TITLE:   Configuración de Emacs usando Doom Emacs
+#+TITLE:   Cofiguración de Emacs usando Doom Emacs
 #+DATE:    mayo 13, 2019
 #+SINCE:   {replace with next tagged release version}
 
@@ -22,7 +22,7 @@
        ophints
        (popup +all
               +defaults)
-       (pretty-code +fira)
+       (pretty-code +pragmata-pro)
        unicode
        vc-gutter
        window-select
@@ -73,6 +73,7 @@
             +habit
             +protocol
             +rest)
+       (python +lsp)
        rest
        (sh +zsh)
 
@@ -179,7 +180,7 @@
 #+END_SRC
 ** Font
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(setq doom-font (font-spec :family "Cascadia Emacs" :size 15))
+(setq doom-font (font-spec :family "PragmataPro Mono Liga" :pixelsize 13.5))
 #+END_SRC
 ** Imenu
 *** Package
@@ -478,7 +479,7 @@
 #+END_SRC
 ** Python
 *** Packages
-#+BEGIN_SRC emacs-lisp :tangle packages.el
+#+BEGIN_SRC emacs-lisp :tangle no
 (package! lsp-python-ms
   :recipe (:host github :repo "andrew-christianson/lsp-python-ms"))
 (package! pyenv-mode)
@@ -487,7 +488,7 @@
 (package! pip-requirements)
 #+END_SRC
 *** Config
-#+BEGIN_SRC emacs-lisp :tangle config.el
+#+BEGIN_SRC emacs-lisp :tangle no
 (set-pretty-symbols! 'python-mode
   :lambda "lambda"
   :not "not"
@@ -615,25 +616,11 @@
 ** SQL
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
-(package! edbi-database-url)
-(package! edbi-minor-mode)
-(package! company-edbi)
 (package! sqlup-mode)
 (package! sql-indent)
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp :tangle config.el
-(use-package! edbi-database-url)
-
-(use-package! edbi-minor-mode
-  :hook (sql-mode . edbi-minor-mode))
-
-(use-package! company-edbi
-  :init
-  (defun cfg:edbi-mode-hook()
-    (add-to-list 'company-backends 'company-edbi))
-  (add-hook 'edbi:sql-mode-hook 'cfg:edbi-mode-hook))
-
 (use-package! sqlup-mode
   :bind ("C-c u" . sqlup-capitalize-keywords-in-region)
   :init
@@ -870,7 +857,7 @@
    '(term-color-white ((t (:background "#acada1" :foreground "#cfd0c2"))))
    '(term-color-yellow ((t (:background "#fdbc4b" :foreground "#fdbc4b"))))))
 #+END_SRC
-** mu4e
+** COMMENT mu4e
 *** Packages
 #+BEGIN_SRC emacs-lisp :tangle packages.el
 (when (executable-find "mu")

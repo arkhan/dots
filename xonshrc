@@ -1,10 +1,11 @@
 # coding: utf-8
+# -*- mode: xonsh; -*-
 
 import os
 import shlex
 from shutil import which
 
-source-foreign bash --login True --overwrite-alias "echo loading xonsh foreign shell"
+source-foreign zsh --login True --overwrite-alias "echo loading xonsh foreign shell"
 
 xontrib load readable-traceback
 
@@ -13,16 +14,20 @@ if ${...}.get('INSIDE_EMACS', False):
 else:
     $TITLE = '{current_job:{} | }{user}@{hostname}: {short_cwd} | xonsh'
 
+if $TERM == "dumb":
+    $PS1="> "
+
 $HOME = os.path.expanduser('~')
 $PATH.insert(0, $HOME + '/.bin')
 $PATH.insert(0, $HOME + '/.local/bin')
 $SHELL_TYPE = 'prompt_toolkit'
 
-if $(which pyenv):
+if os.path.exists(f'{$HOME}/.pyenv'):
     $PYENV_ROOT = f'{$HOME}/.pyenv'
+    $PATH.insert(0, $PYENV_ROOT + '/bin')
     source-foreign zsh --overwrite-alias $(pyenv init -)
-    if $(which pyenv-virtualenv):
-        source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
+    source-foreign zsh --overwrite-alias $(pyenv virtualenv-init -)
+    $BASH_COMPLETIONS.insert(0, $PYENV_ROOT + '/completions')
 
 if os.path.exists(f'{$HOME}/.emacs.d/bin'):
     $PATH.insert(0, $HOME + '/.emacs.d/bin')
@@ -77,7 +82,7 @@ def pyenv_prompt():
 
 $PROMPT_FIELDS['pyenv_prompt'] = pyenv_prompt
 
-$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} >{NO_COLOR} "
+$PROMPT = "{BOLD_WHITE}{pyenv_prompt}{NO_COLOR}{BOLD_BLUE} »{NO_COLOR} "
 $RIGHT_PROMPT = "{gitstatus: {}} {BOLD_INTENSE_BLACK}{short_cwd}{NO_COLOR} "
 
 # Aliases (yeah... no shit, kid)
@@ -133,6 +138,7 @@ pairs = (
     ('pyb', 'python setup.py build'),
     ('ggpull', _git_pull_current_branch),
     ('ggpush', _git_push_current_branch),
+    ('ggpt', 'git pull --tags'),
     ('dco', 'docker-compose'),
     ('dcb', 'docker-compose build'),
     ('dce', 'docker-compose exec'),
@@ -163,3 +169,4 @@ for pair in pairs:
 aliases.update(custom)
 
 del os
+del shlex

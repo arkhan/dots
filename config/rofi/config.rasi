@@ -1,7 +1,7 @@
 Configuration {
   width: 30;
   lines: 5;
-  font: "Terminus 12";
+  font: "Fira Code Retina 10";
   location: 0;
   fixed-num-lines: false;
   terminal: "xst -e";

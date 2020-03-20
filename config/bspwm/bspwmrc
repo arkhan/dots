@@ -56,6 +56,7 @@ bspc rule -a Wine follow=off desktop=^6 state=tiled
 bspc rule -a sxiv follow=off state=floating
 bspc rule -a URxvt:Terminal follow=off state=floating center=on
 bspc rule -a *:Terminal follow=off state=floating center=on
+bspc rule -a *:Buscando follow=off state=floating center=on
 
 # Xresources
 xrdb ~/.Xresources &
@@ -63,7 +64,7 @@ xrdb ~/.Xresources &
 [[ -z $(pgrep feh) ]] && feh --bg-fill $HOME/.dots/walls/03.jpg &
 
 # i3lock Fancy
-[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'Cascadia-Code' &
+[[ -z $(pgrep xss-lock) ]] && xss-lock -- i3lock-fancy-dualmonitor -p -f 'PragmataPro-Mono-Regular' &
 # clipboard
 [[ -z $(pgrep clipboard) ]] && ~/.bin/clipboard &
 # panel
@@ -72,3 +73,26 @@ xrdb ~/.Xresources &
 [[ -z $(pgrep udiskie) ]] && udiskie &
 # sxhkd
 [[ -z $(pgrep sxhkd) ]] && sxhkd &
+# xcompmgr
+[[ -z $(pgrep xcompmgr) ]] && xcompmgr -c -C -t-5 -l-5 -r4.2 &
+
+#! /bin/sh
+
+window_id=$1
+class=$2
+instance=$3
+
+#WM_WINDOW_ROLE Rules
+role=$(xprop -id $1 | grep WM_WINDOW_ROLE | awk -F '"' '{print $2}')
+case "$role" in
+  quake) #Tilix Quake
+    echo "state=floating"
+    echo "border=off"
+    ;;
+  pop-up|bubble|task_dialog|Preferences|dialog|menu)
+    echo "state=floating"
+    ;;
+  About|Organizer|Buscando) #Firefox
+    echo "state=floating"
+    ;;
+esac

@@ -14,5 +14,3 @@ xsetroot -cursor_name left_ptr &
 unclutter &
 
 wmname LG3D &
-
-compton -CG &

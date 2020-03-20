@@ -8,6 +8,17 @@
 c = c  # noqa
 config = config  # noqa
 
+config.set(
+    "content.headers.user_agent",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/77.0",
+    "https://accounts.google.com/*",
+)
+config.set(
+    "content.headers.user_agent",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/77.0",
+    "https://web.whatsapp.com/*",
+)
+
 # Require a confirmation before quitting the application.
 # Type: ConfirmQuit
 # Valid values:
@@ -183,7 +194,8 @@ c.colors.tabs.pinned.even.bg = "black"
 # Default monospace fonts. Whenever "monospace" is used in a font
 # setting, it's replaced with the fonts listed here.
 # Type: Font
-c.fonts.monospace = "Cascadia Code"
+c.fonts.default_family = "PragmataPro Mono"
+c.fonts.default_size = "13.5pt"
 
 # Bindings for normal mode
 config.unbind("/")

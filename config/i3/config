@@ -3,7 +3,7 @@
 set $bin $HOME/.bin
 
 # Terminal
-set $term xst -g 100x30
+set $term kitty
 
 # Display
 set $edp1 eDP1
@@ -25,10 +25,10 @@ floating_modifier $mod4
 bindsym $mod4+F1 exec $bin/hotkeys i3
 
 # %%hotkey: Launch a terminal %%
-bindsym $mod4+Return exec $term
+bindsym $mod4+Return exec $term --class=Terminal
 
 # %%hotkey: Launch terminal with tmux session %%
-bindsym $mod4+Shift+Return exec $term -e $bin/tmx
+bindsym $mod4+Shift+Return exec $term --class=TMux $bin/tmx
 
 # %%hotkey: Launch rofi as program launcher %%
 bindsym $mod4+d exec $bin/rofi-run
@@ -53,13 +53,11 @@ bindsym $mod4+c exec rofi -show calc -modi calc -no-show-match -no-sort
 
 # Programs
 ## Ranger
-bindsym $mod4+Control+t exec $term -n Ranger -e ranger
-## Weechat
-bindsym $mod4+Control+i exec $term -n Weechat -e weechat
+bindsym $mod4+Control+t exec $term --class=Ranger ranger
 ## Ncmpcpp
-bindsym $mod4+Control+p exec $term -n Ncmpcpp -e ncmpcpp
+bindsym $mod4+Control+p exec $term --class=Ranger ncmpcpp
 ## RTorrent
-bindsym $mod4+Control+d exec $term -n RTorrent -e rtorrent
+bindsym $mod4+Control+d exec $term --class=RTorrent rtorrent
 ## Emacs
 bindsym $mod4+Control+e exec /usr/bin/emacs
 
@@ -256,27 +254,31 @@ client.placeholder      #000000 #000000 #747474 #000000   #0c0c0c
 client.background       #000000
 
 # Xresources
-exec --no-startup-id xrdb $HOME/.Xresources
+# exec --no-startup-id xrdb $HOME/.Xresources
 # Wallpaper
 exec --no-startup-id feh --bg-fill $HOME/.dots/walls/03.jpg
 # i3lock Fancy
-exec --no-startup-id xss-lock -- i3lock-fancy-dualmonitor -p -f 'Operator-Mono-Bold'
+exec --no-startup-id xss-lock -- i3lock-fancy-dualmonitor -p -f 'PragmataPro-Mono-Regular'
 # Clipboard
 exec --no-startup-id $bin/clipboard
 # udiskie
 exec --no-startup-id udiskie
+#
+exec --no-startup-id xcompmgr -c -C -t-5 -l-5 -r4.2
 
 assign [title="Firefox|Iceweasel|qutebrowser|Webmacs"] $ws1
 assign [title="Telegram"] $ws2
 assign [class="URxvt" instance="Weechat"] $ws2
-assign [class="(?i)tuxcmd|Spacefm|doublecmd"] $ws4
+assign [class="(?i)tuxcmd|Spacefm|doublecmd|Ranger"] $ws4
 assign [class="URxvt" instance="Ranger"] $ws4
 assign [class="(?i)St" instance="Ranger"] $ws4
 assign [class="(?i)thunderbird|(?i)icedove"] $ws3
 assign [class="JDownloader|Syncthing GTK"] $ws5
+assign [class="RTorrent"] $ws5
 assign [class="URxvt" instance="RTorrent"] $ws5
 assign [class="(?i)St" instance="RTorrent"] $ws5
 assign [class="Lxappearance|(?i)qt5ct|(?i)AnyDesk"] $ws6
+assign [class="Ncmpcpp"] $ws7
 assign [class="URxvt" instance="Ncmpcpp"] $ws7
 assign [class="(?i)St" instance="Ncmpcpp"] $ws7
 assign [class="(?i)mpv|(?i)smplayer|(?i)obs|(?i)cantata"] $ws7
@@ -289,7 +291,7 @@ assign [title="nomacs"] $ws7
 assign [class="Wine"] $ws6
 
 # Floating
-for_window [class="(?i)lxappearance|(?i)qt5ct|(?i)urxvt|(?i)pinentry|(?i)GtkLP"] floating enable
+for_window [class="(?i)lxappearance|(?i)qt5ct|(?i)urxvt|(?i)pinentry|(?i)GtkLP|Terminal"] floating enable
 for_window [title="(?i)systemsettings"] floating enable
 for_window [title="(?i)st"] floating enable
 
